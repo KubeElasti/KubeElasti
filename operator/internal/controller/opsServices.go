@@ -56,7 +56,7 @@ func (r *ElastiServiceReconciler) checkAndCreatePrivateService(ctx context.Conte
 	// We also need to remove the resourceVersion
 	privateSVC.ResourceVersion = ""
 
-	// We also need to remove ownerReferences, and make the private service is managed explicitly by us
+	// We also need to remove ownerReferences, and make the private service managed explicitly by us
 	privateSVC.OwnerReferences = nil
 
 	// Make sure the private service is owned by the ElastiService
