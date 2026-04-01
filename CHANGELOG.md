@@ -29,6 +29,7 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 * docs: replace Discord links with CNCF Slack by @shubhamrai1993 in [`254`](https://github.com/KubeElasti/KubeElasti/pull/254)
 
 ## New Contributors
+
 * @artazar made their first contribution in [`241`](https://github.com/KubeElasti/KubeElasti/pull/241)
 * @chaserhkj made their first contribution in [`256`](https://github.com/KubeElasti/KubeElasti/pull/256)
 
