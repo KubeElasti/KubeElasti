@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Other
+
+* docs: add project governance document and link it from contributor-facing docs
+
 ## v0.1.22 (2026-04-01)
 
 ### Breaking Changes
@@ -158,4 +162,3 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 * dont scale up replicas if the current replicas are greater by @shubhamrai1993 in [#119](https://github.com/truefoundry/KubeElasti/pull/119)
 * fix: port 5000 is used by the systems, using it might be hurdle for u… by @ramantehlan in [#120](https://github.com/truefoundry/KubeElasti/pull/120)
 * dont scale down new service and handle missing prom data by @shubhamrai1993 in [#121](https://github.com/truefoundry/KubeElasti/pull/121)
-
