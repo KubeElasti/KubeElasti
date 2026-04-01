@@ -10,6 +10,8 @@ Open source is at the heart of Elasti. We appreciate feedback, ideas, and enhanc
 
 Before contributing, please take a moment to read through the [README](./README.md) as it provides a comprehensive understanding of the project and are essential reading to ensure that we're all on the same page.
 
+For information about project roles, maintainer responsibilities, and decision-making, see [GOVERNANCE.md](./GOVERNANCE.md).
+
 ## 💻 Development
 
 Refer to [DEVELOPMENT.md](./DEVELOPMENT.md) to get started with the development on Elasti code base.
