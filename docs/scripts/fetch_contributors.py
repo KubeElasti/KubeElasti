@@ -12,7 +12,7 @@ import urllib.request
 import urllib.error
 
 # Repository information
-REPO_OWNER = "truefoundry"
+REPO_OWNER = "KubeElasti"
 REPO_NAME = "KubeElasti"
 OUTPUT_PATH = "docs/assets/contributors.json"
 
