@@ -38,16 +38,6 @@ hide:
   </div>
 </div>
 
-<!-- Companies Section -->
-<!-- <div class="companies-section">
-  <h2>Trusted By</h2>
-  <div class="company-logos">
-    <div class="company-logo placeholder">
-      <img src="images/companies/truefoundry.png" alt="Truefoundry Logo">
-    </div>
-  </div>
-</div> -->
-
 <!-- Features Section -->
 <div class="features-section">
   <h2>Key Features</h2>
@@ -208,4 +198,20 @@ spec:
 <div class="footer-cta">
   <h2>Ready to optimize your Kubernetes resources?</h2>
   <a href="/src/gs-setup/" class="md-button md-button--primary">Get Started with KubeElasti</a>
+</div>
+
+<div class="cncf-project-section">
+  <p class="cncf-project-section__eyebrow">Project status</p>
+  <h2>We are a Cloud Native Computing Foundation sandbox project.</h2>
+  <p>KubeElasti was originally created by TrueFoundry.</p>
+  <p>KubeElasti is developed in the open with community discussions, issues, and pull requests in the project repository.</p>
+  <div class="cncf-project-section__meta">
+    <a href="https://www.cncf.io/" target="_blank" rel="noopener noreferrer">
+      <img
+        src="https://www.cncf.io/wp-content/uploads/2022/07/cncf-color-bg.svg"
+        alt="Cloud Native Computing Foundation logo"
+        class="cncf-project-section__logo"
+      >
+    </a>
+  </div>
 </div>
