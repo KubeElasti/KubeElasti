@@ -13,6 +13,7 @@ import (
 
 	sentryhttp "github.com/getsentry/sentry-go/http"
 
+	"github.com/truefoundry/elasti/resolver/internal/crdcache"
 	"github.com/truefoundry/elasti/resolver/internal/handler"
 	"github.com/truefoundry/elasti/resolver/internal/hostmanager"
 	"github.com/truefoundry/elasti/resolver/internal/operator"
@@ -48,6 +49,8 @@ type config struct {
 	InitialCapacity int `split_words:"true" default:"100"`
 	// HeaderForHost is the header to look for to get the host
 	HeaderForHost string `split_words:"true" default:"Host"`
+	// CRDCachePollIntervalMinutes is the interval in minutes to poll operator for CRD cache
+	CRDCachePollIntervalMinutes int `split_words:"true" default:"5"`
 	// Sentry config
 	SentryDsn string `split_words:"true" default:""`
 	SentryEnv string `envconfig:"SENTRY_ENVIRONMENT" default:""`
@@ -91,6 +94,8 @@ func main() {
 	k8sUtil := k8shelper.NewOps(logger, config)
 	newOperatorRPC := operator.NewOperatorClient(logger, time.Duration(env.OperatorRetryDuration)*time.Second)
 	newHostManager := hostmanager.NewHostManager(logger, time.Duration(env.TrafficReEnableDuration)*time.Second, env.HeaderForHost)
+	crdCache := crdcache.New(logger, newOperatorRPC, time.Duration(env.CRDCachePollIntervalMinutes)*time.Minute)
+	crdCache.StartBackground()
 	newTransport := throttler.NewProxyAutoTransport(env.MaxIdleProxyConns, env.MaxIdleProxyConnsPerHost)
 	newThrottler := throttler.NewThrottler(&throttler.Params{
 		QueueRetryDuration:      time.Duration(env.QueueRetryDuration) * time.Second,
@@ -108,6 +113,7 @@ func main() {
 	// Create a handler
 	requestHandler := handler.NewHandler(&handler.Params{
 		Logger:      logger,
+		CRDCache:    crdCache,
 		ReqTimeout:  time.Duration(env.ReqTimeout) * time.Second,
 		OperatorRPC: newOperatorRPC,
 		HostManager: newHostManager,
@@ -143,6 +149,7 @@ func main() {
 	internalServeMux := http.NewServeMux()
 	internalServeMux.Handle("/metrics", promhttp.Handler())
 	internalServeMux.Handle("/queue-status", sentryHandler.HandleFunc(requestHandler.GetQueueStatus))
+	internalServeMux.Handle("/crd-cache-status", sentryHandler.HandleFunc(requestHandler.GetCRDCacheStatus))
 	internalServeMux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, err := w.Write([]byte("ok"))
@@ -159,6 +166,7 @@ func main() {
 			return
 		}
 	})
+
 	internalServer := &http.Server{
 		Addr:              internalPort,
 		Handler:           internalServeMux,

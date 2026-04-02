@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
+	"github.com/truefoundry/elasti/resolver/internal/crdcache"
 	"github.com/truefoundry/elasti/resolver/internal/prom"
 	"github.com/truefoundry/elasti/resolver/internal/throttler"
 
@@ -28,6 +29,7 @@ type (
 		transport   http.RoundTripper
 		bufferPool  httputil.BufferPool
 		timeout     time.Duration
+		crdCache    *crdcache.Cache
 		operatorRPC Operator
 		hostManager HostManager
 	}
@@ -40,6 +42,7 @@ type (
 		HostManager HostManager
 		Throttler   *throttler.Throttler
 		Transport   http.RoundTripper
+		CRDCache    *crdcache.Cache
 	}
 
 	// Operator is to communicate with the operator
@@ -62,6 +65,7 @@ func NewHandler(hc *Params) *Handler {
 		transport:   hc.Transport,
 		bufferPool:  NewBufferPool(),
 		timeout:     hc.ReqTimeout,
+		crdCache:    hc.CRDCache,
 		operatorRPC: hc.OperatorRPC,
 		hostManager: hc.HostManager,
 	}
@@ -270,5 +274,24 @@ func NewBufferPool() httputil.BufferPool {
 		// allocation when creating the slices. They are implicitly created in the
 		// Get function below.
 		pool: &sync.Pool{},
+	}
+}
+
+func (h *Handler) GetCRDCacheStatus(w http.ResponseWriter, _ *http.Request) {
+	services := h.crdCache.ListCachedServices()
+	response := struct {
+		Count    int                      `json:"count"`
+		Services []crdcache.CachedService `json:"services"`
+	}{
+		Count:    len(services),
+		Services: services,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(w).Encode(response)
+	if err != nil {
+		h.logger.Error("Failed to encode CRD cache status response", zap.Error(err))
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 }
