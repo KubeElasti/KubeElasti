@@ -115,7 +115,7 @@ func (c *Cache) ListCachedServices() []CachedService {
 	cm := c.cache
 
 	var keys []string
-	cm.Range(func(key, value any) bool {
+	cm.Range(func(key, _ any) bool {
 		keys = append(keys, key.(string))
 		return true
 	})

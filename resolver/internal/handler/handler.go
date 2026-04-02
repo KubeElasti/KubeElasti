@@ -277,7 +277,7 @@ func NewBufferPool() httputil.BufferPool {
 	}
 }
 
-func (h *Handler) GetCRDCacheStatus(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetCRDCacheStatus(w http.ResponseWriter, _ *http.Request) {
 	services := h.crdCache.ListCachedServices()
 	response := struct {
 		Count    int                      `json:"count"`
