@@ -113,6 +113,7 @@ func main() {
 	// Create a handler
 	requestHandler := handler.NewHandler(&handler.Params{
 		Logger:      logger,
+		CRDCache:    crdCache,
 		ReqTimeout:  time.Duration(env.ReqTimeout) * time.Second,
 		OperatorRPC: newOperatorRPC,
 		HostManager: newHostManager,
@@ -148,6 +149,7 @@ func main() {
 	internalServeMux := http.NewServeMux()
 	internalServeMux.Handle("/metrics", promhttp.Handler())
 	internalServeMux.Handle("/queue-status", sentryHandler.HandleFunc(requestHandler.GetQueueStatus))
+	internalServeMux.Handle("/crd-cache-status", sentryHandler.HandleFunc(requestHandler.GetCRDCacheStatus))
 	internalServer := &http.Server{
 		Addr:              internalPort,
 		Handler:           internalServeMux,

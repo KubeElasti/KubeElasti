@@ -100,3 +100,14 @@ func (c *Cache) GetElastiService(namespacedServiceName string) (*messages.Elasti
 	}
 	return val.(*messages.ElastiServiceEntry), true
 }
+
+func (c *Cache) GetCacheStatus() int {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	count := 0
+	c.cache.Range(func(key, value any) bool {
+		count++
+		return true
+	})
+	return count
+}
