@@ -4,7 +4,7 @@
   
   <!-- Additional SEO Meta Tags -->
   <meta name="robots" content="index, follow">
-  <meta name="author" content="TrueFoundry">
+  <meta name="author" content="KubeElasti Authors">
   
   <!-- Dynamic Keywords from Page Meta -->
   {% if page and page.meta and page.meta.keywords %}
@@ -26,8 +26,6 @@
   
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:site" content="@truefoundry">
-  <meta name="twitter:creator" content="@truefoundry">
   <meta name="twitter:title" content="{% if page and page.meta and page.meta.title %}{{ page.meta.title }}{% elif page and page.title %}{{ page.title }} - KubeElasti{% else %}KubeElasti - Serverless for Kubernetes{% endif %}">
   <meta name="twitter:description" content="{% if page and page.meta and page.meta.description %}{{ page.meta.description }}{% else %}{{ config.site_description }}{% endif %}">
   <meta name="twitter:image" content="{% if page and page.meta and page.meta.image %}{{ page.meta.image }}{% else %}{{ config.site_url }}images/logo/logo_white_full.png{% endif %}">
@@ -91,9 +89,19 @@
     <span style="margin-left: 20px; margin-right: 20px; font-weight: bold;"> - </span>
     <a href="https://calendar.google.com/calendar/u/0?cid=Y18xNDMzZTE2ZjZkMzM4ZWRhZGViOGNhYjAxNGE1M2IxZmQ2MzZiMjdkOWJlMWNlOTc4Mjk4ODBjMmE5YjEyZDkxQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20" style="color: #ffeb3b; text-decoration: none; font-weight: bold;" target="_blank" rel="noopener noreferrer">📅 Add to Calendar</a>
     <span style="margin-left: 20px; margin-right: 20px; font-weight: bold;"> - </span>
-    <a href="https://discord.gg/qFyN73htgE" style="color: #ffeb3b; text-decoration: none; font-weight: bold;" target="_blank" rel="noopener noreferrer">💬 Join Discord</a>
+    <a href="https://slack.cncf.io/" style="color: #ffeb3b; text-decoration: none; font-weight: bold;" target="_blank" rel="noopener noreferrer">💬 Join CNCF Slack #kubeelasti</a>
     <span style="margin-left: 20px; margin-right: 20px; font-weight: bold;"> - </span>
     <a href="https://github.com/KubeElasti/kubeelasti" style="color: #ffeb3b; text-decoration: none; font-weight: bold;" target="_blank" rel="noopener noreferrer">⭐ Star on GitHub</a>
     
     </div>
+{% endblock %}
+
+{% block footer %}
+  {{ super() }}
+  <div class="cncf-legal-footer">
+    <div class="cncf-legal-footer__inner">
+      <p>Copyright KubeElasti a Series of LF Projects, LLC</p>
+      <p>For website terms of use, trademark policy and other project policies please see <a href="https://lfprojects.org/policies/" target="_blank" rel="noopener noreferrer">lfprojects.org/policies/</a>.</p>
+    </div>
+  </div>
 {% endblock %}

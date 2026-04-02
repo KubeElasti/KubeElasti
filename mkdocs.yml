@@ -1,7 +1,7 @@
 # Site
 site_name: KubeElasti - Serverless for Kubernetes
 site_url: https://kubeelasti.dev/
-site_author: TrueFoundry
+site_author: KubeElasti Authors
 site_description: >-
   KubeElasti is a Kubernetes operator that automatically scales-to-zero your services when they are idle and scales them back up when they receive traffic.
 extra_css:
@@ -12,7 +12,7 @@ repo_name: KubeElasti/KubeElasti
 repo_url: https://github.com/KubeElasti/KubeElasti
 
 # Copyright
-copyright: Copyright &copy; 2025 TrueFoundry
+copyright: Copyright KubeElasti a Series of LF Projects, LLC
 
 theme:
   name: material
@@ -116,25 +116,20 @@ plugins:
 
 extra:
   social:
-    - icon: fontawesome/brands/discord
-      link: https://discord.gg/qFyN73htgE
+    - icon: fontawesome/brands/slack
+      link: https://slack.cncf.io/
     - icon: fontawesome/brands/github
-      link: https://github.com/truefoundry
-    - icon: fontawesome/brands/x-twitter
-      link: https://x.com/truefoundry
-  analytics:
-    provider: google
-    property: G-LQ0TP60DHT
+      link: https://github.com/KubeElasti/KubeElasti
   structured_data:
     organization:
       "@context": "https://schema.org"
       "@type": "Organization"
-      name: "TrueFoundry"
-      url: "https://truefoundry.com"
+      name: "KubeElasti"
+      url: "https://kubeelasti.dev"
       logo: "https://kubeelasti.dev/images/logo/logo_white_full.png"
       sameAs:
-        - "https://github.com/truefoundry"
-        - "https://discord.gg/qFyN73htgE"
+        - "https://github.com/KubeElasti/KubeElasti"
+        - "https://slack.cncf.io/"
     software:
       "@context": "https://schema.org"
       "@type": "SoftwareApplication"
@@ -146,8 +141,8 @@ extra:
       downloadUrl: "https://github.com/KubeElasti/KubeElasti"
       author:
         "@type": "Organization"
-        name: "TrueFoundry"
-        url: "https://truefoundry.com"
+        name: "KubeElasti Authors"
+        url: "https://github.com/KubeElasti/KubeElasti"
       license: "https://github.com/KubeElasti/KubeElasti/blob/main/LICENSE"
       programmingLanguage: "Go"
       keywords: 
@@ -165,8 +160,8 @@ extra:
       description: "Official documentation for KubeElasti - Kubernetes operator for serverless auto-scaling"
       publisher:
         "@type": "Organization"
-        name: "TrueFoundry"
-        url: "https://truefoundry.com"
+        name: "KubeElasti Authors"
+        url: "https://github.com/KubeElasti/KubeElasti"
       potentialAction:
         "@type": "SearchAction"
         target: "https://kubeelasti.dev/search/?q={search_term_string}"
@@ -186,12 +181,12 @@ extra:
       description: "Comprehensive documentation for KubeElasti - Kubernetes operator for serverless auto-scaling"
       author:
         "@type": "Organization"
-        name: "TrueFoundry"
-        url: "https://truefoundry.com"
+        name: "KubeElasti Authors"
+        url: "https://github.com/KubeElasti/KubeElasti"
       publisher:
         "@type": "Organization"
-        name: "TrueFoundry"
-        url: "https://truefoundry.com"
+        name: "KubeElasti Authors"
+        url: "https://github.com/KubeElasti/KubeElasti"
         logo:
           "@type": "ImageObject"
           url: "https://kubeelasti.dev/images/logo/logo_white_full.png"

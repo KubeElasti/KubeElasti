@@ -88,7 +88,7 @@ flowchart TB
 
 !!! tip "Request support for Scale-To-Zero on more resources"
 
-    KubeElasti uses the `/scale` subresource. Which means we can support scale-to-zero on any resource that supports the `/scale` subresource. If you want to request support, please open an issue [here](https://github.com/truefoundry/elasti/issues/new/choose).
+    KubeElasti uses the `/scale` subresource. Which means we can support scale-to-zero on any resource that supports the `/scale` subresource. If you want to request support, please open an issue [here](https://github.com/KubeElasti/KubeElasti/issues/new/choose).
 
 ## Limitations
 

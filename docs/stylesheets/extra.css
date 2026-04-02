@@ -766,6 +766,66 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
+.cncf-project-section {
+  padding: var(--section-padding);
+  text-align: center;
+}
+
+.cncf-project-section__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.9rem;
+  color: var(--elasti-primary);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.cncf-project-section h2 {
+  margin: 0 0 1rem;
+  color: var(--text-color);
+}
+
+.cncf-project-section > p {
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  color: var(--text-color);
+  opacity: 0.9;
+}
+
+.cncf-project-section__meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.cncf-project-section__logo {
+  width: min(320px, 80vw);
+  height: auto;
+}
+
+.cncf-legal-footer {
+  background: var(--md-footer-bg-color);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 1rem 1.2rem 2rem;
+}
+
+.cncf-legal-footer__inner {
+  max-width: 61rem;
+  margin: 0 auto;
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.cncf-legal-footer__inner p {
+  margin: 0.2rem 0;
+}
+
+.cncf-legal-footer__inner a {
+  color: white;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   :root {
@@ -819,5 +879,9 @@
   
   .code-block pre {
     font-size: 0.9rem;
+  }
+
+  .cncf-project-section__meta {
+    flex-direction: column;
   }
 }

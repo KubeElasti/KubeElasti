@@ -36,6 +36,7 @@ Kubernetes clusters can become costly, especially when running multiple services
 - [Monitoring](#monitoring)
 - [Development](#development)
 - [Contribution](#contribution)
+- [Governance](#governance)
 - [Adopters](#adopters)
 - [Getting Help](#getting-help)
 - [Roadmap](#roadmap)
@@ -82,6 +83,10 @@ Refer to [DEVELOPMENT.md](./DEVELOPMENT.md) for more details.
 # Contribution
 
 Contribution details can be found in the [Contribution](./CONTRIBUTING.md) guide.
+
+# Governance
+
+Project governance details, including roles, decision-making, and maintainer responsibilities, are documented in [GOVERNANCE.md](./GOVERNANCE.md).
 
 # Adopters
 

@@ -20,11 +20,11 @@ If you would like to be included in this table, please open an issue and your in
 
 | Organization | Status | Link | More information |
 |--------------|--------|------|------------------|
-| Truefoundry | Production | [truefoundry.com](https://truefoundry.com/) | Used as part of the Truefoundry platform |
-| Automation Anywhere | Development | [automationanywhere.com](https://www.automationanywhere.com/) | Used as part of the Truefoundry platform |
-| Adopt AI | Development | [adopt.ai](https://adopt.ai/) | Used as part of the Truefoundry platform |
-| Aviso AI | Development | [aviso.com](https://aviso.com/) | Used as part of the Truefoundry platform |
-| Brainfish AI | Development | [brainfishai.com](https://brainfishai.com/) | Used as part of the Truefoundry platform |
-| Prodigal Tech | Development | [prodigaltech.com](https://prodigaltech.com/) | Used as part of the Truefoundry platform |
-| Zurich Lab | Production | [zurichlab.in](https://www.zurichlab.in) | Used as part of the Truefoundry platform |
+| TrueFoundry | Production | [truefoundry.com](https://truefoundry.com/) | Uses KubeElasti for scale-to-zero workloads |
+| Automation Anywhere | Development | [automationanywhere.com](https://www.automationanywhere.com/) | Evaluating KubeElasti for Kubernetes scale-to-zero workflows |
+| Adopt AI | Development | [adopt.ai](https://adopt.ai/) | Evaluating KubeElasti for Kubernetes scale-to-zero workflows |
+| Aviso AI | Development | [aviso.com](https://aviso.com/) | Evaluating KubeElasti for Kubernetes scale-to-zero workflows |
+| Brainfish AI | Development | [brainfishai.com](https://brainfishai.com/) | Evaluating KubeElasti for Kubernetes scale-to-zero workflows |
+| Prodigal Tech | Development | [prodigaltech.com](https://prodigaltech.com/) | Evaluating KubeElasti for Kubernetes scale-to-zero workflows |
+| Zurich Lab | Production | [zurichlab.in](https://www.zurichlab.in) | Uses KubeElasti for scale-to-zero workloads |
 | Vxplain | Production | [vxplain.com](https://www.vxplain.com/) | Uses kubeelasti for scale to zero |

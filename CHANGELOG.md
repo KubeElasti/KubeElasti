@@ -8,8 +8,35 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Other
+
+* docs: add project governance document and link it from contributor-facing docs
+
+## v0.1.22 (2026-04-01)
+
+### Breaking Changes
+
 * feat: support scheduled activity for ElastiService objects by `@artazar` in [`#243`](https://github.com/truefoundry/KubeElasti/pull/243)
-* fix: variable name correction for pollingInterval value by `@artazar` in [`#241`](https://github.com/truefoundry/KubeElasti/pull/241)
+* moving all truefoundry/kubeelasti ref to kubeelasti/kubeelasti by @shubhamrai1993 in [`#246`](https://github.com/KubeElasti/KubeElasti/pull/246)
+* add readiness and liveness probe to resolver deployment by @maanas-23 in [`#251`](https://github.com/KubeElasti/KubeElasti/pull/251)
+* fix: clear owner references for private service, allowing referencing services created by other controllers by @chaserhkj in [`256`](https://github.com/KubeElasti/KubeElasti/pull/256)
+
+### Improvements
+
+* Helm Chart Changes by @ramantehlan in [`237`](https://github.com/KubeElasti/KubeElasti/pull/237)
+* fix: variable name correction for pollingInterval value by @artazar in [`241`](https://github.com/KubeElasti/KubeElasti/pull/241)
+
+### Other
+
+* We are officially part of CNCF! by @ramantehlan in [`244`](https://github.com/KubeElasti/KubeElasti/pull/244)
+* Add Raman Tehlan to MAINTAINERS list by @shubhamrai1993 in [`245`](https://github.com/KubeElasti/KubeElasti/pull/245)
+* docs: replace Discord links with CNCF Slack by @shubhamrai1993 in [`254`](https://github.com/KubeElasti/KubeElasti/pull/254)
+
+## New Contributors
+
+* @artazar made their first contribution in [`241`](https://github.com/KubeElasti/KubeElasti/pull/241)
+* @chaserhkj made their first contribution in [`256`](https://github.com/KubeElasti/KubeElasti/pull/256)
+
 
 ## v0.1.21 (2026-01-16)
 
@@ -135,4 +162,3 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 * dont scale up replicas if the current replicas are greater by @shubhamrai1993 in [#119](https://github.com/truefoundry/KubeElasti/pull/119)
 * fix: port 5000 is used by the systems, using it might be hurdle for u… by @ramantehlan in [#120](https://github.com/truefoundry/KubeElasti/pull/120)
 * dont scale down new service and handle missing prom data by @shubhamrai1993 in [#121](https://github.com/truefoundry/KubeElasti/pull/121)
-
