@@ -5,6 +5,9 @@ on:
     tags:
       - v*
 
+permissions:
+  contents: write
+
 env:
   HELM_REGISTRY_URL: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_REGISTRY_URL }}
   HELM_REGISTRY_USERNAME: ${{ secrets.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_USERNAME }}
