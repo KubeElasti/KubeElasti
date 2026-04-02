@@ -149,12 +149,7 @@ func main() {
 	internalServeMux := http.NewServeMux()
 	internalServeMux.Handle("/metrics", promhttp.Handler())
 	internalServeMux.Handle("/queue-status", sentryHandler.HandleFunc(requestHandler.GetQueueStatus))
-<<<<<<< HEAD
 	internalServeMux.Handle("/crd-cache-status", sentryHandler.HandleFunc(requestHandler.GetCRDCacheStatus))
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 14b2891 (feat: add main)
 	internalServeMux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, err := w.Write([]byte("ok"))
