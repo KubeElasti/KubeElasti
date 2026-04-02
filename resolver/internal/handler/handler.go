@@ -278,9 +278,13 @@ func NewBufferPool() httputil.BufferPool {
 }
 
 func (h *Handler) GetCRDCacheStatus(w http.ResponseWriter, r *http.Request) {
-	cacheStatus := h.crdCache.GetCacheStatus()
-	response := Response{
-		Message: fmt.Sprintf("CRD cache has %d services in it", cacheStatus),
+	services := h.crdCache.ListCachedServices()
+	response := struct {
+		Count    int                      `json:"count"`
+		Services []crdcache.CachedService `json:"services"`
+	}{
+		Count:    len(services),
+		Services: services,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

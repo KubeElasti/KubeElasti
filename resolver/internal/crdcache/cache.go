@@ -2,6 +2,7 @@ package crdcache
 
 import (
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 
@@ -101,13 +102,32 @@ func (c *Cache) GetElastiService(namespacedServiceName string) (*messages.Elasti
 	return val.(*messages.ElastiServiceEntry), true
 }
 
-func (c *Cache) GetCacheStatus() int {
+// CachedService is one ElastiService in the resolver's local cache (key is namespace/service-name).
+type CachedService struct {
+	NamespacedName string `json:"namespacedName"`
+	messages.ElastiServiceEntry
+}
+
+// ListCachedServices returns a stable snapshot of cached ElastiService entries.
+func (c *Cache) ListCachedServices() []CachedService {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	count := 0
-	c.cache.Range(func(key, value any) bool {
-		count++
+	cm := c.cache
+
+	var keys []string
+	cm.Range(func(key, value any) bool {
+		keys = append(keys, key.(string))
 		return true
 	})
-	return count
+	sort.Strings(keys)
+	out := make([]CachedService, 0, len(keys))
+	for _, k := range keys {
+		v, ok := cm.Load(k)
+		if !ok {
+			continue
+		}
+		entry := *(v.(*messages.ElastiServiceEntry))
+		out = append(out, CachedService{NamespacedName: k, ElastiServiceEntry: entry})
+	}
+	return out
 }

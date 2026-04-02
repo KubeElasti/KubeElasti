@@ -67,6 +67,14 @@ func TestFetchPopulatesCache(t *testing.T) {
 	if entry.Name != "my-elastiservice" {
 		t.Errorf("Name = %q; want %q", entry.Name, "my-elastiservice")
 	}
+
+	list := c.ListCachedServices()
+	if len(list) != 1 {
+		t.Fatalf("ListCachedServices len = %d; want 1", len(list))
+	}
+	if list[0].NamespacedName != "default/my-svc" || list[0].Name != "my-elastiservice" {
+		t.Errorf("ListCachedServices[0] = %+v; want default/my-svc + my-elastiservice", list[0])
+	}
 }
 
 // TestFetchErrorDoesNotClearCache checks that a failed fetch leaves the previous cache intact.
