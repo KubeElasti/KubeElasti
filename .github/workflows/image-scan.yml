@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: '0 9 * * *'
 
+permissions:
+  contents: write
+
 jobs:
   image-scan-build-resolver:
     name: Image Vulnerability Scan for Build Resolver
