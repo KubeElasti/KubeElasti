@@ -14,6 +14,16 @@ import (
 	"go.uber.org/zap"
 )
 
+var emptyStatusJSON = json.RawMessage(`{}`)
+
+func specJSONWithService(service string) json.RawMessage {
+	b, err := json.Marshal(map[string]string{"service": service})
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
 // swappableHandler lets tests replace the HTTP handler mid-test.
 type swappableHandler struct {
 	mu sync.RWMutex
@@ -50,7 +60,11 @@ func newTestCache(t *testing.T, server *httptest.Server, interval time.Duration)
 func TestFetchPopulatesCache(t *testing.T) {
 	srv := httptest.NewServer(respondWith(&messages.ElastiServiceCacheResponse{
 		Services: map[string]messages.ElastiServiceEntry{
-			"default/my-svc": {Name: "my-elastiservice", Spec: json.RawMessage(`{"service":"my-svc"}`)},
+			"default/my-svc": {
+				Name:   "my-elastiservice",
+				Spec:   specJSONWithService("my-svc"),
+				Status: emptyStatusJSON,
+			},
 		},
 	}))
 	defer srv.Close()
@@ -67,6 +81,15 @@ func TestFetchPopulatesCache(t *testing.T) {
 	if entry.Name != "my-elastiservice" {
 		t.Errorf("Name = %q; want %q", entry.Name, "my-elastiservice")
 	}
+	var spec struct {
+		Service string `json:"service"`
+	}
+	if err := json.Unmarshal(entry.Spec, &spec); err != nil {
+		t.Fatalf("unmarshal entry.Spec: %v", err)
+	}
+	if spec.Service != "my-svc" {
+		t.Errorf("spec.service = %q; want %q", spec.Service, "my-svc")
+	}
 
 	list := c.ListCachedServices()
 	if len(list) != 1 {
@@ -82,7 +105,7 @@ func TestFetchErrorDoesNotClearCache(t *testing.T) {
 	h := &swappableHandler{}
 	h.set(respondWith(&messages.ElastiServiceCacheResponse{
 		Services: map[string]messages.ElastiServiceEntry{
-			"ns/svc": {Name: "es"},
+			"ns/svc": {Name: "es", Spec: specJSONWithService("svc"), Status: emptyStatusJSON},
 		},
 	}))
 	srv := httptest.NewServer(h)
@@ -103,9 +126,12 @@ func TestFetchErrorDoesNotClearCache(t *testing.T) {
 	}
 
 	// Previous data must still be accessible.
-	_, ok := c.GetElastiService("ns/svc")
+	prev, ok := c.GetElastiService("ns/svc")
 	if !ok {
 		t.Fatal("cache was cleared on error; expected previous entry to survive")
+	}
+	if prev.Name != "es" {
+		t.Errorf("Name = %q; want es", prev.Name)
 	}
 }
 
@@ -129,7 +155,7 @@ func TestGetElastiServiceMiss(t *testing.T) {
 func TestConcurrentFetchAndGet(t *testing.T) {
 	srv := httptest.NewServer(respondWith(&messages.ElastiServiceCacheResponse{
 		Services: map[string]messages.ElastiServiceEntry{
-			"ns/svc": {Name: "es"},
+			"ns/svc": {Name: "es", Spec: specJSONWithService("svc"), Status: emptyStatusJSON},
 		},
 	}))
 	defer srv.Close()

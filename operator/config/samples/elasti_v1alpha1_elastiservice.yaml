@@ -7,6 +7,14 @@ metadata:
   name: elastiservice-sample
 spec:
   service: my-service
+  # Synthetic responses while scaled to zero (optional). First match wins.
+  # Empty method matches GET and HEAD only.
+  heartbeat:
+    - path: /healthz
+      response: "ok"
+    - method: GET
+      path: /ready
+      response: '{"ready":true}'
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment

@@ -112,6 +112,10 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 	}
 	h.logger.Debug("request received", zap.Any("host", logger.MaskMiddle(host.IncomingHost, 4, 4)))
 
+	if h.respondHeartbeatIfMatch(w, req, host) {
+		return host, nil
+	}
+
 	prom.QueuedRequestGauge.WithLabelValues(host.SourceService, host.Namespace).Inc()
 	defer prom.QueuedRequestGauge.WithLabelValues(host.SourceService, host.Namespace).Dec()
 
@@ -166,6 +170,37 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 		return host, fmt.Errorf("throttler try error: %w", tryErr)
 	}
 	return host, nil
+}
+
+// respondHeartbeatIfMatch answers configured heartbeat requests locally (no proxy, no operator notify).
+func (h *Handler) respondHeartbeatIfMatch(w http.ResponseWriter, req *http.Request, host *messages.Host) bool {
+	if h.crdCache == nil {
+		return false
+	}
+	key := host.Namespace + "/" + host.SourceService
+	crdDetails, ok := h.crdCache.GetElastiService(key)
+	if !ok {
+		return false
+	}
+	body, matched := crdcache.MatchHeartbeatFromSpec(crdDetails.Spec, req.Method, req.URL.Path)
+	if !matched {
+		return false
+	}
+	h.logger.Debug("heartbeat handled by resolver",
+		zap.String("namespace", host.Namespace),
+		zap.String("service", host.SourceService),
+		zap.String("path", crdcache.NormalizeHTTPPath(req.URL.Path)),
+		zap.String("method", req.Method),
+	)
+	w.Header().Set("Content-Type", crdcache.HeartbeatContentType(body))
+	w.WriteHeader(http.StatusOK)
+	if req.Method == http.MethodHead {
+		return true
+	}
+	if _, err := w.Write([]byte(body)); err != nil {
+		h.logger.Error("heartbeat write response", zap.Error(err))
+	}
+	return true
 }
 
 func (h *Handler) ProxyRequest(w http.ResponseWriter, req *http.Request, host *messages.Host, count int) (rErr error) {

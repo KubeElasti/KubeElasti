@@ -46,6 +46,10 @@ type ElastiServiceSpec struct {
 	ScaleTargetRef ScaleTargetRef `json:"scaleTargetRef"`
 	// Service to scale
 	Service string `json:"service"`
+	// Heartbeat defines synthetic HTTP responses the resolver serves locally (no proxy) while
+	// scaled to zero, e.g. for load balancer health checks. First matching rule wins.
+	// +optional
+	Heartbeat []HeartbeatRule `json:"heartbeat,omitempty"`
 	// Minimum number of replicas to scale to
 	// +kubebuilder:validation:Minimum=1
 	MinTargetReplicas int32 `json:"minTargetReplicas,omitempty" default:"1"`
@@ -63,6 +67,19 @@ type ElastiServiceSpec struct {
 	// When omitted, scale-to-zero is always enabled (default behavior).
 	// When specified, scale-down only occurs during the cron schedule window.
 	EnabledPeriod *EnabledPeriod `json:"enabledPeriod,omitempty"`
+}
+
+// HeartbeatRule is one local response the resolver may return for a matching method and path.
+type HeartbeatRule struct {
+	// Method is the HTTP method to match (e.g. GET, HEAD, POST). If empty, GET and HEAD match.
+	// +optional
+	Method string `json:"method,omitempty"`
+	// Path is the request path (e.g. /healthz). Leading slash is optional; paths are normalized before match.
+	// +kubebuilder:validation:Required
+	Path string `json:"path"`
+	// Response is the literal response body Elasti returns with HTTP 200 when this rule matches.
+	// +kubebuilder:validation:Required
+	Response string `json:"response"`
 }
 
 func (es *ElastiServiceSpec) GetScaleTargetRef() ScaleTargetRef {
