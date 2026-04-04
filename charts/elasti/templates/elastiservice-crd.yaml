@@ -61,11 +61,31 @@ spec:
                 maximum: 604800
                 minimum: 0
                 type: integer
-              heartbeatPath:
+              heartbeat:
                 description: |-
-                  HeartbeatPath is an HTTP path (e.g. /healthz) that the resolver answers locally without
-                  proxying to the workload, so load balancer health checks succeed while scaled to zero.
-                type: string
+                  Heartbeat defines synthetic HTTP responses the resolver serves locally (no proxy) while
+                  scaled to zero, e.g. for load balancer health checks. First matching rule wins.
+                items:
+                  description: HeartbeatRule is one local response the resolver may
+                    return for a matching method and path.
+                  properties:
+                    method:
+                      description: Method is the HTTP method to match (e.g. GET, HEAD,
+                        POST). If empty, GET and HEAD match.
+                      type: string
+                    path:
+                      description: Path is the request path (e.g. /healthz). Leading
+                        slash is optional; paths are normalized before match.
+                      type: string
+                    response:
+                      description: Response is the literal response body Elasti returns
+                        with HTTP 200 when this rule matches.
+                      type: string
+                  required:
+                  - path
+                  - response
+                  type: object
+                type: array
               minTargetReplicas:
                 description: Minimum number of replicas to scale to
                 format: int32

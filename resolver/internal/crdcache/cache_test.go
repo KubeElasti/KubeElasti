@@ -95,7 +95,7 @@ func TestFetchPopulatesCache(t *testing.T) {
 	if len(list) != 1 {
 		t.Fatalf("ListCachedServices len = %d; want 1", len(list))
 	}
-	if list[0].NamespacedName != "default/my-svc" || list[0].CRDDetails.Name != "my-elastiservice" {
+	if list[0].NamespacedName != "default/my-svc" || list[0].Name != "my-elastiservice" {
 		t.Errorf("ListCachedServices[0] = %+v; want default/my-svc + my-elastiservice", list[0])
 	}
 }
