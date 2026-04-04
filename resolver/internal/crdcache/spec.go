@@ -2,24 +2,68 @@ package crdcache
 
 import (
 	"encoding/json"
+	"net/http"
 	"path"
 	"strings"
 )
 
-type elastiserviceSpecFields struct {
-	HeartbeatPath string `json:"heartbeatPath,omitempty"`
+type heartbeatSpecJSON struct {
+	Heartbeat []heartbeatRuleJSON `json:"heartbeat,omitempty"`
 }
 
-// HeartbeatPathFromSpec returns the trimmed heartbeatPath from marshaled ElastiService spec JSON.
-func HeartbeatPathFromSpec(specJSON []byte) string {
+type heartbeatRuleJSON struct {
+	Method   string `json:"method,omitempty"`
+	Path     string `json:"path"`
+	Response string `json:"response"`
+}
+
+// MatchHeartbeatFromSpec returns the configured response body when spec JSON matches method and path.
+// Rules are tried in order; first match wins.
+func MatchHeartbeatFromSpec(specJSON []byte, method, requestPath string) (response string, matched bool) {
 	if len(specJSON) == 0 {
-		return ""
+		return "", false
 	}
-	var s elastiserviceSpecFields
+	var s heartbeatSpecJSON
 	if err := json.Unmarshal(specJSON, &s); err != nil {
-		return ""
+		return "", false
 	}
-	return strings.TrimSpace(s.HeartbeatPath)
+	for _, r := range s.Heartbeat {
+		if strings.TrimSpace(r.Path) == "" {
+			continue
+		}
+		if !httpMethodMatchesRule(r.Method, method) {
+			continue
+		}
+		if !PathsMatchHTTP(requestPath, r.Path) {
+			continue
+		}
+		return r.Response, true
+	}
+	return "", false
+}
+
+func httpMethodMatchesRule(ruleMethod, requestMethod string) bool {
+	rm := strings.TrimSpace(strings.ToUpper(ruleMethod))
+	req := strings.ToUpper(requestMethod)
+	if rm == "" || rm == "*" {
+		return req == http.MethodGet || req == http.MethodHead
+	}
+	return rm == req
+}
+
+// HeartbeatContentType picks Content-Type for a synthetic heartbeat body.
+func HeartbeatContentType(body string) string {
+	b := strings.TrimSpace(body)
+	n := len(b)
+	if n >= 2 {
+		if b[0] == '{' && b[n-1] == '}' {
+			return "application/json; charset=utf-8"
+		}
+		if b[0] == '[' && b[n-1] == ']' {
+			return "application/json; charset=utf-8"
+		}
+	}
+	return "text/plain; charset=utf-8"
 }
 
 // NormalizeHTTPPath returns a canonical path for comparison (leading slash, path.Clean).

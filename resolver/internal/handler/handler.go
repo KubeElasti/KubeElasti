@@ -172,12 +172,8 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 	return host, nil
 }
 
-// respondHeartbeatIfMatch answers heartbeat checks locally when the request path matches
-// heartbeatPath on the cached ElastiService for namespace/sourceService (no proxy, no operator notify).
+// respondHeartbeatIfMatch answers configured heartbeat requests locally (no proxy, no operator notify).
 func (h *Handler) respondHeartbeatIfMatch(w http.ResponseWriter, req *http.Request, host *messages.Host) bool {
-	if req.Method != http.MethodGet && req.Method != http.MethodHead {
-		return false
-	}
 	if h.crdCache == nil {
 		return false
 	}
@@ -186,22 +182,22 @@ func (h *Handler) respondHeartbeatIfMatch(w http.ResponseWriter, req *http.Reque
 	if !ok {
 		return false
 	}
-	hbPath := crdcache.HeartbeatPathFromSpec(crdDetails.Spec)
-	if hbPath == "" {
-		h.logger.Info("Heartbeat path is empty", zap.String("namespace", host.Namespace), zap.String("service", host.SourceService))
-		return false
-	}
-	if !crdcache.PathsMatchHTTP(req.URL.Path, hbPath) {
+	body, matched := crdcache.MatchHeartbeatFromSpec(crdDetails.Spec, req.Method, req.URL.Path)
+	if !matched {
 		return false
 	}
 	h.logger.Debug("heartbeat handled by resolver",
 		zap.String("namespace", host.Namespace),
 		zap.String("service", host.SourceService),
-		zap.String("path", crdcache.NormalizeHTTPPath(hbPath)),
+		zap.String("path", crdcache.NormalizeHTTPPath(req.URL.Path)),
+		zap.String("method", req.Method),
 	)
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Content-Type", crdcache.HeartbeatContentType(body))
 	w.WriteHeader(http.StatusOK)
-	if _, err := w.Write([]byte("ok")); err != nil {
+	if req.Method == http.MethodHead {
+		return true
+	}
+	if _, err := w.Write([]byte(body)); err != nil {
 		h.logger.Error("heartbeat write response", zap.Error(err))
 	}
 	return true
