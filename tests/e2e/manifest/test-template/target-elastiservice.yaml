@@ -6,6 +6,13 @@ metadata:
 spec:
   cooldownPeriod: 300
   minTargetReplicas: 1
+  heartbeat:
+    - method: GET
+      path: /healthz
+      response: "ok"
+    - method: POST
+      path: /hook
+      response: '{"ready":true}'
   scaleTargetRef:
     apiVersion: apps/v1
     kind: deployments
