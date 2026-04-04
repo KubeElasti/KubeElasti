@@ -79,6 +79,11 @@ spec:
                       Uses UTC timezone. Example: "0 9 * * 1-5" for 9 AM Monday-Friday.
                     type: string
                 type: object
+              heartbeatPath:
+                description: |-
+                  HeartbeatPath is an HTTP path (e.g. /healthz) that the resolver answers locally without
+                  proxying to the workload, so load balancer health checks succeed while scaled to zero.
+                type: string
               minTargetReplicas:
                 description: Minimum number of replicas to scale to
                 format: int32

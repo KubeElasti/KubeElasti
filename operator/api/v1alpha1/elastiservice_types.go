@@ -46,6 +46,10 @@ type ElastiServiceSpec struct {
 	ScaleTargetRef ScaleTargetRef `json:"scaleTargetRef"`
 	// Service to scale
 	Service string `json:"service"`
+	// HeartbeatPath is an HTTP path (e.g. /healthz) that the resolver answers locally without
+	// proxying to the workload, so load balancer health checks succeed while scaled to zero.
+	// +optional
+	HeartbeatPath string `json:"heartbeatPath,omitempty"`
 	// Minimum number of replicas to scale to
 	// +kubebuilder:validation:Minimum=1
 	MinTargetReplicas int32 `json:"minTargetReplicas,omitempty" default:"1"`
