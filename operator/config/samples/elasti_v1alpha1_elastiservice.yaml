@@ -7,6 +7,7 @@ metadata:
   name: elastiservice-sample
 spec:
   service: my-service
+  heartbeatPath: /healthz  # optional: resolver answers this path locally (no proxy) while scaled to zero
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
