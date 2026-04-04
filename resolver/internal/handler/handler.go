@@ -112,6 +112,10 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 	}
 	h.logger.Debug("request received", zap.Any("host", logger.MaskMiddle(host.IncomingHost, 4, 4)))
 
+	if h.respondHeartbeatIfMatch(w, req, host) {
+		return host, nil
+	}
+
 	prom.QueuedRequestGauge.WithLabelValues(host.SourceService, host.Namespace).Inc()
 	defer prom.QueuedRequestGauge.WithLabelValues(host.SourceService, host.Namespace).Dec()
 
@@ -166,6 +170,41 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 		return host, fmt.Errorf("throttler try error: %w", tryErr)
 	}
 	return host, nil
+}
+
+// respondHeartbeatIfMatch answers heartbeat checks locally when the request path matches
+// heartbeatPath on the cached ElastiService for namespace/sourceService (no proxy, no operator notify).
+func (h *Handler) respondHeartbeatIfMatch(w http.ResponseWriter, req *http.Request, host *messages.Host) bool {
+	if req.Method != http.MethodGet && req.Method != http.MethodHead {
+		return false
+	}
+	if h.crdCache == nil {
+		return false
+	}
+	key := host.Namespace + "/" + host.SourceService
+	crdDetails, ok := h.crdCache.GetElastiService(key)
+	if !ok {
+		return false
+	}
+	hbPath := crdcache.HeartbeatPathFromSpec(crdDetails.Spec)
+	if hbPath == "" {
+		h.logger.Info("Heartbeat path is empty", zap.String("namespace", host.Namespace), zap.String("service", host.SourceService))
+		return false
+	}
+	if !crdcache.PathsMatchHTTP(req.URL.Path, hbPath) {
+		return false
+	}
+	h.logger.Debug("heartbeat handled by resolver",
+		zap.String("namespace", host.Namespace),
+		zap.String("service", host.SourceService),
+		zap.String("path", crdcache.NormalizeHTTPPath(hbPath)),
+	)
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	if _, err := w.Write([]byte("ok")); err != nil {
+		h.logger.Error("heartbeat write response", zap.Error(err))
+	}
+	return true
 }
 
 func (h *Handler) ProxyRequest(w http.ResponseWriter, req *http.Request, host *messages.Host, count int) (rErr error) {
