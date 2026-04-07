@@ -8,10 +8,14 @@ spec:
   minTargetReplicas: 1
   heartbeat:
     - method: GET
-      path: /healthz
+      path:
+        type: PathPrefix
+        value: /healthz
       response: "ok"
     - method: POST
-      path: /hook
+      path:
+        type: Exact
+        value: /hook
       response: '{"ready":true}'
   scaleTargetRef:
     apiVersion: apps/v1

@@ -182,7 +182,7 @@ func (h *Handler) respondHeartbeatIfMatch(w http.ResponseWriter, req *http.Reque
 	if !ok {
 		return false
 	}
-	body, matched := crdcache.MatchHeartbeatFromSpec(crdDetails.Spec, req.Method, req.URL.Path)
+	body, matched := crdcache.MatchHeartbeatFromSpec(crdDetails.Spec, req)
 	if !matched {
 		return false
 	}

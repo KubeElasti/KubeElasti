@@ -8,12 +8,16 @@ metadata:
 spec:
   service: my-service
   # Synthetic responses while scaled to zero (optional). First match wins.
-  # Empty method matches GET and HEAD only.
+  # Match fields follow Gateway API HTTPRouteMatch (path, headers, queryParams, method).
+  # Omit method to allow any HTTP method; omit path for default prefix "/".
   heartbeat:
-    - path: /healthz
+    - path:
+        type: Exact
+        value: /healthz
       response: "ok"
     - method: GET
-      path: /ready
+      path:
+        value: /ready
       response: '{"ready":true}'
   scaleTargetRef:
     apiVersion: apps/v1

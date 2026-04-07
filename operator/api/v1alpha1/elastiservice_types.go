@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 const (
@@ -48,6 +49,9 @@ type ElastiServiceSpec struct {
 	Service string `json:"service"`
 	// Heartbeat defines synthetic HTTP responses the resolver serves locally (no proxy) while
 	// scaled to zero, e.g. for load balancer health checks. First matching rule wins.
+	// Each rule uses the same match fields and semantics as Gateway API HTTPRouteMatch
+	// (https://gateway-api.sigs.k8s.io/reference/1.5/spec/#httproutematch): path, headers,
+	// queryParams, and method are ANDed; omitted path defaults to prefix "/".
 	// +optional
 	Heartbeat []HeartbeatRule `json:"heartbeat,omitempty"`
 	// Minimum number of replicas to scale to
@@ -69,14 +73,13 @@ type ElastiServiceSpec struct {
 	EnabledPeriod *EnabledPeriod `json:"enabledPeriod,omitempty"`
 }
 
-// HeartbeatRule is one local response the resolver may return for a matching method and path.
+// HeartbeatRule is one local response when an incoming request matches Gateway API HTTPRouteMatch.
 type HeartbeatRule struct {
-	// Method is the HTTP method to match (e.g. GET, HEAD, POST). If empty, GET and HEAD match.
+	// Path, headers, queryParams, and method are gateway.networking.k8s.io/v1.HTTPRouteMatch
+	// (sigs.k8s.io/gateway-api/apis/v1), inlined into this object.
+	// https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteMatch
 	// +optional
-	Method string `json:"method,omitempty"`
-	// Path is the request path (e.g. /healthz). Leading slash is optional; paths are normalized before match.
-	// +kubebuilder:validation:Required
-	Path string `json:"path"`
+	gatewayv1.HTTPRouteMatch `json:",inline"`
 	// Response is the literal response body Elasti returns with HTTP 200 when this rule matches.
 	// +kubebuilder:validation:Required
 	Response string `json:"response"`
