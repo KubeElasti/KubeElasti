@@ -1,0 +1,124 @@
+name: Bug report
+description: Report a problem or unexpected behavior in Elasti
+title: "[BUG] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. The fields below help us reproduce and fix issues faster.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: What went wrong? Summarize the issue in a few sentences.
+      placeholder: e.g. ElastiService reconciles fail with … when …
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can we see the same behavior? Include commands, manifests, and settings where possible.
+      placeholder: |
+        1. Install Elasti with …
+        2. Apply this ElastiService / scale target …
+        3. Trigger scaling / traffic …
+        4. Observe …
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead? Include error messages if any.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Environment
+
+  - type: input
+    id: k8s-version
+    attributes:
+      label: Kubernetes version
+      description: Output of `kubectl version` (server line is enough) or cluster version from your cloud console.
+      placeholder: e.g. v1.31.2
+    validations:
+      required: true
+
+  - type: input
+    id: elasti-version
+    attributes:
+      label: Elasti version
+      description: Chart app version, image tag, or git SHA you deployed.
+      placeholder: e.g. 0.x.y or main@abc1234
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Installation method
+      options:
+        - Helm
+        - Manual / raw manifests (install.yaml, kustomize, etc.)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: values-yaml
+    attributes:
+      label: Helm values or install overrides
+      description: Paste relevant `values.yaml` snippets or flags (redact secrets). Skip if not using Helm.
+      render: yaml
+
+  - type: textarea
+    id: external-path
+    attributes:
+      label: External components in the request path
+      description: Ingress controller, service mesh, gateway, DNS, etc.
+      placeholder: e.g. NGINX Ingress, Istio, Gateway API …
+
+  - type: dropdown
+    id: autoscaler
+    attributes:
+      label: Autoscaler in use
+      options:
+        - HPA
+        - KEDA
+        - Other
+        - None / not applicable
+    validations:
+      required: true
+
+  - type: input
+    id: cloud
+    attributes:
+      label: Cloud provider (if applicable)
+      placeholder: e.g. AWS EKS, GKE, AKS, on-prem, …
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Logs and additional context
+      description: Relevant operator/resolver logs, events (`kubectl describe`), screenshots, or links to discussions. Use code blocks for logs.
+      placeholder: |
+        ```text
+        paste logs here
+        ```
