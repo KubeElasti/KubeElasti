@@ -87,7 +87,7 @@ elastiController:
       repository: tfy-images/elasti-operator
       ## @param elastiController.manager.image.tag tag to use for the deployment
       ##
-      tag: 8e2e094d75a0978fe55894f15085537198c6c8f8
+      tag: 4dcb78e53c4caa06f0acf662d321d54208abdfd3
     ## @param elastiController.manager.imagePullPolicy image pull policy
     ##
     imagePullPolicy: IfNotPresent
@@ -200,7 +200,7 @@ elastiResolver:
       repository: tfy-images/elasti-resolver
       ## @param elastiResolver.proxy.image.tag tag to use for the deployment
       ##
-      tag: 8e2e094d75a0978fe55894f15085537198c6c8f8
+      tag: 4dcb78e53c4caa06f0acf662d321d54208abdfd3
     ## @param elastiResolver.proxy.imagePullPolicy image pull policy
     ##
     imagePullPolicy: IfNotPresent
