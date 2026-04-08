@@ -1,0 +1,128 @@
+# Posts a welcome comment on a contributor's first issue or PR in this repo.
+# Uses pull_request_target so fork PRs can receive a comment (token has base-repo permissions).
+name: First interaction greeting
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  greet:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Greet contributor
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        env:
+          PR_MESSAGE: |
+            👋 Welcome to the KubeElasti community! 💖
+
+            Thanks and congrats 🎉 for opening your first PR here! We're excited to have you contributing.
+
+            **Before merge, please ensure:**
+            - ✅ **CHANGELOG** — Add your change under `Unreleased` in [`CHANGELOG.md`](https://github.com/KubeElasti/KubeElasti/blob/main/CHANGELOG.md)
+            - ✅ **Tests** — Run and add tests where it makes sense ([`DEVELOPMENT.md`](https://github.com/KubeElasti/KubeElasti/blob/main/DEVELOPMENT.md))
+            - ✅ **PR description** — Clear summary and link to the related issue if there is one ([`CONTRIBUTING.md`](https://github.com/KubeElasti/KubeElasti/blob/main/CONTRIBUTING.md))
+
+            📬 If you're using KubeElasti in your organization, please [add yourself to our Adopters list](https://kubeelasti.dev/src/adopters/). 🙏 It helps the project gain momentum and credibility.
+
+            **Resources:**
+            - 📖 [Documentation](https://kubeelasti.dev) — Guides, configuration, and architecture
+            - 🧭 [Getting Started](https://github.com/KubeElasti/KubeElasti/blob/main/docs/src/gs-setup.md) — Install and first steps
+            - 💬 [Discussions](https://github.com/KubeElasti/KubeElasti/discussions) — Ideas and Q&A
+            - 🤝 [Contributing](https://github.com/KubeElasti/KubeElasti/blob/main/CONTRIBUTING.md)
+
+            A maintainer will review your PR soon. Hope you have a great time here!
+
+            🌟 ~~~~~~~~~~ 🌟
+
+            If you like KubeElasti, please ⭐ star ⭐ the repo — it really helps others discover the project.
+          ISSUE_MESSAGE: |
+            👋 Welcome to the KubeElasti community! 💖
+
+            Thanks and congrats 🎉 for opening your first issue here! Every issue helps make KubeElasti better.
+
+            **Want to work on this?** Comment on the issue so maintainers and contributors know you're interested.
+
+            **Find something to contribute:**
+            - [`good first issue`](https://github.com/search?q=repo%3AKubeElasti%2FKubeElasti+is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) | [`help wanted`](https://github.com/search?q=repo%3AKubeElasti%2FKubeElasti+is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
+
+            📬 If you're using KubeElasti in your organization, please [add yourself to our Adopters list](https://kubeelasti.dev/src/adopters/). 🙏 It helps the project gain momentum and credibility.
+
+            **Resources:**
+            - 📖 [Documentation](https://kubeelasti.dev) — Guides, configuration, and architecture
+            - 💬 [Discussions](https://github.com/KubeElasti/KubeElasti/discussions) — Ideas and Q&A
+            - 🤝 [Contributing](https://github.com/KubeElasti/KubeElasti/blob/main/CONTRIBUTING.md)
+
+            Hope you have a great time here!
+
+            🌟 ~~~~~~~~~~ 🌟
+
+            If you like KubeElasti, please ⭐ star ⭐ the repo — it really helps others discover the project.
+
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const author = context.payload.pull_request?.user?.login || context.payload.issue?.user?.login;
+            const isPR = !!context.payload.pull_request;
+            const itemNumber = context.payload.pull_request?.number || context.payload.issue?.number;
+
+            if (!author || !itemNumber) {
+              console.log('Could not determine author or item number');
+              return;
+            }
+
+            // Skip bots
+            if (author.endsWith('[bot]') || author === 'dependabot' || author === 'github-actions' || author === 'renovate') {
+              console.log(`Skipping bot: ${author}`);
+              return;
+            }
+
+            // First issue vs first PR are counted separately (plain issues vs PRs).
+            // Use Issues API — not Search — so results include the item that just opened (search is delayed).
+            let page = 1;
+            let matchCount = 0;
+            while (true) {
+              const { data: items } = await github.rest.issues.listForRepo({
+                owner,
+                repo,
+                creator: author,
+                state: 'all',
+                per_page: 100,
+                page,
+              });
+              if (items.length === 0) break;
+              for (const item of items) {
+                const itemIsPR = !!item.pull_request;
+                if (itemIsPR !== isPR) continue;
+                matchCount++;
+                if (matchCount > 1) break;
+              }
+              if (matchCount > 1) break;
+              if (items.length < 100) break;
+              page++;
+            }
+            if (matchCount !== 1) {
+              console.log(
+                `Skipping greeting: found ${matchCount} ${isPR ? 'PR' : 'issue'}(s) for ${author} in this repo (greet only on first, expected count 1)`,
+              );
+              return;
+            }
+
+            console.log(`First-time greeting for ${author} on ${isPR ? 'PR' : 'issue'} #${itemNumber}`);
+
+            const message = isPR ? process.env.PR_MESSAGE : process.env.ISSUE_MESSAGE;
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: itemNumber,
+              body: message
+            });
+
+            console.log('Greeting posted successfully');

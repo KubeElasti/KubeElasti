@@ -1,0 +1,46 @@
+name: Feature request
+description: Suggest an idea or improvement for Elasti
+title: "[FEATURE] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing your idea. The fields below help us understand the proposal and prioritize it.
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should this feature achieve? Describe the behavior or capability you want.
+      placeholder: e.g. Support … so that …
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: How would you use this? What problem does it solve today?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: implement
+    attributes:
+      label: Implementation
+      description: Are you interested in contributing an implementation?
+      options:
+        - Yes, I plan to open a PR or contribute
+        - Maybe — depends on scope or design
+        - No — feature request only
+        - Not sure yet
+    validations:
+      required: true
+
+  - type: textarea
+    id: anything-else
+    attributes:
+      label: Anything else
+      description: Alternatives you considered, references (docs, other projects), or other context.
