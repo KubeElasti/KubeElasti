@@ -8,9 +8,13 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Improvement
+* Add heartbeat to handle liveness and other probes by @ramantehlan in [`263`](https://github.com/KubeElasti/KubeElasti/pull/263)
+
 ### Other
 
 * docs: add project governance document and link it from contributor-facing docs
+* Update Lint version from v1 to v2 by @ramantehlan in [`263`](https://github.com/KubeElasti/KubeElasti/pull/263)
 
 ## v0.1.22 (2026-04-01)
 

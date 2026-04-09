@@ -5,3 +5,12 @@ commands:
     namespaced: true
   - command: kubectl wait --for=delete pods -l app=target-deployment --timeout=400s
     namespaced: true
+# We need to restart the resolver to update the cache 
+  - command: kubectl scale deployment/elasti-resolver --replicas=0 -n elasti
+    namespaced: true
+  - command: kubectl wait --for=delete pods -l app=elasti-resolver -n elasti --timeout=400s
+    namespaced: true
+  - command: kubectl scale deployment/elasti-resolver --replicas=1 -n elasti
+    namespaced: true
+  - command: kubectl wait --for=condition=Ready pods -l app=elasti-resolver -n elasti --timeout=400s
+    namespaced: true

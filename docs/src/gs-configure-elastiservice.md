@@ -26,6 +26,18 @@ spec:
   minTargetReplicas: <min-target-replicas> # (3)
   service: <service-name>
   cooldownPeriod: <cooldown-period> # (4)
+  heartbeat: # (18) Optional
+  - response: <response-body> # (19)
+    method: <HTTP-method> # (20) Optional (default: any)
+    path: # (21) Optional (default: PathPrefix "/")
+      type: <Exact|PathPrefix|RegularExpression>
+      value: </path>
+    headers: # (22) Optional
+    - name: <header-name>
+      value: <header-value>
+    queryParams: # (23) Optional
+    - name: <query-param-name>
+      value: <query-param-value>
   scaleTargetRef:
     apiVersion: <apiVersion> # (5)
     kind: <kind> # (6)
@@ -62,6 +74,12 @@ spec:
 15. **Optional**: Define when scale-to-zero is active. Omit this field for always-on behavior.
 16. Replace with a 5-item cron expression (minute hour day month weekday) in UTC.
 17. Replace with a duration string (e.g., "8h", "24h").
+18. **Optional**: Heartbeat rules let the resolver serve a synthetic **200 OK** response for matching requests (without proxying / scaling logic). Useful for health checks and probes.
+19. Response body to return. If it looks like JSON (starts with `{` or `[`), `Content-Type` is `application/json; charset=utf-8`; otherwise `text/plain; charset=utf-8`.
+20. **Optional**: HTTP method to match. If omitted, matches any method.
+21. **Optional**: Path match. If omitted, defaults to `PathPrefix "/"` (matches everything). The matching behavior follows Gateway API `HTTPRouteMatch` path types.
+22. **Optional**: Header matchers (all must match). Header names are case-insensitive.
+23. **Optional**: Query param matchers (all must match).
 
 The key fields to be specified in the spec are:
 
@@ -81,6 +99,7 @@ The key fields to be specified in the spec are:
 - `autoscaler`: **Optional** integration with an external autoscaler (HPA/KEDA) if needed
     - `<autoscaler-type>`: keda
     - `<autoscaler-object-name>`: Name of the KEDA ScaledObject
+- `heartbeat`: **Optional** synthetic responses served by the resolver (no proxy) when a request matches. Matching uses Gateway API-style rules for path/headers/queryParams/method.
 
 ---
 
@@ -143,7 +162,48 @@ We can configure the `cooldownPeriod` to specify the minimum time (in seconds) t
 
 <br>
 
-### **5. EnabledPeriod: Control when scale-to-zero is active (Optional)**
+### **5. Heartbeat: Serve synthetic responses for health checks (Optional)**
+
+Heartbeat rules are evaluated by the **resolver** for every incoming request. If a rule matches, the resolver returns the configured `response` immediately with **HTTP 200**, and the request does **not** go through the proxy / queue / scale-up path.
+
+**Matching semantics**
+
+- **All conditions are ANDed**: `method`, `path`, `headers`, and `queryParams` must all match (when provided).
+- **Path types**:
+  - `Exact`: exact path match (after normalizing extra slashes).
+  - `PathPrefix`: prefix match (default when `path` is omitted).
+  - `RegularExpression`: regex match.
+- **Defaults**:
+  - If `method` is omitted, it matches any method.
+  - If `path` is omitted, it defaults to `PathPrefix "/"` (matches everything).
+
+**Example**
+
+```yaml
+heartbeat:
+  - method: GET
+    path:
+      type: PathPrefix
+      value: /healthz
+    response: "ok"
+  - method: POST
+    path:
+      type: Exact
+      value: /hook
+    headers:
+      - name: X-Probe
+        value: "1"
+    queryParams:
+      - name: ping
+        value: pong
+    response: '{"ready":true}'
+```
+
+**Backwards compatibility**
+
+If you previously used a plain string for `path` (for example `path: "/healthz"`), it is treated as an **Exact** match.
+
+### **6. EnabledPeriod: Control when scale-to-zero is active (Optional)**
 
 The `enabledPeriod` field allows you to define specific time windows when the scale-to-zero policy should be active. Outside of these periods, KubeElasti will maintain the service at `minTargetReplicas` and prevent scale-down. This is useful for scenarios like:
 
