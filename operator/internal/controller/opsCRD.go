@@ -43,7 +43,7 @@ func (r *ElastiServiceReconciler) updateCRDStatus(ctx context.Context, crdNamesp
 		prom.ModeGauge.WithLabelValues(crdNamespacedName.String()).Set(modeGauge)
 	}()
 	es := &v1alpha1.ElastiService{}
-	if err = r.Client.Get(ctx, crdNamespacedName, es); err != nil {
+	if err = r.Get(ctx, crdNamespacedName, es); err != nil {
 		r.Logger.Error("Failed to get ElastiService for status update", zap.String("es", crdNamespacedName.String()), zap.Error(err))
 		return fmt.Errorf("failed to get elastiService for status update")
 	}
@@ -74,7 +74,7 @@ func (r *ElastiServiceReconciler) addCRDFinalizer(ctx context.Context, es *v1alp
 
 // finalizeCRD reset changes made for the CRD
 func (r *ElastiServiceReconciler) finalizeCRD(ctx context.Context, es *v1alpha1.ElastiService, req ctrl.Request) error {
-	r.Logger.Info("ElastiService is being deleted", zap.String("name", es.Name), zap.Any("deletionTimestamp", es.ObjectMeta.DeletionTimestamp))
+	r.Logger.Info("ElastiService is being deleted", zap.String("name", es.Name), zap.Any("deletionTimestamp", es.DeletionTimestamp))
 	var wg sync.WaitGroup
 	wg.Add(3)
 	// Stop all active informers related to this CRD in background
@@ -205,7 +205,7 @@ func (r *ElastiServiceReconciler) watchPublicService(ctx context.Context, es *v1
 
 func (r *ElastiServiceReconciler) finalizeCRDIfDeleted(ctx context.Context, es *v1alpha1.ElastiService, req ctrl.Request) (isDeleted bool, err error) {
 	// If the ElastiService is being deleted, we need to clean up the resources
-	if !es.ObjectMeta.DeletionTimestamp.IsZero() {
+	if !es.DeletionTimestamp.IsZero() {
 		defer func() {
 			e := values.Success
 			if err != nil {

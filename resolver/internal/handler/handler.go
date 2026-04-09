@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -197,7 +198,7 @@ func (h *Handler) respondHeartbeatIfMatch(w http.ResponseWriter, req *http.Reque
 	if req.Method == http.MethodHead {
 		return true
 	}
-	if _, err := w.Write([]byte(body)); err != nil {
+	if _, err := io.WriteString(w, body); err != nil { //nolint:gosec // G705: body from ElastiService CRD heartbeat config, not request-derived HTML
 		h.logger.Error("heartbeat write response", zap.Error(err))
 	}
 	return true

@@ -54,10 +54,10 @@ type (
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.17.3/pkg/reconcile
 func (r *ElastiServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (res ctrl.Result, err error) {
-	r.Logger.Debug("- In Reconcile", zap.String("es", req.NamespacedName.String()))
-	mutex := r.getMutexForReconcile(req.NamespacedName.String())
+	r.Logger.Debug("- In Reconcile", zap.String("es", req.String()))
+	mutex := r.getMutexForReconcile(req.String())
 	mutex.Lock()
-	defer r.Logger.Debug("- Out of Reconcile", zap.String("es", req.NamespacedName.String()))
+	defer r.Logger.Debug("- Out of Reconcile", zap.String("es", req.String()))
 	defer mutex.Unlock()
 	startTime := time.Now()
 
@@ -65,7 +65,7 @@ func (r *ElastiServiceReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		e := values.Success
 		if err != nil {
 			e = err.Error()
-			r.Logger.Error("Error reconciling ElastiService.", zap.String("es", req.NamespacedName.String()), zap.Error(err))
+			r.Logger.Error("Error reconciling ElastiService.", zap.String("es", req.String()), zap.Error(err))
 		}
 		duration := time.Since(startTime).Seconds()
 		prom.CRDReconcileHistogram.WithLabelValues(req.String(), e).Observe(duration)
@@ -161,7 +161,7 @@ func (r *ElastiServiceReconciler) reconcileExistingCRDs(ctx context.Context, wat
 
 	for _, es := range crdList.Items {
 		// Skip if being deleted
-		if !es.ObjectMeta.DeletionTimestamp.IsZero() {
+		if !es.DeletionTimestamp.IsZero() {
 			r.Logger.Debug("Skipping ElastiService because it is being deleted", zap.String("name", es.Name), zap.String("namespace", es.Namespace))
 			continue
 		}

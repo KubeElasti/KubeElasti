@@ -10,6 +10,13 @@ import (
 	"strings"
 )
 
+// Gateway API HTTPRoute-style match type strings (JSON "type" fields and defaults).
+const (
+	matchTypePathPrefix        = "PathPrefix"
+	matchTypeExact             = "Exact"
+	matchTypeRegularExpression = "RegularExpression"
+)
+
 type heartbeatSpecJSON struct {
 	Heartbeat []heartbeatRuleJSON `json:"heartbeat,omitempty"`
 }
@@ -81,11 +88,11 @@ func methodMatchesHeartbeat(ruleMethod *string, requestMethod string) bool {
 
 func parseHeartbeatPath(raw json.RawMessage) *effectivePathMatch {
 	if len(raw) == 0 {
-		return &effectivePathMatch{Type: "PathPrefix", Value: "/"}
+		return &effectivePathMatch{Type: matchTypePathPrefix, Value: "/"}
 	}
 	b := bytes.TrimSpace(raw)
 	if len(b) == 0 {
-		return &effectivePathMatch{Type: "PathPrefix", Value: "/"}
+		return &effectivePathMatch{Type: matchTypePathPrefix, Value: "/"}
 	}
 	// Legacy: JSON string path uses exact match (previous ElastiService behavior).
 	if b[0] == '"' {
@@ -93,7 +100,7 @@ func parseHeartbeatPath(raw json.RawMessage) *effectivePathMatch {
 		if err := json.Unmarshal(raw, &s); err != nil {
 			return nil
 		}
-		return &effectivePathMatch{Type: "Exact", Value: s}
+		return &effectivePathMatch{Type: matchTypeExact, Value: s}
 	}
 	var obj struct {
 		Type  *string `json:"type,omitempty"`
@@ -102,7 +109,7 @@ func parseHeartbeatPath(raw json.RawMessage) *effectivePathMatch {
 	if err := json.Unmarshal(raw, &obj); err != nil {
 		return nil
 	}
-	typ := "PathPrefix"
+	typ := matchTypePathPrefix
 	if obj.Type != nil && strings.TrimSpace(*obj.Type) != "" {
 		typ = strings.TrimSpace(*obj.Type)
 	}
@@ -115,11 +122,11 @@ func parseHeartbeatPath(raw json.RawMessage) *effectivePathMatch {
 
 func pathMatchesGateway(requestPath string, m *effectivePathMatch) bool {
 	switch m.Type {
-	case "Exact":
+	case matchTypeExact:
 		return NormalizeHTTPPath(requestPath) == NormalizeHTTPPath(m.Value)
-	case "PathPrefix":
+	case matchTypePathPrefix:
 		return pathPrefixMatchElements(requestPath, m.Value)
-	case "RegularExpression":
+	case matchTypeRegularExpression:
 		re, err := regexp.Compile(m.Value)
 		if err != nil {
 			return false
@@ -164,18 +171,18 @@ func headersMatchGateway(rules []httpHeaderMatchJSON, h http.Header) bool {
 		if name == "" {
 			return false
 		}
-		typ := "Exact"
+		typ := matchTypeExact
 		if rule.Type != nil && strings.TrimSpace(*rule.Type) != "" {
 			typ = strings.TrimSpace(*rule.Type)
 		}
 		got := strings.TrimSpace(h.Get(name))
 		want := rule.Value
 		switch typ {
-		case "Exact":
+		case matchTypeExact:
 			if got != want {
 				return false
 			}
-		case "RegularExpression":
+		case matchTypeRegularExpression:
 			re, err := regexp.Compile(want)
 			if err != nil {
 				return false
@@ -196,18 +203,18 @@ func queryParamsMatchGateway(rules []httpQueryParamMatchJSON, q url.Values) bool
 		if name == "" {
 			return false
 		}
-		typ := "Exact"
+		typ := matchTypeExact
 		if rule.Type != nil && strings.TrimSpace(*rule.Type) != "" {
 			typ = strings.TrimSpace(*rule.Type)
 		}
 		got := strings.TrimSpace(q.Get(name))
 		want := rule.Value
 		switch typ {
-		case "Exact":
+		case matchTypeExact:
 			if got != want {
 				return false
 			}
-		case "RegularExpression":
+		case matchTypeRegularExpression:
 			re, err := regexp.Compile(want)
 			if err != nil {
 				return false
