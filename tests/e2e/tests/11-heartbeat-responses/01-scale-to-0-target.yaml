@@ -1,16 +1,13 @@
 apiVersion: kuttl.dev/v1beta1
 kind: TestStep
+# KEDA's ScaledObject has minReplicaCount: 1; without pausing it, KEDA rescales the Deployment
+# after manual scale-to-0 and heartbeat checks hit the real backend (httpbin 404) instead of synthetic responses.
 commands:
+  - command: kubectl annotate scaledobject target-scaled-object autoscaling.keda.sh/paused=true --overwrite
+    namespaced: true
   - command: kubectl scale deployment/target-deployment --replicas=0
     namespaced: true
   - command: kubectl wait --for=delete pods -l app=target-deployment --timeout=400s
     namespaced: true
 # We need to restart the resolver to update the cache 
-  - command: kubectl scale deployment/elasti-resolver --replicas=0 -n elasti
-    namespaced: true
-  - command: kubectl wait --for=delete pods -l app=elasti-resolver -n elasti --timeout=400s
-    namespaced: true
-  - command: kubectl scale deployment/elasti-resolver --replicas=1 -n elasti
-    namespaced: true
-  - command: kubectl wait --for=condition=Ready pods -l app=elasti-resolver -n elasti --timeout=400s
-    namespaced: true
+  - command: sleep 75

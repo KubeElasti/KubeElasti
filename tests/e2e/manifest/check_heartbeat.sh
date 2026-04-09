@@ -1,12 +1,21 @@
 #!/bin/sh
 # Verify ElastiService heartbeat rules are applied by the resolver (synthetic responses).
 #
+# This script is invoked TWICE with different first arguments — only one branch runs per invocation:
+#   check_heartbeat.sh initial   → exercises /healthz and /hook only (no /probe).
+#   check_heartbeat.sh updated     → exercises /probe only (must run AFTER the patch; see below).
+#
+# Kuttl test 11-heartbeat-responses runs steps in filename order; /probe is added before "updated":
+#   02-check-heartbeat-initial.yaml  → initial
+#   03-patch-heartbeat.yaml          → kubectl patch adds GET /probe -> alive
+#   04-wait-resolver-cache.yaml      → sleep for resolver CRD cache
+#   05-check-heartbeat-updated.yaml  → updated
+#
 # Phases:
-#   initial — Expectations from tests/e2e/manifest/test-template/target-elastiservice.yaml:
+#   initial — From target-elastiservice.yaml:
 #             GET  /healthz (PathPrefix) -> ok
 #             POST /hook   (Exact)      -> {"ready":true}
-#   updated — After patch_elastiservice_heartbeat.sh:
-#             GET /probe (Exact) -> alive
+#   updated — After patch_elastiservice_heartbeat.sh (GET /probe -> alive); also verifies /healthz no longer returns "ok".
 #
 set -u
 
@@ -52,6 +61,8 @@ case "$PHASE" in
     ;;
 
   updated)
+    # /probe is not in target-elastiservice.yaml; tests/e2e/tests/11-heartbeat-responses/03-patch-heartbeat.yaml
+    # runs patch_elastiservice_heartbeat.sh to set GET /probe -> alive before this phase.
     echo "  Expect GET ${BASE_URL}/probe -> alive (patched rule)"
     body=$(curl_exec --max-time 30 -s "${BASE_URL}/probe")
     if [ "$body" != "alive" ]; then
