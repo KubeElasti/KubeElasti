@@ -57,7 +57,7 @@ jobs:
         with:
           working-directory: ${{ matrix.modules }}
           args: -v --timeout 5m
-          version: v1.64.8
+          version: v2.11.4
   test:
     needs: detect-modules
     runs-on: ubuntu-latest

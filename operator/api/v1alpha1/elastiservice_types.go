@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 const (
@@ -53,6 +52,7 @@ type ElastiServiceSpec struct {
 	// (https://gateway-api.sigs.k8s.io/reference/1.5/spec/#httproutematch): path, headers,
 	// queryParams, and method are ANDed; omitted path defaults to prefix "/".
 	// +optional
+	// +kubebuilder:validation:MaxItems=32
 	Heartbeat []HeartbeatRule `json:"heartbeat,omitempty"`
 	// Minimum number of replicas to scale to
 	// +kubebuilder:validation:Minimum=1
@@ -73,16 +73,68 @@ type ElastiServiceSpec struct {
 	EnabledPeriod *EnabledPeriod `json:"enabledPeriod,omitempty"`
 }
 
-// HeartbeatRule is one local response when an incoming request matches Gateway API HTTPRouteMatch.
+// HeartbeatRule is one local response when an incoming request matches path, headers,
+// queryParams, and method with the same semantics as Gateway API HTTPRouteMatch
+// (https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteMatch).
+// Types are defined locally so the CRD does not inherit Gateway API OpenAPI CEL rules (Kubernetes cost limits).
 type HeartbeatRule struct {
-	// Path, headers, queryParams, and method are gateway.networking.k8s.io/v1.HTTPRouteMatch
-	// (sigs.k8s.io/gateway-api/apis/v1), inlined into this object.
-	// https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteMatch
+	// Path specifies a HTTP request path matcher. Omitted defaults to prefix "/" in the resolver.
 	// +optional
-	gatewayv1.HTTPRouteMatch `json:",inline"`
+	Path *HeartbeatPathMatch `json:"path,omitempty"`
+	// Headers specifies HTTP request header matchers (ANDed).
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	Headers []HeartbeatHeaderMatch `json:"headers,omitempty"`
+	// QueryParams specifies HTTP query parameter matchers (ANDed).
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	QueryParams []HeartbeatQueryParamMatch `json:"queryParams,omitempty"`
+	// Method, when set, matches the HTTP method.
+	// +optional
+	// +kubebuilder:validation:Enum=GET;HEAD;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
+	Method *string `json:"method,omitempty"`
 	// Response is the literal response body Elasti returns with HTTP 200 when this rule matches.
 	// +kubebuilder:validation:Required
 	Response string `json:"response"`
+}
+
+// HeartbeatPathMatch matches the request path (Gateway API HTTPPathMatch semantics).
+type HeartbeatPathMatch struct {
+	// Type is Exact, PathPrefix, or RegularExpression. Empty defaults to PathPrefix in the resolver.
+	// +optional
+	// +kubebuilder:validation:Enum=Exact;PathPrefix;RegularExpression
+	Type string `json:"type,omitempty"`
+	// Value is the path or regular expression to match.
+	// +optional
+	// +kubebuilder:validation:MaxLength=1024
+	Value string `json:"value,omitempty"`
+}
+
+// HeartbeatHeaderMatch matches one request header.
+type HeartbeatHeaderMatch struct {
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MaxLength=256
+	Name string `json:"name"`
+	// Type is Exact or RegularExpression. Empty defaults to Exact in the resolver.
+	// +optional
+	// +kubebuilder:validation:Enum=Exact;RegularExpression
+	Type string `json:"type,omitempty"`
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MaxLength=4096
+	Value string `json:"value"`
+}
+
+// HeartbeatQueryParamMatch matches one query parameter.
+type HeartbeatQueryParamMatch struct {
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MaxLength=256
+	Name string `json:"name"`
+	// +optional
+	// +kubebuilder:validation:Enum=Exact;RegularExpression
+	Type string `json:"type,omitempty"`
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MaxLength=1024
+	Value string `json:"value"`
 }
 
 func (es *ElastiServiceSpec) GetScaleTargetRef() ScaleTargetRef {

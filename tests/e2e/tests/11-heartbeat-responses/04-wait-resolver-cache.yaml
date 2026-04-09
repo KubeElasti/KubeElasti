@@ -1,0 +1,5 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+# Resolver CRD cache polls the operator on a fixed interval (see CRD_CACHE_POLL_INTERVAL_MINUTES in e2e values).
+commands:
+  - command: sleep 75

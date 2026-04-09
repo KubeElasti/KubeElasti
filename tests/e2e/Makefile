@@ -27,6 +27,8 @@ test:
 chmod-scripts:
 	@chmod +x ./manifest/setup.sh
 	@chmod +x ./manifest/setup-statefulset.sh
+	@chmod +x ./manifest/check_heartbeat.sh
+	@chmod +x ./manifest/patch_elastiservice_heartbeat.sh
 
 .PHONY: build-images
 build-images: ## Build and push images

@@ -16,7 +16,6 @@ require (
 	k8s.io/client-go v0.34.1
 	k8s.io/utils v0.0.0-20250820121507-0af2bda4dd1d
 	sigs.k8s.io/controller-runtime v0.22.1
-	sigs.k8s.io/gateway-api v1.4.1
 )
 
 replace github.com/truefoundry/elasti/pkg v0.0.0 => ../pkg
