@@ -7,6 +7,7 @@ metadata:
   labels:
     {{- include "elasti.labels" (dict "context" . "name" "elasti") | nindent 4 }}
 spec:
+  group: elasti.truefoundry.com
   names:
     kind: ElastiService
     listKind: ElastiServiceList
