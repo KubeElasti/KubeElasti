@@ -10,6 +10,12 @@ import (
 	"github.com/truefoundry/elasti/operator/api/v1alpha1"
 )
 
+const (
+	MatchTypePathPrefix        = "PathPrefix"
+	MatchTypeExact             = "Exact"
+	MatchTypeRegularExpression = "RegularExpression"
+)
+
 // MatchProbeResponseFromSpec returns the configured response body and HTTP status when spec JSON
 // matches the request using ElastiService CRD probeResponse semantics (path, headers, queryParams, method ANDed).
 // Rules are tried in order; first match wins.
@@ -82,14 +88,14 @@ type probePathMatch struct {
 
 func normalizeProbePathMatch(p *v1alpha1.ProbeResponsePathMatch) probePathMatch {
 	if p == nil {
-		return probePathMatch{Type: "PathPrefix", Value: "/"}
+		return probePathMatch{Type: MatchTypePathPrefix, Value: "/"}
 	}
 	typ := strings.TrimSpace(p.Type)
 	if typ == "" {
-		typ = "PathPrefix"
+		typ = MatchTypePathPrefix
 	}
 	val := p.Value
-	if canonicalPathMatchType(typ) == "PathPrefix" && val == "" {
+	if canonicalPathMatchType(typ) == MatchTypePathPrefix && val == "" {
 		val = "/"
 	}
 	return probePathMatch{Type: typ, Value: val}
@@ -98,14 +104,14 @@ func normalizeProbePathMatch(p *v1alpha1.ProbeResponsePathMatch) probePathMatch 
 func canonicalPathMatchType(t string) string {
 	ts := strings.TrimSpace(t)
 	switch {
-	case ts == "", strings.EqualFold(ts, "PathPrefix"):
-		return "PathPrefix"
-	case strings.EqualFold(ts, "Exact"):
-		return "Exact"
-	case strings.EqualFold(ts, "RegularExpression"):
-		return "RegularExpression"
+	case ts == "", strings.EqualFold(ts, MatchTypePathPrefix):
+		return MatchTypePathPrefix
+	case strings.EqualFold(ts, MatchTypeExact):
+		return MatchTypeExact
+	case strings.EqualFold(ts, MatchTypeRegularExpression):
+		return MatchTypeRegularExpression
 	default:
-		return "PathPrefix"
+		return MatchTypePathPrefix
 	}
 }
 
@@ -148,14 +154,14 @@ func headerValueMatches(rule v1alpha1.ProbeResponseHeaderMatch, h http.Header) b
 	}
 	typ := strings.TrimSpace(rule.Type)
 	switch {
-	case typ == "" || strings.EqualFold(typ, "Exact"):
+	case typ == "" || strings.EqualFold(typ, MatchTypeExact):
 		for _, v := range values {
 			if v == rule.Value {
 				return true
 			}
 		}
 		return false
-	case strings.EqualFold(typ, "RegularExpression"):
+	case strings.EqualFold(typ, MatchTypeRegularExpression):
 		re, err := regexp.Compile(rule.Value)
 		if err != nil {
 			return false
@@ -195,14 +201,14 @@ func queryParamValueMatches(rule v1alpha1.ProbeResponseQueryParamMatch, q url.Va
 	}
 	typ := strings.TrimSpace(rule.Type)
 	switch {
-	case typ == "" || strings.EqualFold(typ, "Exact"):
+	case typ == "" || strings.EqualFold(typ, MatchTypeExact):
 		for _, v := range values {
 			if v == rule.Value {
 				return true
 			}
 		}
 		return false
-	case strings.EqualFold(typ, "RegularExpression"):
+	case strings.EqualFold(typ, MatchTypeRegularExpression):
 		re, err := regexp.Compile(rule.Value)
 		if err != nil {
 			return false
