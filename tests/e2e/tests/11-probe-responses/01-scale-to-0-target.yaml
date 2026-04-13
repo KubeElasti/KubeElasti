@@ -1,7 +1,7 @@
 apiVersion: kuttl.dev/v1beta1
 kind: TestStep
 # KEDA's ScaledObject has minReplicaCount: 1; without pausing it, KEDA rescales the Deployment
-# after manual scale-to-0 and heartbeat checks hit the real backend (httpbin 404) instead of synthetic responses.
+# after manual scale-to-0 and probeResponse checks hit the real backend (httpbin 404) instead of synthetic responses.
 commands:
   - command: kubectl annotate scaledobject target-scaled-object autoscaling.keda.sh/paused=true --overwrite
     namespaced: true

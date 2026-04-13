@@ -6,7 +6,7 @@ metadata:
 spec:
   cooldownPeriod: 300
   minTargetReplicas: 1
-  heartbeat:
+  probeResponse:
     - method: GET
       path:
         type: PathPrefix

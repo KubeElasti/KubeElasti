@@ -79,16 +79,21 @@ spec:
                       Uses UTC timezone. Example: "0 9 * * 1-5" for 9 AM Monday-Friday.
                     type: string
                 type: object
-              heartbeat:
+              minTargetReplicas:
+                description: Minimum number of replicas to scale to
+                format: int32
+                minimum: 1
+                type: integer
+              probeResponse:
                 description: |-
-                  Heartbeat defines synthetic HTTP responses the resolver serves locally (no proxy) while
+                  ProbeResponse defines synthetic HTTP responses the resolver serves locally (no proxy) while
                   scaled to zero, e.g. for load balancer health checks. First matching rule wins.
                   Each rule uses the same match fields and semantics as Gateway API HTTPRouteMatch
                   (https://gateway-api.sigs.k8s.io/reference/1.5/spec/#httproutematch): path, headers,
                   queryParams, and method are ANDed; omitted path defaults to prefix "/".
                 items:
                   description: |-
-                    HeartbeatRule is one local response when an incoming request matches path, headers,
+                    ProbeResponseRule is one local response when an incoming request matches path, headers,
                     queryParams, and method with the same semantics as Gateway API HTTPRouteMatch
                     (https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteMatch).
                     Types are defined locally so the CRD does not inherit Gateway API OpenAPI CEL rules (Kubernetes cost limits).
@@ -97,7 +102,8 @@ spec:
                       description: Headers specifies HTTP request header matchers
                         (ANDed).
                       items:
-                        description: HeartbeatHeaderMatch matches one request header.
+                        description: ProbeResponseHeaderMatch matches one request
+                          header.
                         properties:
                           name:
                             maxLength: 256
@@ -153,7 +159,8 @@ spec:
                       description: QueryParams specifies HTTP query parameter matchers
                         (ANDed).
                       items:
-                        description: HeartbeatQueryParamMatch matches one query parameter.
+                        description: ProbeResponseQueryParamMatch matches one query
+                          parameter.
                         properties:
                           name:
                             maxLength: 256
@@ -181,11 +188,6 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
-              minTargetReplicas:
-                description: Minimum number of replicas to scale to
-                format: int32
-                minimum: 1
-                type: integer
               scaleTargetRef:
                 description: ScaleTargetRef of the target resource to scale
                 properties:

@@ -1,6 +1,0 @@
-apiVersion: kuttl.dev/v1beta1
-kind: TestStep
-# Requires 03-patch-heartbeat.yaml (adds GET /probe) and 04-wait-resolver-cache.yaml before this step.
-commands:
-  - command: sh ../../manifest/check_heartbeat.sh updated $NAMESPACE
-    namespaced: true

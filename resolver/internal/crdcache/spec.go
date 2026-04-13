@@ -8,6 +8,8 @@ import (
 	"path"
 	"regexp"
 	"strings"
+
+	"github.com/truefoundry/elasti/operator/api/v1alpha1"
 )
 
 // Gateway API HTTPRoute-style match type strings (JSON "type" fields and defaults).
@@ -17,16 +19,16 @@ const (
 	matchTypeRegularExpression = "RegularExpression"
 )
 
-type heartbeatSpecJSON struct {
-	Heartbeat []heartbeatRuleJSON `json:"heartbeat,omitempty"`
+type probeResponseSpecJSON struct {
+	ProbeResponse []probeResponseRuleJSON `json:"probeResponse,omitempty"`
 }
 
-type heartbeatRuleJSON struct {
+type probeResponseRuleJSON struct {
 	PathRaw     json.RawMessage           `json:"path,omitempty"`
 	Headers     []httpHeaderMatchJSON     `json:"headers,omitempty"`
 	QueryParams []httpQueryParamMatchJSON `json:"queryParams,omitempty"`
 	Method      *string                   `json:"method,omitempty"`
-	Response    string                    `json:"response"`
+	Response    v1alpha1.ProbeResponse    `json:"response"`
 }
 
 type httpHeaderMatchJSON struct {
@@ -46,25 +48,25 @@ type effectivePathMatch struct {
 	Value string
 }
 
-// MatchHeartbeatFromSpec returns the configured response body when spec JSON matches the request
+// MatchProbeResponseFromSpec returns the configured response body when spec JSON matches the request
 // using Gateway API HTTPRouteMatch semantics (path, headers, queryParams, method ANDed).
 // Rules are tried in order; first match wins.
-func MatchHeartbeatFromSpec(specJSON []byte, req *http.Request) (response string, matched bool) {
+func MatchProbeResponseFromSpec(specJSON []byte, req *http.Request) (response string, matched bool) {
 	if req == nil || len(specJSON) == 0 {
 		return "", false
 	}
-	var s heartbeatSpecJSON
+	var s probeResponseSpecJSON
 	if err := json.Unmarshal(specJSON, &s); err != nil {
 		return "", false
 	}
-	for _, r := range s.Heartbeat {
-		if strings.TrimSpace(r.Response) == "" {
+	for _, r := range s.ProbeResponse {
+		if strings.TrimSpace(string(r.Response.Body)) == "" {
 			continue
 		}
-		if !methodMatchesHeartbeat(r.Method, req.Method) {
+		if !methodMatchesProbeResponse(r.Method, req.Method) {
 			continue
 		}
-		ep := parseHeartbeatPath(r.PathRaw)
+		ep := parseProbeResponsePath(r.PathRaw)
 		if ep == nil || !pathMatchesGateway(req.URL.Path, ep) {
 			continue
 		}
@@ -74,19 +76,19 @@ func MatchHeartbeatFromSpec(specJSON []byte, req *http.Request) (response string
 		if !queryParamsMatchGateway(r.QueryParams, req.URL.Query()) {
 			continue
 		}
-		return r.Response, true
+		return string(r.Response.Body), true
 	}
 	return "", false
 }
 
-func methodMatchesHeartbeat(ruleMethod *string, requestMethod string) bool {
+func methodMatchesProbeResponse(ruleMethod *string, requestMethod string) bool {
 	if ruleMethod == nil || strings.TrimSpace(*ruleMethod) == "" {
 		return true
 	}
 	return strings.EqualFold(strings.TrimSpace(*ruleMethod), requestMethod)
 }
 
-func parseHeartbeatPath(raw json.RawMessage) *effectivePathMatch {
+func parseProbeResponsePath(raw json.RawMessage) *effectivePathMatch {
 	if len(raw) == 0 {
 		return &effectivePathMatch{Type: matchTypePathPrefix, Value: "/"}
 	}
@@ -229,8 +231,8 @@ func queryParamsMatchGateway(rules []httpQueryParamMatchJSON, q url.Values) bool
 	return true
 }
 
-// HeartbeatContentType picks Content-Type for a synthetic heartbeat body.
-func HeartbeatContentType(body string) string {
+// ProbeResponseContentType picks Content-Type for a synthetic probe response body.
+func ProbeResponseContentType(body string) string {
 	b := strings.TrimSpace(body)
 	n := len(b)
 	if n >= 2 {

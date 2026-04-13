@@ -10,7 +10,7 @@ spec:
   # Synthetic responses while scaled to zero (optional). First match wins.
   # Match fields follow Gateway API HTTPRouteMatch (path, headers, queryParams, method).
   # Omit method to allow any HTTP method; omit path for default prefix "/".
-  heartbeat:
+  probeResponse:
     - path:
         type: Exact
         value: /healthz

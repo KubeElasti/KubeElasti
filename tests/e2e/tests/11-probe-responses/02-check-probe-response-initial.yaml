@@ -1,5 +1,5 @@
 apiVersion: kuttl.dev/v1beta1
 kind: TestStep
 commands:
-  - command: sh ../../manifest/patch_elastiservice_heartbeat.sh $NAMESPACE
+  - command: sh ../../manifest/check_probe_response.sh initial $NAMESPACE
     namespaced: true

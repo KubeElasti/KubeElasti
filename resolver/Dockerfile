@@ -3,19 +3,20 @@ FROM golang:1.24.6  AS builder
 ARG TARGETOS
 ARG TARGETARCH
 
-COPY ../pkg ../pkg
-
 WORKDIR /workspace
-# Copy the Go Modules manifests
-COPY ./resolver/go.mod go.mod
-COPY ./resolver/go.sum go.sum
+# Resolver module; replace directives point to ../pkg and ../operator from here.
+COPY resolver/go.mod resolver/go.sum ./
+COPY pkg/go.mod pkg/go.sum /pkg/
+COPY operator/go.mod operator/go.sum /operator/
 
 # cache deps before building and copying source so that we don't need to re-download as much
 # and so that source changes don't invalidate our downloaded layer
 RUN go mod download
 
-# Copy the go source
-COPY ./resolver/ .
+# Full source for local replace targets and resolver
+COPY pkg /pkg/
+COPY operator /operator/
+COPY resolver/ .
 
 # Build
 # the GOARCH has not a default value to allow the binary be built according to the host where the command

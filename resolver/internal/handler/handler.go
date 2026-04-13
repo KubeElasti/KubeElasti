@@ -113,7 +113,7 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 	}
 	h.logger.Debug("request received", zap.Any("host", logger.MaskMiddle(host.IncomingHost, 4, 4)))
 
-	if h.respondHeartbeatIfMatch(w, req, host) {
+	if h.respondProbeResponseIfMatch(w, req, host) {
 		return host, nil
 	}
 
@@ -173,8 +173,8 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 	return host, nil
 }
 
-// respondHeartbeatIfMatch answers configured heartbeat requests locally (no proxy, no operator notify).
-func (h *Handler) respondHeartbeatIfMatch(w http.ResponseWriter, req *http.Request, host *messages.Host) bool {
+// respondProbeResponseIfMatch answers configured probe response requests locally (no proxy, no operator notify).
+func (h *Handler) respondProbeResponseIfMatch(w http.ResponseWriter, req *http.Request, host *messages.Host) bool {
 	if h.crdCache == nil {
 		return false
 	}
@@ -183,23 +183,23 @@ func (h *Handler) respondHeartbeatIfMatch(w http.ResponseWriter, req *http.Reque
 	if !ok {
 		return false
 	}
-	body, matched := crdcache.MatchHeartbeatFromSpec(crdDetails.Spec, req)
+	body, matched := crdcache.MatchProbeResponseFromSpec(crdDetails.Spec, req)
 	if !matched {
 		return false
 	}
-	h.logger.Debug("heartbeat handled by resolver",
+	h.logger.Debug("probe response handled by resolver",
 		zap.String("namespace", host.Namespace),
 		zap.String("service", host.SourceService),
 		zap.String("path", crdcache.NormalizeHTTPPath(req.URL.Path)),
 		zap.String("method", req.Method),
 	)
-	w.Header().Set("Content-Type", crdcache.HeartbeatContentType(body))
+	w.Header().Set("Content-Type", crdcache.ProbeResponseContentType(body))
 	w.WriteHeader(http.StatusOK)
 	if req.Method == http.MethodHead {
 		return true
 	}
-	if _, err := io.WriteString(w, body); err != nil { //nolint:gosec // G705: body from ElastiService CRD heartbeat config, not request-derived HTML
-		h.logger.Error("heartbeat write response", zap.Error(err))
+	if _, err := io.WriteString(w, body); err != nil { //nolint:gosec // G705: body from ElastiService CRD probeResponse config, not request-derived HTML
+		h.logger.Error("probe response write error", zap.Error(err))
 	}
 	return true
 }

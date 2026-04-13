@@ -17,7 +17,7 @@ elastiController:
 elastiResolver:
   proxy:
     env:
-      # Speed up heartbeat CRD cache refresh during e2e (default 5m is too slow for patch assertions).
+      # Speed up probeResponse CRD cache refresh during e2e (default 5m is too slow for patch assertions).
       crdCachePollIntervalMinutes: "1"
     image:
       registry: local

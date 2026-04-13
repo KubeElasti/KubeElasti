@@ -8,8 +8,9 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
-### Improvement
-* Add heartbeat to handle liveness and other probes by @ramantehlan in [`263`](https://github.com/KubeElasti/KubeElasti/pull/263)
+### Breaking Changes
+
+* **ElastiService**: Rename `spec.heartbeat` to `spec.probeResponse` for synthetic local HTTP responses (probes, health checks); related API types renamed (for example `HeartbeatRule` → `ProbeResponseRule`) by @ramantehlan in [`263`](https://github.com/KubeElasti/KubeElasti/pull/263)
 
 ### Other
 
