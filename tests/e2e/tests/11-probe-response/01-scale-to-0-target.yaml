@@ -1,0 +1,13 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  # KEDA ScaledObject has minReplicaCount: 1; without pausing, KEDA reconciles the deployment back
+  # to at least 1 replica (see pkg/scaling/scale_handler.go handleScaleToZero).
+  - command: kubectl patch scaledobject target-scaled-object --type=merge -p '{"metadata":{"annotations":{"autoscaling.keda.sh/paused":"true","autoscaling.keda.sh/paused-replicas":"0"}}}'
+    namespaced: true
+  - command: kubectl scale deployment/target-deployment --replicas=0
+    namespaced: true
+  - command: kubectl wait --for=delete pods -l app=target-deployment --timeout=400s
+    namespaced: true
+  # To allow resolver to refresh the crd cache
+  - command: sleep 75

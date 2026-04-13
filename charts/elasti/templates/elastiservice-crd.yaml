@@ -184,7 +184,6 @@ spec:
                       properties:
                         body:
                           description: Body is the response body to return.
-                          format: byte
                           type: string
                         status:
                           description: Status is the HTTP status code to return.

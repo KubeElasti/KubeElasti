@@ -16,6 +16,9 @@ elastiController:
         memory: 64Mi
 elastiResolver:
   proxy:
+    env:
+      # Speed up probeResponse CRD cache refresh during e2e (default 5m is too slow for patch assertions).
+      crdCachePollIntervalMinutes: "1"
     image:
       registry: local
       repository: elasti-resolver
