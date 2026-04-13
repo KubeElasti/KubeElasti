@@ -46,6 +46,14 @@ type ElastiServiceSpec struct {
 	ScaleTargetRef ScaleTargetRef `json:"scaleTargetRef"`
 	// Service to scale
 	Service string `json:"service"`
+	// ProbeResponse defines synthetic HTTP responses the resolver serves locally (no proxy) while
+	// scaled to zero, e.g. for load balancer health checks. First matching rule wins.
+	// Each rule uses the same match fields and semantics as Gateway API HTTPRouteMatch
+	// (https://gateway-api.sigs.k8s.io/reference/1.5/spec/#httproutematch): path, headers,
+	// queryParams, and method are ANDed; omitted path defaults to prefix "/".
+	// +optional
+	// +kubebuilder:validation:MaxItems=32
+	ProbeResponse []ProbeResponseRule `json:"probeResponse,omitempty"`
 	// Minimum number of replicas to scale to
 	// +kubebuilder:validation:Minimum=1
 	MinTargetReplicas int32 `json:"minTargetReplicas,omitempty" default:"1"`
@@ -63,6 +71,77 @@ type ElastiServiceSpec struct {
 	// When omitted, scale-to-zero is always enabled (default behavior).
 	// When specified, scale-down only occurs during the cron schedule window.
 	EnabledPeriod *EnabledPeriod `json:"enabledPeriod,omitempty"`
+}
+
+// ProbeResponseRule is to give a local response when an incoming request matches path, headers,
+// queryParams, and method
+type ProbeResponseRule struct {
+	// Path specifies a HTTP request path matcher. Omitted defaults to prefix "/" in the resolver.
+	// +optional
+	Path *ProbeResponsePathMatch `json:"path,omitempty"`
+	// Headers specifies HTTP request header matchers (ANDed).
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	Headers []ProbeResponseHeaderMatch `json:"headers,omitempty"`
+	// QueryParams specifies HTTP query parameter matchers (ANDed).
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	QueryParams []ProbeResponseQueryParamMatch `json:"queryParams,omitempty"`
+	// Method, when set, matches the HTTP method.
+	// +optional
+	// +kubebuilder:validation:Enum=GET;HEAD;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
+	Method *string `json:"method,omitempty"`
+	// Response is the literal response body Elasti returns with HTTP 200 when this rule matches.
+	// +kubebuilder:validation:Required
+	Response ProbeResponse `json:"response"`
+}
+
+type ProbeResponse struct {
+	// Status is the HTTP status code to return.
+	// +kubebuilder:validation:Enum=200;204;400;401;403;404;500;502;503;504
+	Status int `json:"status"`
+	// Body is the response body to return.
+	// +kubebuilder:validation:Required
+	Body string `json:"body"`
+}
+
+// ProbeResponsePathMatch matches the request path (Gateway API HTTPPathMatch semantics).
+type ProbeResponsePathMatch struct {
+	// Type is Exact, PathPrefix, or RegularExpression. Empty defaults to PathPrefix in the resolver.
+	// +optional
+	// +kubebuilder:validation:Enum=Exact;PathPrefix;RegularExpression
+	Type string `json:"type,omitempty"`
+	// Value is the path or regular expression to match.
+	// +optional
+	// +kubebuilder:validation:MaxLength=1024
+	Value string `json:"value,omitempty"`
+}
+
+// ProbeResponseHeaderMatch matches one request header.
+type ProbeResponseHeaderMatch struct {
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MaxLength=256
+	Name string `json:"name"`
+	// Type is Exact or RegularExpression. Empty defaults to Exact in the resolver.
+	// +optional
+	// +kubebuilder:validation:Enum=Exact;RegularExpression
+	Type string `json:"type,omitempty"`
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MaxLength=4096
+	Value string `json:"value"`
+}
+
+// ProbeResponseQueryParamMatch matches one query parameter.
+type ProbeResponseQueryParamMatch struct {
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MaxLength=256
+	Name string `json:"name"`
+	// +optional
+	// +kubebuilder:validation:Enum=Exact;RegularExpression
+	Type string `json:"type,omitempty"`
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MaxLength=1024
+	Value string `json:"value"`
 }
 
 func (es *ElastiServiceSpec) GetScaleTargetRef() ScaleTargetRef {
