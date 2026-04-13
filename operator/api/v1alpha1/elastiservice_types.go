@@ -102,7 +102,7 @@ type ProbeResponse struct {
 	Status int `json:"status"`
 	// Body is the response body to return.
 	// +kubebuilder:validation:Required
-	Body json.RawMessage `json:"body"`
+	Body string `json:"body"`
 }
 
 // ProbeResponsePathMatch matches the request path (Gateway API HTTPPathMatch semantics).
