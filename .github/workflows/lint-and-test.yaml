@@ -53,11 +53,11 @@ jobs:
         run: go mod tidy
         working-directory: ${{ matrix.modules }}
       - name: golangci-lint ${{ matrix.modules }}
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           working-directory: ${{ matrix.modules }}
           args: -v --timeout 5m
-          version: v1.64.8
+          version: v2.11.4
   test:
     needs: detect-modules
     runs-on: ubuntu-latest

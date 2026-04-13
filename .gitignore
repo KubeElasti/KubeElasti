@@ -13,6 +13,7 @@ report.html
 site/
 db-go-service
 .cache/
+.gomodcache/
 
 .qodo
 .codeql-db
