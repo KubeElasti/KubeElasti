@@ -61,11 +61,154 @@ spec:
                 maximum: 604800
                 minimum: 0
                 type: integer
+              enabledPeriod:
+                description: |-
+                  EnabledPeriod defines when the scale-to-zero policy is active.
+                  When omitted, scale-to-zero is always enabled (default behavior).
+                  When specified, scale-down only occurs during the cron schedule window.
+                properties:
+                  duration:
+                    default: 24h
+                    description: |-
+                      Duration specifies how long the enabled period lasts from each scheduled trigger.
+                      Accepts formats like "1h", "30m", "8h", etc.
+                    type: string
+                  schedule:
+                    default: 0 0 * * *
+                    description: |-
+                      Schedule is a 5-item cron expression (minute hour day month weekday).
+                      Uses UTC timezone. Example: "0 9 * * 1-5" for 9 AM Monday-Friday.
+                    type: string
+                type: object
               minTargetReplicas:
                 description: Minimum number of replicas to scale to
                 format: int32
                 minimum: 1
                 type: integer
+              probeResponse:
+                description: |-
+                  ProbeResponse defines synthetic HTTP responses the resolver serves locally (no proxy) while
+                  scaled to zero, e.g. for load balancer health checks. First matching rule wins.
+                  Each rule uses the same match fields and semantics as Gateway API HTTPRouteMatch
+                  (https://gateway-api.sigs.k8s.io/reference/1.5/spec/#httproutematch): path, headers,
+                  queryParams, and method are ANDed; omitted path defaults to prefix "/".
+                items:
+                  description: |-
+                    ProbeResponseRule is to give a local response when an incoming request matches path, headers,
+                    queryParams, and method
+                  properties:
+                    headers:
+                      description: Headers specifies HTTP request header matchers
+                        (ANDed).
+                      items:
+                        description: ProbeResponseHeaderMatch matches one request
+                          header.
+                        properties:
+                          name:
+                            maxLength: 256
+                            type: string
+                          type:
+                            description: Type is Exact or RegularExpression. Empty
+                              defaults to Exact in the resolver.
+                            enum:
+                            - Exact
+                            - RegularExpression
+                            type: string
+                          value:
+                            maxLength: 4096
+                            type: string
+                        required:
+                        - name
+                        - value
+                        type: object
+                      maxItems: 16
+                      type: array
+                    method:
+                      description: Method, when set, matches the HTTP method.
+                      enum:
+                      - GET
+                      - HEAD
+                      - POST
+                      - PUT
+                      - DELETE
+                      - CONNECT
+                      - OPTIONS
+                      - TRACE
+                      - PATCH
+                      type: string
+                    path:
+                      description: Path specifies a HTTP request path matcher. Omitted
+                        defaults to prefix "/" in the resolver.
+                      properties:
+                        type:
+                          description: Type is Exact, PathPrefix, or RegularExpression.
+                            Empty defaults to PathPrefix in the resolver.
+                          enum:
+                          - Exact
+                          - PathPrefix
+                          - RegularExpression
+                          type: string
+                        value:
+                          description: Value is the path or regular expression to
+                            match.
+                          maxLength: 1024
+                          type: string
+                      type: object
+                    queryParams:
+                      description: QueryParams specifies HTTP query parameter matchers
+                        (ANDed).
+                      items:
+                        description: ProbeResponseQueryParamMatch matches one query
+                          parameter.
+                        properties:
+                          name:
+                            maxLength: 256
+                            type: string
+                          type:
+                            enum:
+                            - Exact
+                            - RegularExpression
+                            type: string
+                          value:
+                            maxLength: 1024
+                            type: string
+                        required:
+                        - name
+                        - value
+                        type: object
+                      maxItems: 16
+                      type: array
+                    response:
+                      description: Response is the literal response body Elasti returns
+                        with HTTP 200 when this rule matches.
+                      properties:
+                        body:
+                          description: Body is the response body to return.
+                          format: byte
+                          type: string
+                        status:
+                          description: Status is the HTTP status code to return.
+                          enum:
+                          - 200
+                          - 204
+                          - 400
+                          - 401
+                          - 403
+                          - 404
+                          - 500
+                          - 502
+                          - 503
+                          - 504
+                          type: integer
+                      required:
+                      - body
+                      - status
+                      type: object
+                  required:
+                  - response
+                  type: object
+                maxItems: 32
+                type: array
               scaleTargetRef:
                 description: ScaleTargetRef of the target resource to scale
                 properties:
