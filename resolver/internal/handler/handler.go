@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -112,6 +113,10 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 	}
 	h.logger.Debug("request received", zap.Any("host", logger.MaskMiddle(host.IncomingHost, 4, 4)))
 
+	if h.respondProbeResponseIfMatch(w, req, host) {
+		return host, nil
+	}
+
 	prom.QueuedRequestGauge.WithLabelValues(host.SourceService, host.Namespace).Inc()
 	defer prom.QueuedRequestGauge.WithLabelValues(host.SourceService, host.Namespace).Dec()
 
@@ -166,6 +171,38 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 		return host, fmt.Errorf("throttler try error: %w", tryErr)
 	}
 	return host, nil
+}
+
+// respondProbeResponseIfMatch answers configured probe response requests locally (no proxy, no operator notify).
+func (h *Handler) respondProbeResponseIfMatch(w http.ResponseWriter, req *http.Request, host *messages.Host) bool {
+	if h.crdCache == nil {
+		return false
+	}
+	key := host.Namespace + "/" + host.SourceService
+	crdDetails, ok := h.crdCache.GetElastiService(key)
+	if !ok {
+		return false
+	}
+	body, status, matched := crdcache.MatchProbeResponseFromSpec(crdDetails.Spec, req)
+	if !matched {
+		return false
+	}
+	h.logger.Debug("probe response handled by resolver",
+		zap.String("namespace", host.Namespace),
+		zap.String("service", host.SourceService),
+		zap.String("path", req.URL.Path),
+		zap.String("method", req.Method),
+		zap.Int("status", status),
+	)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(status)
+	if req.Method == http.MethodHead {
+		return true
+	}
+	if _, err := io.WriteString(w, body); err != nil { //nolint:gosec // G705: body from ElastiService CRD probeResponse config, not request-derived HTML
+		h.logger.Error("probe response write error", zap.Error(err))
+	}
+	return true
 }
 
 func (h *Handler) ProxyRequest(w http.ResponseWriter, req *http.Request, host *messages.Host, count int) (rErr error) {
