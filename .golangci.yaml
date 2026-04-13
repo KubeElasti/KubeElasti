@@ -1,15 +1,14 @@
+# https://golangci-lint.run/configuration/file/
+version: "2"
 run:
-  tests: false
   timeout: 5m
-  go: "1.23"
+  go: "1.24"
   modules-download-mode: readonly
+  tests: false
 linters:
-  # Enable specific linter
-  # https://golangci-lint.run/usage/linters/#enabled-by-default
   enable:
     - bodyclose
     - containedctx
-#     - contextcheck
     - copyloopvar
     - dogsled
     - dupl
@@ -18,46 +17,55 @@ linters:
     - errchkjson
     - errname
     - errorlint
-#    - exhaustive
-#     - forcetypeassert
     - gocognit
     - goconst
     - gocritic
     - gocyclo
-    - gofmt
     - goheader
-    - goimports
-#     - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - grouper
     - importas
     - ineffassign
-#    - ireturn
     - maintidx
     - makezero
     - misspell
     - nakedret
     - nilerr
     - nilnil
-#     - noctx
     - nolintlint
-#     - nonamedreturns
     - nosprintfhostport
     - predeclared
-#     - promlinter
     - revive
     - staticcheck
-    - stylecheck
     - thelper
     - tparallel
-    - typecheck
     - unconvert
     - unparam
     - unused
     - usetesting
     - whitespace
     - wrapcheck
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

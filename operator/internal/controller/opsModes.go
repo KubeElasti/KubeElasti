@@ -22,15 +22,15 @@ func (r *ElastiServiceReconciler) getMutexForSwitchMode(key string) *sync.Mutex 
 
 func (r *ElastiServiceReconciler) switchMode(ctx context.Context, req ctrl.Request, mode string) error {
 	{
-		r.Logger.Debug(fmt.Sprintf("[Switching to %s Mode]", strings.ToUpper(mode)), zap.String("es", req.NamespacedName.String()))
-		mutex := r.getMutexForSwitchMode(req.NamespacedName.String())
+		r.Logger.Debug(fmt.Sprintf("[Switching to %s Mode]", strings.ToUpper(mode)), zap.String("es", req.String()))
+		mutex := r.getMutexForSwitchMode(req.String())
 		mutex.Lock()
 		defer mutex.Unlock()
 	}
 
 	es, err := r.getCRD(ctx, req.NamespacedName)
 	if err != nil {
-		r.Logger.Error("Failed to get CRD", zap.String("es", req.NamespacedName.String()), zap.Error(err))
+		r.Logger.Error("Failed to get CRD", zap.String("es", req.String()), zap.Error(err))
 		return fmt.Errorf("failed to get CRD: %w", err)
 	}
 
@@ -39,18 +39,18 @@ func (r *ElastiServiceReconciler) switchMode(ctx context.Context, req ctrl.Reque
 	switch mode {
 	case values.ServeMode:
 		if err = r.enableServeMode(ctx, es); err != nil {
-			r.Logger.Error("Failed to enable SERVE mode", zap.String("es", req.NamespacedName.String()), zap.Error(err))
+			r.Logger.Error("Failed to enable SERVE mode", zap.String("es", req.String()), zap.Error(err))
 			return err
 		}
-		r.Logger.Info("[SERVE mode enabled]", zap.String("es", req.NamespacedName.String()))
+		r.Logger.Info("[SERVE mode enabled]", zap.String("es", req.String()))
 	case values.ProxyMode:
 		if err = r.enableProxyMode(ctx, req, es); err != nil {
-			r.Logger.Error("Failed to enable PROXY mode", zap.String("es", req.NamespacedName.String()), zap.Error(err))
+			r.Logger.Error("Failed to enable PROXY mode", zap.String("es", req.String()), zap.Error(err))
 			return err
 		}
-		r.Logger.Info("[PROXY mode enabled]", zap.String("es", req.NamespacedName.String()))
+		r.Logger.Info("[PROXY mode enabled]", zap.String("es", req.String()))
 	default:
-		r.Logger.Error("Invalid mode", zap.String("mode", mode), zap.String("es", req.NamespacedName.String()))
+		r.Logger.Error("Invalid mode", zap.String("mode", mode), zap.String("es", req.String()))
 	}
 	return nil
 }
