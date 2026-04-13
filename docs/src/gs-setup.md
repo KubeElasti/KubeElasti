@@ -206,41 +206,50 @@ metadata:
 spec:
   minTargetReplicas: <min-target-replicas> # (3)
   service: <service-name>
-  cooldownPeriod: <cooldown-period> # (4)
+  probeResponse: # (4) Optional
+    - method: GET
+      path:
+        type: PathPrefix
+        value: /healthz
+      response:
+        status: 200
+        body: '{"ok":true}'
+  cooldownPeriod: <cooldown-period> # (5)
   scaleTargetRef:
-    apiVersion: <apiVersion> # (5)
-    kind: <kind> # (6)
-    name: <deployment-or-rollout-or-statefulset-name> # (7)
+    apiVersion: <apiVersion> # (6)
+    kind: <kind> # (7)
+    name: <deployment-or-rollout-or-statefulset-name> # (8)
   triggers:
-  - type: <trigger-type> # (8)
-    metadata:
-      query: <query> # (9)
-      serverAddress: <server-address> # (10)
-      threshold: <threshold> # (11)
-      uptimeFilter: <uptime-filter> #(12)
-      headers: # (13)
-        key1: value1
-        key2: value2
+    - type: <trigger-type> # (9)
+      metadata:
+        query: <query> # (10)
+        serverAddress: <server-address> # (11)
+        threshold: <threshold> # (12)
+        uptimeFilter: <uptime-filter> #(13)
+        headers: # (14)
+          key1: value1
+          key2: value2
   autoscaler:
-    name: <autoscaler-object-name> # (14)
-    type: <autoscaler-type> # (15)
+    name: <autoscaler-object-name> # (15)
+    type: <autoscaler-type> # (16)
 ```
 
 1. Replace it with the service you want managed by elasti.
 2. Replace it with the namespace of the service.
 3. Replace it with the min replicas to bring up when first request arrives. Minimum: 1
-4. Replace it with the cooldown period to wait after scaling up before considering scale down. Default: 900 seconds (15 minutes) | Maximum: 604800 seconds (7 days) | Minimum: 1 second (1 second)
-5. ApiVersion should be `apps/v1` if you are using `Deployment` or `StatefulSet` or `argoproj.io/v1alpha1` in case you are using argo-rollouts. 
-6. Kind should be either `Deployment` or `Rollout`(in case you are using Argo Rollouts) or `StatefulSet` 
-7. Name should exactly match the name of the deployment or rollout or statefulset.
-8. Replace it with the trigger type. Currently, KubeElasti supports only one trigger type - `prometheus`. 
-9. Replace it with the trigger query. In this case, it is the number of requests per second.
-10. Replace it with the trigger server address. In this case, it is the address of the prometheus server.
-11. Replace it with the trigger threshold. In this case, it is the number of requests per second.
-12. Replace it with the uptime filter of your TSDB instance. Default: `container="prometheus"`.
-13. Optional headers to be sent along with the query to the prometheus server. Useful when using Grafana Mimir as the TSDB instance.
-14. Replace it with the autoscaler name. In this case, it is the name of the KEDA ScaledObject.
-15. Replace it with the autoscaler type. In this case, it is `keda`.
+4. Optional rules for health checks or other probe-style requests that should be answered directly by the resolver while the service is at 0 replicas.
+5. Replace it with the cooldown period to wait after scaling up before considering scale down. Default: 900 seconds (15 minutes) | Maximum: 604800 seconds (7 days) | Minimum: 1 second (1 second)
+6. ApiVersion should be `apps/v1` if you are using `Deployment` or `StatefulSet` or `argoproj.io/v1alpha1` in case you are using argo-rollouts.
+7. Kind should be either `Deployment` or `Rollout`(in case you are using Argo Rollouts) or `StatefulSet`
+8. Name should exactly match the name of the deployment or rollout or statefulset.
+9. Replace it with the trigger type. Currently, KubeElasti supports only one trigger type - `prometheus`.
+10. Replace it with the trigger query. In this case, it is the number of requests per second.
+11. Replace it with the trigger server address. In this case, it is the address of the prometheus server.
+12. Replace it with the trigger threshold. In this case, it is the number of requests per second.
+13. Replace it with the uptime filter of your TSDB instance. Default: `container="prometheus"`.
+14. Optional headers to be sent along with the query to the prometheus server. Useful when using Grafana Mimir as the TSDB instance.
+15. Replace it with the autoscaler name. In this case, it is the name of the KEDA ScaledObject.
+16. Replace it with the autoscaler type. In this case, it is `keda`.
 
 
 ??? example "Demo ElastiService"
@@ -253,6 +262,14 @@ spec:
     spec:
       cooldownPeriod: 5
       minTargetReplicas: 1
+      probeResponse:
+        - method: GET
+          path:
+            type: PathPrefix
+            value: /healthz
+          response:
+            status: 200
+            body: '{"ok":true}'
       scaleTargetRef:
         apiVersion: apps/v1
         kind: deployments
@@ -268,6 +285,8 @@ spec:
         name: target-scaled-object
         type: keda
     ```
+
+If your ingress, load balancer, or platform sends health checks to the service while it is scaled to zero, add a `probeResponse` rule for that path. Matching requests are answered by the resolver directly and do not scale the workload up.
 
 <br>
 
