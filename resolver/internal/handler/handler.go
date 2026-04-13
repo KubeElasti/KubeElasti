@@ -189,7 +189,7 @@ func (h *Handler) respondProbeResponseIfMatch(w http.ResponseWriter, req *http.R
 	}
 	h.logger.Debug("probe response handled by resolver",
 		zap.String("namespace", host.Namespace),
-		zap.String("service", host.SourceService),
+		zap.String("service", logger.MaskMiddle(host.SourceService, 6, 6)),
 		zap.String("path", req.URL.Path),
 		zap.String("method", req.Method),
 		zap.Int("status", status),
