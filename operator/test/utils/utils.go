@@ -22,7 +22,7 @@ import (
 	"os/exec"
 	"strings"
 
-	. "github.com/onsi/ginkgo/v2" //nolint: golint, revive, stylecheck
+	"github.com/onsi/ginkgo/v2"
 )
 
 const (
@@ -35,7 +35,7 @@ const (
 )
 
 func warnError(err error) {
-	_, err = fmt.Fprintf(GinkgoWriter, "warning: %v\n", err)
+	_, err = fmt.Fprintf(ginkgo.GinkgoWriter, "warning: %v\n", err)
 	if err != nil {
 		fmt.Println("Failed to write warning message")
 	}
@@ -55,7 +55,7 @@ func Run(cmd *exec.Cmd) ([]byte, error) {
 	cmd.Dir = dir
 
 	if err := os.Chdir(cmd.Dir); err != nil {
-		_, err := fmt.Fprintf(GinkgoWriter, "chdir dir: %s\n", err)
+		_, err := fmt.Fprintf(ginkgo.GinkgoWriter, "chdir dir: %s\n", err)
 		if err != nil {
 			return nil, fmt.Errorf("failed to chdir dir: %w", err)
 		}
@@ -64,7 +64,7 @@ func Run(cmd *exec.Cmd) ([]byte, error) {
 	cmd.Env = append(os.Environ(), "GO111MODULE=on")
 	command := strings.Join(cmd.Args, " ")
 
-	_, err := fmt.Fprintf(GinkgoWriter, "running: %s\n", command)
+	_, err := fmt.Fprintf(ginkgo.GinkgoWriter, "running: %s\n", command)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
 	}
