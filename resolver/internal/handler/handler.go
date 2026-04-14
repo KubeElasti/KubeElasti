@@ -142,6 +142,9 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 	defer cancel()
 	if tryErr := h.throttler.Try(ctx, host,
 		func(count int) error {
+			// Advice client that the outstanding connection should be closed
+			// since routing change could potentially happen after this
+			w.Header().Set("Connection", "close")
 			err := h.ProxyRequest(w, req, host, count)
 			if err != nil {
 				h.logger.Error("Error proxying request", zap.Error(err))
