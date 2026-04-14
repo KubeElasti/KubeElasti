@@ -15,6 +15,7 @@ CURL_NAMESPACE="default"
 TARGET_NAMESPACE=""
 TARGET_RESOURCE=""
 TARGET_NAME=""
+NUM_CONN_REUSED_REQUESTS=0
 MAX_RETRIES=5
 TIMEOUT=160
 
@@ -34,6 +35,10 @@ while [ "$#" -gt 0 ]; do
             TARGET_NAME="$2"
             shift 2
             ;;
+        --num-conn-reused-requests)
+            NUM_CONN_REUSED_REQUESTS="$2"
+            shift 2
+            ;;
         *)
             shift
             ;;
@@ -49,6 +54,11 @@ if [ -z "$TARGET_RESOURCE" ] || [ -z "$TARGET_NAME" ]; then
     echo "${RED}ERROR: --target-resource and --target-name flags are required.${NC}"
     exit 5
 fi
+
+CURL_REUSED_TARGETS=()
+for _i in $(seq $NUM_CONN_REUSED_REQUESTS); do
+    CURL_REUSED_TARGETS+=(-o /dev/null "$URL")
+done
 
 # --- Color Definitions ---
 RED='\033[0;31m'
@@ -130,7 +140,7 @@ for i in $(seq 1 $MAX_RETRIES); do
     echo "\n${CYAN}--- Request $i/$MAX_RETRIES ---${NC}"
     echo "  ${CYAN}Time:${NC} $(date)"
 
-    echo "  ${CYAN}Executing: kubectl exec -n $CURL_NAMESPACE $CURL_POD_NAME -- curl --max-time $TIMEOUT --retry 2 --retry-delay 1 -s -o /dev/null -w \"%{http_code}\" \"$URL\""
+    echo "  ${CYAN}Executing: kubectl exec -n $CURL_NAMESPACE $CURL_POD_NAME -- curl --max-time $TIMEOUT --retry 2 --retry-delay 1 -s ${CURL_REUSED_TARGETS[@]} -o /dev/null -w \"%{http_code\n}\" \"$URL\""
     start_time=$(date +%s)
     start_time_rfc=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     code=$(kubectl exec -n "$CURL_NAMESPACE" "$CURL_POD_NAME" -- curl \
@@ -138,9 +148,12 @@ for i in $(seq 1 $MAX_RETRIES); do
         --retry 2 \
         --retry-delay 1 \
         -s \
+        "${CURL_REUSED_TARGETS[@]}" \
         -o /dev/null \
-        -w "%{http_code}" \
+        -w "%{http_code}\n" \
         "$URL" 2>&1)
+    # In case of reused connection tests, we only care about last response code
+    code=$(echo "$code" | tail -n1)
     result=$?
     end_time=$(date +%s)
     duration=$((end_time - start_time))
