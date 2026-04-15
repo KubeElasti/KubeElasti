@@ -27,6 +27,7 @@ test:
 chmod-scripts:
 	@chmod +x ./manifest/setup.sh
 	@chmod +x ./manifest/setup-statefulset.sh
+	@chmod +x ./manifest/check_probe_response.sh
 
 .PHONY: build-images
 build-images: ## Build and push images

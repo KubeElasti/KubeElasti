@@ -8,10 +8,14 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Breaking Changes
+
+* add probeResponse to ElastiService, without scale up of the target service by `@ramantehlan`in 
+
 ### Other
 
 * docs: add project governance document and link it from contributor-facing docs
-* lint fixes: update lint version to v2 in github workflow & fix existing issues by `@ramantehlan`in [#265](https://github.com/KubeElasti/KubeElasti/pull/265)
+* lint fixes: update lint version to v2 in github workflow & fix existing issues by `@ramantehlan` in [#265](https://github.com/KubeElasti/KubeElasti/pull/265)
 
 ## v0.1.22 (2026-04-01)
 
