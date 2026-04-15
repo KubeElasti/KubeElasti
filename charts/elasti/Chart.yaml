@@ -3,8 +3,8 @@ name: elasti
 description: KubeElasti is a Kubernetes-native solution that offers scale-to-zero functionality when there is no traffic and automatic scale up to 1 when traffic arrives.
 icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/images/logo/logo_theme_200x200.png
 type: application
-version: 0.1.22
-appVersion: "0.1.22"
+version: 0.1.23
+appVersion: "0.1.23"
 # kubeVersion: ">=1.25.0-0"
 home: https://kubeelasti.dev
 sources:
