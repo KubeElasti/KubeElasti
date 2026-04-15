@@ -183,7 +183,7 @@ func (h *Handler) respondProbeResponseIfMatch(w http.ResponseWriter, req *http.R
 	if !ok {
 		return false
 	}
-	body, status, matched := crdcache.MatchProbeResponseFromSpec(crdDetails.Spec, req)
+	body, status, matched := crdcache.MatchProbeResponseFromSpec(crdDetails.Spec, req, h.logger.Named("crdcache.spec.match"))
 	if !matched {
 		return false
 	}
@@ -194,7 +194,6 @@ func (h *Handler) respondProbeResponseIfMatch(w http.ResponseWriter, req *http.R
 		zap.String("method", req.Method),
 		zap.Int("status", status),
 	)
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	if req.Method == http.MethodHead {
 		return true
