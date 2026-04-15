@@ -20,6 +20,8 @@ KubeElasti (Sometimes referred to as just "Elasti") is a Kubernetes-native solut
 
 KubeElasti uses a proxy mechanism that queues and holds requests for scaled-down services, bringing them up only when needed. The proxy is used only when the service is scaled down to 0. When the service is scaled up to 1, the proxy is disabled and the requests are processed directly by the pods of the service.
 
+KubeElasti can also serve configured probe responses directly from the resolver while a workload is scaled to zero. This allows health checks such as `/healthz` to succeed without forcing a scale-up.
+
 ## How It Works
 
 KubeElasti continuously monitors an ElastiService by evaluating a set of custom triggers defined in its configuration. These triggers represent various conditions—such as traffic metrics or other custom signals—that determine whether a service should be active or scaled down.
@@ -85,6 +87,8 @@ flowchart TB
 - **Prometheus Metrics Export:** KubeElasti exports Prometheus metrics for easy out-of-the-box monitoring. You can also import a pre-built dashboard into Grafana for comprehensive visualization.
 
 - **Generic Service Support:** KubeElasti works at the kubernetes service level. It also supports East-West traffic using cluster-local service DNS, ensuring robust and flexible traffic management across your services. So any ingress or service mesh solution can be used with KubeElasti.
+
+- **Probe Responses While Scaled to Zero:** The resolver can answer configured probe and health-check requests locally, so external checks can stay green without waking the workload.
 
 !!! tip "Request support for Scale-To-Zero on more resources"
 
