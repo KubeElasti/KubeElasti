@@ -11,14 +11,16 @@ on:
 jobs:
   greet:
     runs-on: ubuntu-latest
+    # pull_request_target uses the workflow from the *base* branch. Merge workflow changes to
+    # main (or the default branch) for updates to take effect on fork PRs.
     permissions:
       contents: read
       issues: write
       pull-requests: write
     steps:
       - name: Greet contributor
-        # v3 exposes legacy Octokit (github.issues.*); this script uses github.rest.* (Octokit REST v18+).
-        uses: actions/github-script@v7
+        # v9 runs on Node 24 (avoids Node 20 deprecation). v3 used legacy github.issues; v7+ use github.rest.issues.
+        uses: actions/github-script@v9
         env:
           PR_MESSAGE: |
             👋 Welcome to the KubeElasti community! 💖
@@ -69,6 +71,11 @@ jobs:
         with:
           script: |
             const { owner, repo } = context.repo;
+            // Octokit: modern clients use github.rest.issues; legacy (e.g. github-script v3) used github.issues.
+            const issues = github.rest?.issues ?? github.issues;
+            if (!issues?.listForRepo || !issues?.createComment) {
+              throw new Error('GitHub Issues API not available (expected github.rest.issues or github.issues)');
+            }
             const author = context.payload.pull_request?.user?.login || context.payload.issue?.user?.login;
             const isPR = !!context.payload.pull_request;
             const itemNumber = context.payload.pull_request?.number || context.payload.issue?.number;
@@ -89,7 +96,7 @@ jobs:
             let page = 1;
             let matchCount = 0;
             while (true) {
-              const { data: items } = await github.rest.issues.listForRepo({
+              const { data: items } = await issues.listForRepo({
                 owner,
                 repo,
                 creator: author,
@@ -119,7 +126,7 @@ jobs:
 
             const message = isPR ? process.env.PR_MESSAGE : process.env.ISSUE_MESSAGE;
 
-            await github.rest.issues.createComment({
+            await issues.createComment({
               owner,
               repo,
               issue_number: itemNumber,
