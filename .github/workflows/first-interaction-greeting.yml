@@ -1,5 +1,3 @@
-# Posts a welcome comment on a contributor's first issue or PR in this repo.
-# Uses pull_request_target so fork PRs can receive a comment (token has base-repo permissions).
 name: First interaction greeting
 
 on:
@@ -11,15 +9,12 @@ on:
 jobs:
   greet:
     runs-on: ubuntu-latest
-    # pull_request_target uses the workflow from the *base* branch. Merge workflow changes to
-    # main (or the default branch) for updates to take effect on fork PRs.
     permissions:
       contents: read
       issues: write
       pull-requests: write
     steps:
       - name: Greet contributor
-        # v9 runs on Node 24 (avoids Node 20 deprecation). v3 used legacy github.issues; v7+ use github.rest.issues.
         uses: actions/github-script@v9
         env:
           PR_MESSAGE: |
