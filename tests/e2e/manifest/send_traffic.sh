@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Enhanced traffic testing script with comprehensive debugging
 set -u
