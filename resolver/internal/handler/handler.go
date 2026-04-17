@@ -125,7 +125,7 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 		h.logger.Info("Traffic not allowed", zap.Any("host", logger.MaskMiddle(host.IncomingHost, 4, 4)))
 		w.Header().Set("Connection", "close")
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusForbidden)
+		w.WriteHeader(http.StatusRequestTimeout)
 		_, err := w.Write([]byte(`{"error": "traffic is switched"}`))
 		if err != nil {
 			h.logger.Error("Error writing response", zap.Error(err))
