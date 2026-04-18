@@ -41,6 +41,8 @@ reload-images: ## Reload images into kind and restart deployments
 	@kind load docker-image local/elasti-resolver:v1alpha1 --name $(CLUSTER_NAME)
 	@echo "Restarting elasti operator deployment..."
 	@kubectl rollout restart deployment elasti-operator-controller-manager -n $(ELASTI_NAMESPACE)
+	@echo "Restarting elasti resolver deployment..."
+	@kubectl rollout restart deployment elasti-resolver -n $(ELASTI_NAMESPACE)
 	@echo "Images reloaded and deployment restarted."
 
 .PHONY: kind-up

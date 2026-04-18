@@ -14,6 +14,7 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ### Other
 
+* fix: Prevent clients from reusing connections for proxy mode, fixing connection-reusing clients behavior (e.g. git) at scale 0, by `@chaserhkj` in [`269`](https://github.com/KubeElasti/KubeElasti/pull/269)
 * docs: add project governance document and link it from contributor-facing docs
 * lint fixes: update lint version to v2 in github workflow & fix existing issues by `@ramantehlan` in [#265](https://github.com/KubeElasti/KubeElasti/pull/265)
 
