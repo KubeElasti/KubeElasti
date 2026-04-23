@@ -44,3 +44,40 @@ flowchart LR
   Obs -.-> Prom["Prometheus"]
 
 ```
+
+## Request Routing
+
+The resolver identifies the target service by reading a single header on each
+incoming request. Two things decide which header is read:
+
+- By default, the resolver binary reads the standard HTTP `Host` header
+  (`resolver/cmd/main.go:51`, `HeaderForHost string ... default:"Host"`).
+- The shipped Helm chart overrides that default to `X-Envoy-Decorator-Operation`
+  (`charts/elasti/values.yaml`, `elastiResolver.proxy.env.headerForHost`) so
+  that deployments fronted by Envoy, Istio, or similar proxies that rewrite the
+  Host header keep working.
+
+Whichever header is selected, its value is parsed into `namespace` and
+`service` by `GetHost` in `hostmanager.go` and used to look up the target
+service to forward the request to.
+
+This has a practical consequence. Whatever routes traffic to the resolver,
+whether an Ingress controller, a service mesh, a `Service` selector, or a
+direct client, must arrive at the resolver with a header value that matches
+the target service's in-cluster FQDN format (for example,
+`target-deployment.target.svc.cluster.local`). If the header does not match,
+the resolver cannot tell which service the request was meant for and will not
+forward the request.
+
+The ingress example in
+[Getting Started, Setup](./gs-setup.md#3-deploy-a-target-application)
+shows one way to satisfy this: the NGINX annotation
+`nginx.ingress.kubernetes.io/upstream-vhost` rewrites the Host header to the
+service FQDN before the request reaches the resolver.
+
+To use a different header (for example, a custom one set by your edge proxy),
+override the Helm value at install time:
+
+```shell
+--set elastiResolver.proxy.env.headerForHost=X-My-Custom-Host
+```

@@ -175,6 +175,13 @@ spec:
                   number: 80
 ```
 
+The `nginx.ingress.kubernetes.io/upstream-vhost` annotation above is
+important for elasti: it sets the `Host` header on the request NGINX
+forwards upstream, and the resolver reads that header to decide which
+target service to route to. See
+[Resolver Architecture > Request Routing](./arch-resolver.md#request-routing)
+for details on how routing works and how to override the header.
+
 Apply it:
 
 ```bash
