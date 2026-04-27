@@ -8,6 +8,9 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+
+## v0.1.23 (2026-04-15)
+
 ### Breaking Changes
 
 * add probeResponse to ElastiService, without scale up of the target service by `@ramantehlan`in 
@@ -17,6 +20,8 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 * fix: Prevent clients from reusing connections for proxy mode, fixing connection-reusing clients behavior (e.g. git) at scale 0, by `@chaserhkj` in [`269`](https://github.com/KubeElasti/KubeElasti/pull/269)
 * docs: add project governance document and link it from contributor-facing docs
 * lint fixes: update lint version to v2 in github workflow & fix existing issues by `@ramantehlan` in [#265](https://github.com/KubeElasti/KubeElasti/pull/265)
+* Update github issue and PR forms, updated raw images and PR/Issue greeting message by `@ramantehlan` in [#264](https://github.com/KubeElasti/KubeElasti/pull/264)
+
 
 ## v0.1.22 (2026-04-01)
 
