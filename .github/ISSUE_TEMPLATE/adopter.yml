@@ -1,0 +1,49 @@
+name: Add us to Adopters
+description: Get listed as a KubeElasti adopter (helps motivate OSS work)
+title: "[ADOPTER] <your org/team name>"
+labels:
+  - adopters
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for using **KubeElasti**.
+
+        Adding your team as an adopter helps us stay motivated to keep investing in open source, and it adds credibility for new teams evaluating the project.
+
+        After you submit this issue, maintainers can add you to the [Adopters list](https://kubeelasti.dev/src/adopters/).
+
+        If you prefer not to share details publicly, you can keep the description brief.
+
+  - type: input
+    id: name
+    attributes:
+      label: Organization / team name
+      placeholder: "Acme Corp (Platform Team)"
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Website (optional)
+      placeholder: "https://acme.com"
+    validations:
+      required: false
+
+  - type: textarea
+    id: usage
+    attributes:
+      label: How are you using KubeElasti?
+      description: One or two sentences is perfect (e.g. workloads, clusters, ingress or mesh setup).
+      placeholder: "Using KubeElasti to scale internal APIs to zero when idle and bring them back on traffic, alongside KEDA for 1→n scaling on our EKS clusters."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Consent
+      options:
+        - label: I confirm the information above is OK to publish in the KubeElasti adopters list.
+          required: true
