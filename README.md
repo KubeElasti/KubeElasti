@@ -1,7 +1,7 @@
 > If you are using KubeElasti, please help us by giving us 30 seconds to add yourself to the [Adopters List](https://github.com/KubeElasti/KubeElasti/issues/new?template=adopter.yml). This will encourage us to continue working on it. ❤️
 
 <div align="center">
-<img src="./docs/images/logo/banner.png" alt="KubeElasti Banner">
+<img src="./docs/assets/images/logo/banner.png" alt="KubeElasti Banner">
 </div>
 
 <div align="center">
@@ -22,7 +22,7 @@ Kubernetes clusters can become costly, especially when running multiple services
 > KubeElasti(Sometimes referred to as just "Elasti").
 
 <div align="center">
-  <img src="./docs/images/intro.png" alt="Illustration of KubeElasti's active vs. serverless modes">
+  <img src="./docs/assets/images/intro.png" alt="Illustration of KubeElasti's active vs. serverless modes">
 </div>
 
 # Contents
@@ -49,7 +49,7 @@ KubeElasti is a Kubernetes-native solution that offers scale-to-zero functionali
 KubeElasti uses a proxy mechanism that queues and holds requests for scaled-down services, bringing them up only when needed. The proxy is used only when the service is scaled down to 0. When the service is scaled up to 1, the proxy is disabled and the requests are processed directly by the pods of the service.
 
 <div align="center">
-<img src="./docs/images/modes.png" width="400px">
+<img src="./docs/assets/images/modes.png" width="400px">
 </div>
 
 ## Key Features
@@ -62,19 +62,19 @@ KubeElasti uses a proxy mechanism that queues and holds requests for scaled-down
 
 - **Generic Service Support:** KubeElasti works at the kubernetes service level. It also supports East-West traffic using cluster-local service DNS, ensuring robust and flexible traffic management across your services. So any ingress or service mesh solution can be used with KubeElasti.
 
-- **Autoscaler Integration:** KubeElasti can work seamlessly with [HPA](./docs/src/gs-scalers.md#scaling-with-hpa) and [Keda](./docs/src/gs-scalers.md#scaling-with-keda).
+- **Autoscaler Integration:** KubeElasti can work seamlessly with [HPA](./docs/src/documentation/get-started/scalers.md#scaling-with-hpa) and [Keda](./docs/src/documentation/get-started/scalers.md#scaling-with-keda).
 
 # Getting Started
 
-Details on how to install and configure KubeElasti can be found in the [Getting Started](./docs/src/gs-setup.md) guide.
+Details on how to install and configure KubeElasti can be found in the [installation and demo](./docs/src/install/demo-setup.md) guide.
 
 # Configure KubeElasti
 
-Check out the different ways to configure KubeElasti in the [Configuration](./docs/src/gs-configure-elastiservice.md) guide.
+Check out the different ways to configure KubeElasti in the [Configuration](./docs/src/install/configure-elastiservice.md) guide.
 
 # Monitoring
 
-Monitoring details can be found in the [Monitoring](./docs/src/arch-monitoring.md) guide.
+Monitoring details can be found in the [Monitoring](./docs/src/documentation/get-started/monitoring.md) guide.
 
 # Development
 
@@ -90,7 +90,7 @@ Project governance details, including roles, decision-making, and maintainer res
 
 # Adopters
 
-See the list of organizations who are using KubeElasti in Production or in Staging in the [Adopters](./docs/src/adopters.md) guide.
+See the list of organizations who are using KubeElasti in Production or in Staging in the [Adopters](./docs/src/about/adopters.md) guide.
 
 
 # Getting Help

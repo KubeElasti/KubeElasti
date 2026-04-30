@@ -8,6 +8,7 @@ keywords:
   - Minikube development
   - Docker Desktop Kubernetes
   - local testing environment
+icon: lucide/test-tube
 ---
 
 # Playground
@@ -93,7 +94,7 @@ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
         --create-namespace
       ```
 
-      This will deploy a nginx ingress controller in the `ingress-nginx` namespace.
+      This will deploy an NGINX ingress controller in the `nginx` namespace.
 
 === "Istio"
 
@@ -115,7 +116,7 @@ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
       kubectl apply -f ./playground/config/gateway.yaml
       ```
 
-      This will deploy a Istio ingress controller in the `istio-system` namespace.
+      This will deploy an Istio ingress controller in the `istio-system` namespace.
 
 ## 6. Deploy KubeElasti Locally
 
@@ -145,11 +146,11 @@ Add virtual service if you are using istio.
 kubectl apply -f ./playground/config/demo-virtualService.yaml
 ```
 
-This will deploy a httpbin service in the `target` namespace.
+This will deploy a `target-deployment` (httpbin) Service, Deployment, and Ingress in the `target` namespace.
 
 ## 8. Create ElastiService Resource
 
-Using the [ElastiService Definition](./gs-configure-elastiservice.md), create a manifest file for your service and apply it. For demo, we use the below manifest.
+Using the [ElastiService Definition](../../install/configure-elastiservice.md), create a manifest file for your service and apply it. For demo, we use the below manifest.
 
 ```bash
 kubectl -n target apply -f ./playground/config/demo-deployment-elastiService.yaml
@@ -161,22 +162,22 @@ kubectl -n target apply -f ./playground/config/demo-deployment-elastiService.yam
 ### 9.1 Scale down the service
 
 ```bash
-kubectl -n target scale deployment httpbin --replicas=0
+kubectl -n target scale deployment target-deployment --replicas=0
 ```
 
 ### 9.2 Send request to the service while target is scaled down
 
 ```bash
-kubectl run -it --rm curl --image=alpine/curl -- http://httpbin.target.svc.cluster.local/headers
+kubectl run -it --rm curl --image=alpine/curl -- http://target-deployment.target.svc.cluster.local/headers
 ```
 
 ### 9.3 Portforward Ingress
 
 ```bash
-kubectl port-forward svc/nginx-ingress-controller 8080:80 -n ingress-nginx
+# NGINX (release name "nginx-ingress" installed in the "nginx" namespace)
+kubectl port-forward svc/nginx-ingress-ingress-nginx-controller 8080:80 -n nginx
 
-# or 
-
+# or Istio
 kubectl port-forward -n istio-system svc/istio-ingressgateway 8080:80
 ```
 
@@ -189,7 +190,7 @@ You should see the target service pod getting scaled up and response from the ne
 ```bash
 kubectl logs -n elasti deployments/elasti-operator-controller-manager -f
 kubectl logs -n elasti deployments/elasti-resolver -f
-kubectl logs -n target deployments/httpbin -f
+kubectl logs -n target deployments/target-deployment -f
 kubectl logs -n istio-system deployments/istiod -f
 ```
 

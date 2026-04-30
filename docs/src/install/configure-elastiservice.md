@@ -8,9 +8,12 @@ keywords:
   - scale to zero configuration
   - ElastiService yaml
   - KubeElasti triggers
+icon: lucide/sliders-horizontal
 ---
 
-# Configure ElastiService
+# Configuration
+
+## ElastiService
 
 To enable scale to 0 on any supported resource, we will need to create an ElastiService custom resource for that resource. 
 
@@ -23,66 +26,68 @@ metadata:
   name: <service-name> # (1)
   namespace: <service-namespace> # (2)
 spec:
-  minTargetReplicas: <min-target-replicas> # (3)
-  service: <service-name>
-  probeResponse: # (4) Optional
-    - method: GET # (5)
-      path: # (6)
+  service: <service-name> # (3)
+  minTargetReplicas: <min-target-replicas> # (4)
+  cooldownPeriod: <cooldown-period> # (5)
+  scaleTargetRef:
+    apiVersion: <apiVersion> # (6)
+    kind: <kind> # (7)
+    name: <deployment-or-rollout-or-statefulset-name> # (8)
+  triggers:
+    - type: <trigger-type> # (9)
+      metadata:
+        query: <query> # (10)
+        serverAddress: <server-address> # (11)
+        threshold: <threshold> # (12)
+        uptimeFilter: <uptime-filter> # (13)
+  autoscaler: # (14) Optional
+    name: <autoscaler-object-name> # (15)
+    type: <autoscaler-type> # (16)
+  probeResponse: # (17) Optional
+    - method: GET # (18)
+      path: # (19)
         type: PathPrefix
         value: /healthz
-      headers: # (7) Optional
+      headers: # (20) Optional
         - name: X-Probe-Type
           value: lb
-      queryParams: # (8) Optional
+      queryParams: # (21) Optional
         - name: source
           value: healthcheck
       response:
-        status: 200 # (9)
-        body: '{"ok":true}' # (10)
-  cooldownPeriod: <cooldown-period> # (11)
-  scaleTargetRef:
-    apiVersion: <apiVersion> # (12)
-    kind: <kind> # (13)
-    name: <deployment-or-rollout-or-statefulset-name> # (14)
-  enabledPeriod: # (22) Optional
-    schedule: <cron-schedule> # (23)
-    duration: <duration> # (24)
-  triggers:
-    - type: <trigger-type> # (15)
-      metadata:
-        query: <query> # (16)
-        serverAddress: <server-address> # (17)
-        threshold: <threshold> # (18)
-        uptimeFilter: <uptime-filter> #(19)
-  autoscaler:
-    name: <autoscaler-object-name> # (20)
-    type: <autoscaler-type> # (21)
+        status: 200 # (22)
+        body: '{"ok":true}' # (23)
+  enabledPeriod: # (24) Optional
+    schedule: <cron-schedule> # (25)
+    duration: <duration> # (26)
 ```
 
-1. Replace it with the service you want managed by elasti.
-2. Replace it with the namespace of the service.
-3. Replace it with the min replicas to bring up when first request arrives. Minimum: 1
-4. **Optional**: Configure synthetic responses that the resolver can serve directly while the target workload is scaled to zero. This is useful for load balancer health checks and similar probes.
-5. Match the HTTP method. If omitted, any method matches.
-6. Match the request path using `Exact`, `PathPrefix`, or `RegularExpression`. If omitted, it defaults to a path prefix of `/`.
-7. **Optional**: Match request headers. All listed headers must match.
-8. **Optional**: Match query parameters. All listed query params must match.
-9. HTTP status code to return when this rule matches. Supported values are `200`, `204`, `400`, `401`, `403`, `404`, `500`, `502`, `503`, and `504`.
-10. JSON response body returned by the resolver. The resolver serves it with `Content-Type: application/json; charset=utf-8`.
-11. Replace it with the cooldown period to wait after scaling up before considering scale down. Default: 900 seconds (15 minutes) | Maximum: 604800 seconds (7 days) | Minimum: 1 second (1 second)
-12. ApiVersion should be `apps/v1` if you are using `Deployment` or `StatefulSet` or `argoproj.io/v1alpha1` in case you are using argo-rollouts.
-13. Kind should be either `Deployment` or `Rollout`(in case you are using Argo Rollouts) or `StatefulSet`
-14. Name should exactly match the name of the deployment or rollout or statefulset.
-15. Replace it with the trigger type. Currently, KubeElasti supports only one trigger type - `prometheus`.
-16. Replace it with the trigger query. In this case, it is the number of requests per second.
-17. Replace it with the trigger server address. In this case, it is the address of the prometheus server.
-18. Replace it with the trigger threshold. In this case, it is the number of requests per second.
-19. Replace it with the uptime filter of your TSDB instance. Default: `container="prometheus"`.
-20. Replace it with the autoscaler name. In this case, it is the name of the KEDA ScaledObject.
-21. Replace it with the autoscaler type. In this case, it is `keda`.
-22. **Optional**: Define when scale-to-zero is active. Omit this field for always-on behavior.
-23. Replace with a 5-item cron expression (minute hour day month weekday) in UTC.
-24. Replace with a duration string (e.g., "8h", "24h").
+1. Name of the ElastiService object. Conventionally matches the name of the Kubernetes `Service` you want to manage.
+2. Namespace of the Kubernetes `Service` to manage. The ElastiService must live in the same namespace.
+3. Name of the existing Kubernetes `Service` whose traffic should be intercepted while the workload is at zero replicas.
+4. Minimum number of replicas to bring up when the first request arrives. **Minimum: 1**.
+5. Cooldown period (in seconds) to wait after scaling up before considering scale down. **Default: 900 (15 minutes) | Maximum: 604800 (7 days) | Minimum: 0 (disable cooldown).**
+6. `apiVersion` of the scale target. Use `apps/v1` for `Deployment` and `StatefulSet`, or `argoproj.io/v1alpha1` for Argo Rollouts.
+7. `kind` of the scale target. One of `Deployment`, `StatefulSet`, or `Rollout`.
+8. Name of the deployment, rollout, or statefulset to scale.
+9. Trigger type. Currently only `prometheus` is supported.
+10. Prometheus query that decides scale-down. KubeElasti polls this metric and compares against `threshold`.
+11. Address of the Prometheus server (e.g. `http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090`).
+12. Numeric threshold. If the query value is **below** this for the cooldown window, the workload is scaled to zero.
+13. **Optional** PromQL filter used to detect Prometheus uptime, defaults to `container="prometheus"`.
+14. **Optional** integration with an external autoscaler. Currently only `keda` is wired in. KubeElasti pauses the ScaledObject while the workload is at zero so KEDA does not bring it back up.
+15. Name of the KEDA `ScaledObject` to pause/resume.
+16. Autoscaler type. Currently only `keda` is supported.
+17. **Optional** list of probe-response rules. Matching requests are answered directly by the resolver while the workload is scaled to zero, **without** triggering scale-up.
+18. **Optional** HTTP method to match. If omitted, any method matches.
+19. **Optional** request path matcher. `type` is one of `Exact`, `PathPrefix`, or `RegularExpression`. If `path` is omitted, the rule defaults to a `PathPrefix` of `/`.
+20. **Optional** header matchers (ANDed). All listed headers must match for the rule to fire.
+21. **Optional** query-parameter matchers (ANDed). All listed params must match for the rule to fire.
+22. HTTP status code to return when this rule matches. Allowed values: `200`, `204`, `400`, `401`, `403`, `404`, `500`, `502`, `503`, `504`.
+23. Response body returned by the resolver. Sent with `Content-Type: application/json; charset=utf-8`.
+24. **Optional** schedule that gates when scale-to-zero is active. If omitted, scale-to-zero is always active.
+25. 5-field cron expression (minute hour day month weekday) in **UTC** that opens the scale-to-zero window.
+26. Go duration string (for example `"8h"`, `"24h"`) that controls how long each window lasts.
 
 The key fields to be specified in the spec are:
 
@@ -94,28 +99,28 @@ The key fields to be specified in the spec are:
 - `<kind>`: Replace by `Rollout` or `Deployment` or `StatefulSet`
 - `<apiVersion>`: Replace with `argoproj.io/v1alpha1` or `apps/v1`
 - `<deployment-or-rollout-or-statefulset-name>`: Replace with name of the rollout or the deployment or statefulset for the service. This will be scaled up to min-target-replicas when first request comes
-- `cooldownPeriod`: Minimum time (in seconds) to wait after scaling up before considering scale down. 
+- `cooldownPeriod`: Minimum time (in seconds) to wait after scaling up before considering scale down.
     - Default: 900 seconds (15 minutes)
     - Maximum: 604800 seconds (7 days)
-    - Minimum: 1 seconds (1 second)
+    - Minimum: 0 seconds (disable cooldown)
 - `probeResponse`: **Optional** list of probe match rules that return a synthetic response directly from the resolver while the target is scaled to zero
     - Rules are evaluated in order
     - First match wins
     - Requests served by `probeResponse` do not trigger scale-up
 - `triggers`: List of conditions that determine when to scale down (currently supports only Prometheus metrics)
-- `autoscaler`: **Optional** integration with an external autoscaler (HPA/KEDA) if needed
-    - `<autoscaler-type>`: keda
-    - `<autoscaler-object-name>`: Name of the KEDA ScaledObject
+- `autoscaler`: **Optional** integration with an external autoscaler. Currently only **KEDA** is supported. KubeElasti pauses the named `ScaledObject` while the workload is at zero so KEDA does not bring it back up. HPA does not need to be registered here — it works alongside KubeElasti without coordination.
+    - `<autoscaler-type>`: `keda`
+    - `<autoscaler-object-name>`: Name of the KEDA `ScaledObject`
 
----
 
-## Configuration Explanation
+
+## Specs
 
 The section below explains how the different configuration options are used in KubeElasti.
 
-### **1. scaleTargetRef: Which service KubeElasti should manage**
+### **1. scaleTargetRef**
 
-This is defined using the `scaleTargetRef` field in the spec. 
+Target service is defined using the `scaleTargetRef` field in the spec. 
 
 - `scaleTargetRef.kind`: should be either be  `Deployment` or `Rollout` or `StatefulSet` (in case you are using Argo Rollouts). 
 - `scaleTargetRef.apiVersion` should be `apps/v1` if you are using `Deployment` or `StatefulSet` or `argoproj.io/v1alpha1` in case you are using argo-rollouts.  
@@ -123,9 +128,9 @@ This is defined using the `scaleTargetRef` field in the spec.
 
 <br>
 
-### **2. Triggers: When to scale down the service to 0**
+### **2. triggers**
 
-This is defined using the `triggers` field in the spec. Currently, KubeElasti supports only one trigger type - `prometheus`. 
+Triggers to scale down the service to 0 is defined using the `triggers` field in the spec. Currently, KubeElasti supports only one trigger type - `prometheus`. 
 The `metadata` section holds trigger-specific data:  
 
 - **query** - the Prometheus query to evaluate  
@@ -139,16 +144,16 @@ An example trigger is as follows:
 
 ```yaml
 triggers:
-- type: prometheus
+  - type: prometheus
     metadata:
-    query: sum(rate(nginx_ingress_controller_nginx_process_requests_total[1m])) or vector(0)
-    serverAddress: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
-    threshold: 0.5
+      query: sum(rate(nginx_ingress_controller_requests[1m])) or vector(0)
+      serverAddress: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+      threshold: "0.5"
 ```
 
 <br>
 
-### **3. ProbeResponse: Answer health checks without scaling up**
+### **3. probeResponse**
 
 The optional `probeResponse` field lets the resolver return a local response for matching requests while the target service remains scaled to zero. This is mainly useful for liveness checks, readiness checks, or load balancer health checks that should succeed even when no application pods are running.
 
@@ -183,7 +188,7 @@ Use `PathPrefix` for simple health endpoints and `RegularExpression` only when y
 
 <br>
 
-### **4. Scalers: How to scale up the service to 1**
+### **4. scalers**
 
 Once the service is scaled down to 0, we also need to pause the current autoscaler to make sure it doesn't scale up the service again. While this is not a problem with HPA, Keda will scale up the service again since the min replicas is 1. Hence, KubeElasti needs to know about the **KEDA** ScaledObject so that it can pause it. This information is provided in the `autoscaler` field of the ElastiService. Currently, the only supported autoscaler type is **keda**.
 
@@ -195,17 +200,17 @@ autoscaler:
 
 <br>
 
-### **5. CooldownPeriod: Minimum time (in seconds) to wait after scaling up before considering scale down**
+### **5. cooldownPeriod**
 
-As soon as the service is scaled down to 0, KubeElasti **resolver** will start accepting requests for that service. On receiving the first request, it will scale up the service to `minTargetReplicas`. Once the pod is up, the new requests are handled by the service pods and do not pass through the elasti-resolver. The requests that came before the pod scaled up are held in memory of the elasti-resolver and are processed once the pod is up.
+Minimum time (in seconds) to wait after scaling up before considering scale down. As soon as the service is scaled down to 0, KubeElasti **resolver** will start accepting requests for that service. On receiving the first request, it will scale up the service to `minTargetReplicas`. Once the pod is up, the new requests are handled by the service pods and do not pass through the elasti-resolver. The requests that came before the pod scaled up are held in memory of the elasti-resolver and are processed once the pod is up.
 
 We can configure the `cooldownPeriod` to specify the minimum time (in seconds) to wait after scaling up before considering scale down.
 
 <br>
 
-### **6. EnabledPeriod: Control when scale-to-zero is active (Optional)**
+### **6. enabledPeriod**
 
-The `enabledPeriod` field allows you to define specific time windows when the scale-to-zero policy should be active. Outside of these periods, KubeElasti will maintain the service at `minTargetReplicas` and prevent scale-down. This is useful for scenarios like:
+Control when scale-to-zero is active (Optional). The `enabledPeriod` field allows you to define specific time windows when the scale-to-zero policy should be active. Outside of these periods, KubeElasti will maintain the service at `minTargetReplicas` and prevent scale-down. This is useful for scenarios like:
 
 - Only allowing scale-to-zero during night hours
 - Preventing scale-down during business hours when you want services always ready

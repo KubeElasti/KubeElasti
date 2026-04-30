@@ -8,13 +8,16 @@ keywords:
   - Kubernetes operators in production
   - serverless Kubernetes adoption
   - cloud native organizations
+icon: lucide/building-2
+hide:
+  - toc
+  # - navigation
+  # - path
 ---
 
 # KubeElasti Adopters
 
-This page contains a list of organizations who are using KubeElasti in production or in stages of development.
-
-If you would like to be included in this table, please open an issue and your information will be added.
+This page contains a list of organizations who are using KubeElasti in production or in stages of development. If you would like to be included in this table, open a [**issue on Github**](https://github.com/KubeElasti/KubeElasti/issues/new?template=adopter.yml) and maintainers will add your entry.
 
 ## Adopters
 

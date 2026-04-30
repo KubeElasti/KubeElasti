@@ -17,7 +17,7 @@ entries:
       arrives.
     digest: a02f9e132660d1d459c8ded1f749664e8f2e33da3721c854db1a1defe344c9d2
     home: https://kubeelasti.dev
-    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/images/logo/logo_theme_200x200.png
+    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/assets/images/logo/logo_theme_200x200.png
     keywords:
     - Scale-to-zero
     - Operator
@@ -46,7 +46,7 @@ entries:
       arrives.
     digest: d062f2be6f42897a2a6305490b106f7583cc09d2eefbbfa4129390ab37cc7bfe
     home: https://kubeelasti.dev
-    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/images/logo/logo_theme_200x200.png
+    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/assets/images/logo/logo_theme_200x200.png
     keywords:
     - Scale-to-zero
     - Operator
@@ -75,7 +75,7 @@ entries:
       arrives.
     digest: d311a24007a90e05a69e9193f0258a0bf939b81d6c078c310eaa6a17fb831b47
     home: https://kubeelasti.dev
-    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/images/logo/logo_theme_200x200.png
+    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/assets/images/logo/logo_theme_200x200.png
     keywords:
     - Scale-to-zero
     - Operator

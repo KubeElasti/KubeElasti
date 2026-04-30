@@ -1,7 +1,7 @@
 ---
-title: "KubeElasti - Serverless for Kubernetes | Auto Scale-to-Zero"
+title: "KubeElasti"
 description: "KubeElasti automatically scales your Kubernetes services to zero when idle and scales up when traffic arrives. Save costs without losing traffic, no code changes required."
-keywords: 
+keywords:
   - Kubernetes serverless
   - scale to zero
   - Kubernetes auto-scaling
@@ -12,206 +12,279 @@ keywords:
   - cloud native
   - DevOps automation
   - resource optimization
+icon: lucide/sparkles
 hide:
   - navigation
   - toc
 ---
 
-<!-- Hero Section -->
-<div class="hero-section">
-  <div class="hero-content">
-  <div class="hero-logo-title">
-    <!-- <img src="images/logo/logo_theme_200x200.png" alt="KubeElasti Logo" class="hero-logo"> -->
-     <h1 class="hero-title">KubeElasti</h1>
-    </div>
-    <p class="hero-subtitle">Serverless for Kubernetes</p>
-    <p class="hero-description">Automatically scale your services to zero when idle and scale up when traffic arrives.
-    <br><br>
-    KubeElasti <b>saves cost</b> using scale-to-zero <b>without losing any traffic</b>, requires <b>no code changes</b>, and integrates with your existing Kubernetes infrastructure.</p>
-    <div class="hero-buttons">
-      <a href="/src/gs-setup/" class="md-button md-button--primary">Get Started</a>
-      <a href="https://slack.cncf.io/" class="md-button" rel="noopener noreferrer">Join #kubeelasti on CNCF Slack</a>
-    </div>
-  </div>
-  <div class="hero-image">
-    <img src="images/hero.png" alt="Illustration of KubeElasti scale-to-zero lifecycle">
-  </div>
-</div>
-
-<!-- Features Section -->
-<div class="features-section">
-  <h2>Key Features</h2>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">💰</div>
-      <h3>Cost Optimization</h3>
-      <p>Scale to zero when there's no traffic to save resources and reduce costs</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">⚡</div>
-      <h3>Zero Downtime</h3>
-      <p>Queues requests during scale-up to ensure no traffic is lost</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔧</div>
-      <h3>Simple Configuration</h3>
-      <p>Easy setup with a single CRD and minimal configuration required</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔄</div>
-      <h3>Seamless Compatibility</h3>
-      <p>Works with your existing Kubernetes setup, HPA, and Keda</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📈</div>
-      <h3>Out of Box Monitoring</h3>
-      <p>Built-in monitoring with Prometheus metrics and Grafana dashboards</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🛡️</div>
-      <h3>Request Preservation</h3>
-      <p>Ensures all incoming requests are processed even during scale operations</p>
-    </div>
-  </div>
-</div>
-
-<!-- How It Works Section -->
-<div class="how-it-works-section">
-  <h2>How It Works</h2>
-  <div class="how-it-works-content">
-    <div class="how-it-works-image">
-      <img src="images/modes.png" alt="Diagram illustrating KubeElasti proxy and serve modes">
-    </div>
-    <div class="how-it-works-steps">
-      <div class="step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h3>Scaling Down</h3>
-          <p>When all triggers indicate inactivity, KubeElasti scales the service to 0 replicas and switches to proxy mode</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h3>Traffic Queueing</h3>
-          <p>In proxy mode, KubeElasti intercepts and queues incoming requests to the scaled-down service</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h3>Scaling Up</h3>
-          <p>When traffic arrives, KubeElasti immediately scales the service back up to its minimum replicas</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-number">4</div>
-        <div class="step-content">
-          <h3>Serve Mode</h3>
-          <p>Once the service is up, KubeElasti switches to serve mode and processes all queued requests</p>
-        </div>
+<div class="landing">
+  <section class="landing-hero">
+    <div class="landing-hero__copy">
+      <p class="landing-badge"><span class="landing-badge__dot" aria-hidden="true"></span> CNCF Sandbox · Scale-to-zero for HTTP services</p>
+      <h1 class="landing-hero__title">Automatically scale your services to zero when idle and scale up when traffic arrives.</h1>
+      <p class="landing-hero__lead"></p>
+      <p class="landing-hero__body">
+        A Kubernetes-native operator that saves cost using scale-to-zero without losing any traffic, requires no code changes, and integrates with your existing Kubernetes infrastructure.
+      </p>
+      <div class="landing-hero__actions">
+        <a href="/src/install/installation/" class="md-button md-button--primary">Get started</a>
+        <a href="https://slack.cncf.io/" class="md-button" rel="noopener noreferrer">CNCF Slack · #kubeelasti</a>
       </div>
     </div>
+    <div class="landing-hero__visual">
+      <img src="assets/images/hero.png" width="960" height="720" alt="Illustration of KubeElasti scale-to-zero lifecycle" loading="eager" decoding="async">
+    </div>
+  </section>
+
+  <div class="landing-pillars" role="list">
+    <div class="landing-pillar" role="listitem">
+      <span class="landing-pillar__label">Traffic</span>
+      <p class="landing-pillar__text">Queue-aware resolver holds HTTP requests while the first pod comes online.</p>
+    </div>
+    <div class="landing-pillar" role="listitem">
+      <span class="landing-pillar__label">Signals</span>
+      <p class="landing-pillar__text">Prometheus queries and thresholds decide when it is safe to scale to zero.</p>
+    </div>
+    <div class="landing-pillar" role="listitem">
+      <span class="landing-pillar__label">Fit</span>
+      <p class="landing-pillar__text">Works with the ingress and mesh you already run, no new programming model.</p>
+    </div>
   </div>
-</div>
 
-<!-- Get Started Section -->
-<div class="get-started-section">
-  <h2>Serverless with just 1 File</h2>
-  <div class="get-started-steps">
-    <div class="code-block">
-      <pre><code> 
-<span class="gray"># Create ElastiService CRD for the service you want to optimize</span>
-<span class="gray"># Replace values between <> with actual values</span>
-kubectl apply -f - &lt;&lt;EOF <span class="blue">
-apiVersion: <span class="green">elasti.truefoundry.com/v1alpha1</span>
-kind: <span class="green">ElastiService</span>
-metadata:
-  name: <span class="yellow">&lt;TARGET_SERVICE&gt;</span>
-  namespace: <span class="yellow">&lt;TARGET_SERVICE_NAMESPACE&gt;</span>
-spec:
-  minTargetReplicas: <span class="green">1</span>
-  service: <span class="yellow">&lt;TARGET_SERVICE_NAME&gt;</span>
-  cooldownPeriod: <span class="green">5</span>
-  scaleTargetRef:
-    apiVersion: <span class="green">apps/v1</span>
-    kind: <span class="green">deployments</span>
-    name: <span class="yellow">&lt;TARGET_DEPLOYMENT_NAME&gt;</span>
-  triggers:
-    - type:   <span class="green">prometheus</span>
-      metadata:
-        <span class="gray"># Select a trigger metric to monitor</span>
-        query: <span class="green">sum(rate(nginx_ingress_controller_nginx_process_requests_total[1m])) or vector(0)</span>
-        <span class="gray"># Replace with the address of your Prometheus server</span>
-        serverAddress: <span class="green">http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090</span>
-        threshold: <span class="green">"0.5"</span>
-</span>EOF
+  <section class="landing-section" aria-labelledby="features-title">
+    <header class="landing-section__head">
+      <p class="landing-section__eyebrow">Product</p>
+      <h2 class="landing-section__title" id="features-title">Built for real clusters</h2>
+      <p class="landing-section__desc">Scale-to-zero without replacing your ingress, mesh, or workloads.</p>
+    </header>
+    <div class="landing-bento">
+      <article class="landing-bento__item landing-bento__item--wide">
+        <div class="landing-bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <h3>Save cost</h3>
+        <p>Turn off pods when triggers say the workload is idle. Cooldowns and optional windows keep behaviour predictable.</p>
+      </article>
+      <article class="landing-bento__item landing-bento__item--wide">
+        <div class="landing-bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>Wake path that preserves requests</h3>
+        <p>Proxy mode queues traffic at zero replicas, then hands off to pods in serve mode when ready.</p>
+      </article>
+      <article class="landing-bento__item">
+        <div class="landing-bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <h3>One CRD to adopt</h3>
+        <p><code>ElastiService</code> references your existing Service, Deployment, StatefulSet, or Argo Rollout.</p>
+      </article>
+      <article class="landing-bento__item">
+        <div class="landing-bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+        </div>
+        <h3>HPA and KEDA friendly</h3>
+        <p>Scale from zero with KubeElasti; let HPA or KEDA own 1→N. Optional KEDA pause keeps ScaledObjects from fighting idle scale.</p>
+      </article>
+      <article class="landing-bento__item">
+        <div class="landing-bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+        </div>
+        <h3>Observable by default</h3>
+        <p>Prometheus metrics for operator and resolver; wire ServiceMonitors when you enable chart monitoring.</p>
+      </article>
+      <article class="landing-bento__item landing-bento__item--accent">
+        <div class="landing-bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Probe responses at zero replicas</h3>
+        <p>Answer health checks from the resolver so load balancers stay green without forcing a scale-up.</p>
+      </article>
+    </div>
+  </section>
 
-<span class="gray"># 🎉 That's it! You just created a scale-to-zero service</span>
+  <section class="landing-section" aria-labelledby="flow-title">
+    <header class="landing-section__head">
+      <p class="landing-section__eyebrow">Lifecycle</p>
+      <h2 class="landing-section__title" id="flow-title">From steady traffic to cold start</h2>
+      <p class="landing-section__desc">Four beats that match how the controller and resolver cooperate.</p>
+    </header>
+    <div class="landing-split">
+      <div class="landing-split__media">
+        <img src="assets/images/modes.png" width="800" height="600" alt="Diagram illustrating KubeElasti proxy and serve modes" loading="lazy" decoding="async">
+      </div>
+      <div class="landing-flow" role="list">
+        <div class="landing-flow__row" role="listitem">
+          <div class="landing-flow__num">1</div>
+          <div class="landing-flow__body">
+            <h3>Scale down</h3>
+            <p>When triggers stay under threshold, replicas go to zero and the Service shifts to proxy mode.</p>
+          </div>
+        </div>
+        <div class="landing-flow__row" role="listitem">
+          <div class="landing-flow__num">2</div>
+          <div class="landing-flow__body">
+            <h3>Queue at the edge</h3>
+            <p>The resolver accepts HTTP, matches optional probe rules, and queues everything else.</p>
+          </div>
+        </div>
+        <div class="landing-flow__row" role="listitem">
+          <div class="landing-flow__num">3</div>
+          <div class="landing-flow__body">
+            <h3>Scale up</h3>
+            <p>First meaningful request notifies the operator; workloads return to <code>minTargetReplicas</code>.</p>
+          </div>
+        </div>
+        <div class="landing-flow__row" role="listitem">
+          <div class="landing-flow__num">4</div>
+          <div class="landing-flow__body">
+            <h3>Serve mode</h3>
+            <p>Endpoints point at live pods again; queued work drains and the data path stays direct.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-section" aria-labelledby="install-title">
+    <header class="landing-section__head">
+      <p class="landing-section__eyebrow">Install</p>
+      <h2 class="landing-section__title" id="install-title">Scale-to-zero with just one file</h2>
+      <p class="landing-section__desc">Replace placeholders, apply, then follow the full Helm guide for production defaults.</p>
+    </header>
+    <div class="landing-code-wrap">
+      <div class="landing-code">
+        <div class="landing-code__chrome" aria-hidden="true">
+          <span class="landing-code__dot"></span>
+          <span class="landing-code__dot"></span>
+          <span class="landing-code__dot"></span>
+          <span class="landing-code__label">elasti-service.yaml</span>
+        </div>
+        <pre><code><span class="cc"># Create an ElastiService for the workload you want at zero when idle</span>
+<span class="cc"># Replace placeholders, then: kubectl apply -f elasti-service.yaml</span>
+kubectl apply -f - <span class="ck">&lt;&lt;</span><span class="cn">EOF</span>
+<span class="ck">apiVersion:</span> elasti.truefoundry.com/v1alpha1
+<span class="ck">kind:</span> ElastiService
+<span class="ck">metadata:</span>
+  <span class="ck">name:</span> <span class="cs">&lt;TARGET_SERVICE&gt;</span>
+  <span class="ck">namespace:</span> <span class="cs">&lt;TARGET_SERVICE_NAMESPACE&gt;</span>
+<span class="ck">spec:</span>
+  <span class="ck">minTargetReplicas:</span> <span class="cn">1</span>
+  <span class="ck">service:</span> <span class="cs">&lt;TARGET_SERVICE_NAME&gt;</span>
+  <span class="ck">cooldownPeriod:</span> <span class="cn">5</span>
+  <span class="ck">scaleTargetRef:</span>
+    <span class="ck">apiVersion:</span> apps/v1
+    <span class="ck">kind:</span> Deployment
+    <span class="ck">name:</span> <span class="cs">&lt;TARGET_DEPLOYMENT_NAME&gt;</span>
+  <span class="ck">triggers:</span>
+    - <span class="ck">type:</span> prometheus
+      <span class="ck">metadata:</span>
+        <span class="ck">query:</span> <span class="cs">sum(rate(nginx_ingress_controller_requests[1m])) or vector(0)</span>
+        <span class="ck">serverAddress:</span> <span class="cs">http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090</span>
+        <span class="ck">threshold:</span> <span class="cs">"0.5"</span>
+<span class="cn">EOF</span>
 </code></pre>
-</div>
-
-  </div>
-       <div class="get-started-content">
-      <p>KubeElasti is easy to set up and configure. Follow our step-by-step guide to get started.</p>
-      <a href="/src/gs-setup/" class="md-button md-button--primary">Full Installation Guide</a>
+      </div>
+      <div class="landing-cta-row">
+        <a href="/src/install/installation/" class="md-button md-button--primary">Full installation guide</a>
+      </div>
     </div>
-</div>
+  </section>
 
-<div class="get-started-section">
-  <h2>Demo - See KubeElasti in action!</h2>
-<div style="position: relative; padding-bottom: 55.026178010471206%; height: 0;">
+  <section class="landing-section" aria-labelledby="demo-title">
+    <header class="landing-section__head">
+      <p class="landing-section__eyebrow">Watch</p>
+      <h2 class="landing-section__title" id="demo-title">See KubeElasti in action</h2>
+      <p class="landing-section__desc">Walkthrough of install, triggers, and a live scale-to-zero path.</p>
+    </header>
+    <div class="landing-video">
+      <div class="landing-video__inner">
+        <iframe
+          src="https://www.loom.com/embed/53b7b524b4c342f99ba44fd5d8104265?sid=c88660d1-a569-470c-8224-b1fffde9a2c6"
+          title="KubeElasti demo video"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
 
-<iframe
-    src="https://www.loom.com/embed/53b7b524b4c342f99ba44fd5d8104265?sid=c88660d1-a569-470c-8224-b1fffde9a2c6"
-    frameborder="0"
-    webkitallowfullscreen
-    mozallowfullscreen
-    allowfullscreen
-    title="KubeElasti Demo"
-    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
-</iframe>
+  <section class="landing-section" aria-labelledby="community-title">
+    <header class="landing-section__head">
+      <p class="landing-section__eyebrow">Community</p>
+      <h2 class="landing-section__title" id="community-title">Build with us</h2>
+      <p class="landing-section__desc">Issues, design notes, and adopters all land in the open.</p>
+    </header>
+    <div class="landing-community">
+      <a class="landing-community__link" href="https://github.com/KubeElasti/KubeElasti" rel="noopener noreferrer">
+        <span class="landing-community__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.01-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.775.417-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57A12.034 12.034 0 0 0 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        </span>
+        <span class="landing-community__label">GitHub</span>
+      </a>
+      <a class="landing-community__link" href="https://slack.cncf.io/" rel="noopener noreferrer">
+        <span class="landing-community__icon" aria-hidden="true">
+          <svg class="landing-community__icon-svg--slack" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 270" fill="currentColor" focusable="false">
+            <g>
+              <g>
+                <path d="M99.4,151.2c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h12.9V151.2z"/>
+                <path d="M105.9,151.2c0-7.1,5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v32.3c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9C105.9,183.5,105.9,151.2,105.9,151.2z"/>
+              </g>
+              <g>
+                <path d="M118.8,99.4c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v12.9H118.8z"/>
+                <path d="M118.8,105.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9H86.5c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9C86.5,105.9,118.8,105.9,118.8,105.9z"/>
+              </g>
+              <g>
+                <path d="M170.6,118.8c0-7.1,5.8-12.9,12.9-12.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9h-12.9V118.8z"/>
+                <path d="M164.1,118.8c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9V86.5c0-7.1,5.8-12.9,12.9-12.9c7.1,0,12.9,5.8,12.9,12.9V118.8z"/>
+              </g>
+              <g>
+                <path d="M151.2,170.6c7.1,0,12.9,5.8,12.9,12.9c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9v-12.9H151.2z"/>
+                <path d="M151.2,164.1c-7.1,0-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h32.3c7.1,0,12.9,5.8,12.9,12.9c0,7.1-5.8,12.9-12.9,12.9H151.2z"/>
+              </g>
+            </g>
+          </svg>
+        </span>
+        <span class="landing-community__label">CNCF Slack</span>
+      </a>
+      <a class="landing-community__link" href="https://github.com/KubeElasti/KubeElasti/issues" rel="noopener noreferrer">
+        <span class="landing-community__icon" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.75 3 6.77 3 4.5 3 2.6 5.02 1 7.5 1c1.22 0 2.4.45 3.3 1.2"/><path d="M17.47 9c1.93-.25 3.53-2.23 3.53-4.5C21 2.6 18.98 1 16.5 1c-1.22 0-2.4.45-3.3 1.2"/></svg>
+        </span>
+        <span class="landing-community__label">Report an issue</span>
+      </a>
+    </div>
+  </section>
 
-</div>
-</div>
 
-<!-- Community Section -->
-<div class="community-section">
-  <h2>Join Our Community</h2>
-  <p>Get help, share your experience, and contribute to KubeElasti</p>
-  <div class="community-links">
-    <a href="https://github.com/KubeElasti/KubeElasti" class="community-link">
-      <span class="community-icon">🐱</span>
-      <span class="community-text">GitHub</span>
-    </a>
-    <a href="https://slack.cncf.io/" class="community-link">
-      <span class="community-icon">💬</span>
-      <span class="community-text">CNCF Slack #kubeelasti</span>
-    </a>
-    <a href="https://github.com/KubeElasti/KubeElasti/issues" class="community-link">
-      <span class="community-icon">🆘</span>
-      <span class="community-text">Report Issues</span>
-    </a>
+
+  <div class="landing-footer-cta">
+    <h2>Ready to optimize your Kubernetes workloads?</h2>
+    <a href="/src/install/installation/" class="md-button md-button--primary">Get started with KubeElasti</a>
   </div>
 </div>
 
-<div class="footer-cta">
-  <h2>Ready to optimize your Kubernetes resources?</h2>
-  <a href="/src/gs-setup/" class="md-button md-button--primary">Get Started with KubeElasti</a>
-</div>
-
-<div class="cncf-project-section">
-  <p class="cncf-project-section__eyebrow">Project status</p>
-  <h2>We are a Cloud Native Computing Foundation sandbox project.</h2>
-  <p>KubeElasti was originally created by TrueFoundry.</p>
-  <p>KubeElasti is developed in the open with community discussions, issues, and pull requests in the project repository.</p>
-  <div class="cncf-project-section__meta">
-    <a href="https://www.cncf.io/" target="_blank" rel="noopener noreferrer">
-      <img
-        src="https://www.cncf.io/wp-content/uploads/2022/07/cncf-color-bg.svg"
-        alt="Cloud Native Computing Foundation logo"
-        class="cncf-project-section__logo"
-      >
-    </a>
+  <div class="landing-cncf">
+    <p class="landing-cncf__eyebrow">Project status</p>
+    <h2>We are a Cloud Native Computing Foundation sandbox project.</h2>
+    <p>KubeElasti was originally created by TrueFoundry.</p>
+    <p>KubeElasti is developed in the open with community discussions, issues, and pull requests in the project repository.</p>
+    <div class="landing-cncf__meta">
+      <a href="https://www.cncf.io/" target="_blank" rel="noopener noreferrer">
+        <img
+          class="landing-cncf__logo"
+          src="https://raw.githubusercontent.com/cncf/artwork/master/other/cncf/horizontal/color/cncf-color.svg#only-light"
+          alt="Cloud Native Computing Foundation logo"
+          width="320"
+          height="48"
+          loading="lazy">
+        <img
+          class="landing-cncf__logo"
+          src="https://raw.githubusercontent.com/cncf/artwork/master/other/cncf/horizontal/white/cncf-white.svg#only-dark"
+          alt="Cloud Native Computing Foundation logo"
+          width="320"
+          height="48"
+          loading="lazy">
+      </a>
+    </div>
   </div>
-</div>
+  

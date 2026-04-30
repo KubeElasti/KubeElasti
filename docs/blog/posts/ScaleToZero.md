@@ -18,6 +18,8 @@ author:
 slug: scale-to-zero
 ---
 
+# Scale-to-Zero
+
 If you've ever deployed HTTP services on Kubernetes, you've probably dealt with **idle pods** that burn resources during off-hours or inactivity. 
 
 In today's blog, we dive into the concept of **Scale-to-Zero**, why it matters, how existing tools implement it (and where they fall short), and how [**KubeElasti**](https://github.com/KubeElasti/KubeElasti) solves this problem with **zero rewrites, zero request loss**, and **zero lingering proxies**.
@@ -124,7 +126,7 @@ With KubeElasti, you can implement it **without changing your service code**, **
 
 Want to give it a spin? Start here:
 
-* 🧪 Quickstart: [Get Started Guide](../../src/gs-setup.md)
+* 🧪 Quickstart: [Install & demo](../../src/install/demo-setup.md)
 * 🧩 Source Code: [KubeElasti on GitHub](https://github.com/KubeElasti/KubeElasti)
 
 

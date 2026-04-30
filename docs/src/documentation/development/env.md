@@ -8,6 +8,7 @@ keywords:
   - Docker development
   - local development environment
   - contributing to KubeElasti
+icon: lucide/terminal
 ---
 
 # Dev Environment
@@ -56,7 +57,7 @@ Understanding the repository structure will help you navigate and contribute eff
 ├── pkg
 ├── playground
 ├── resolver
-└── test
+└── tests
 ```
 
 ### Main Modules
@@ -85,7 +86,7 @@ Understanding the repository structure will help you navigate and contribute eff
 ### Other Directories
 
 - **`./playground`:** Code to setup a playground to try and test KubeElasti.
-- **`./test`:** Load testing scripts.
-- **`./pkg`:** Common packages, shared by Operator and Resolve.
+- **`./tests`:** End-to-end tests (`tests/e2e/`, KUTTL based) and load testing scripts (`tests/load/`).
+- **`./pkg`:** Common packages, shared by the operator and resolver.
 - **`./charts`:** Helm chart template.
-- **`./docs`:** Detailed documentation on the HLD, LLD and Architecture of KubeElasti.
+- **`./docs`:** Detailed documentation on the HLD, LLD and architecture of KubeElasti.

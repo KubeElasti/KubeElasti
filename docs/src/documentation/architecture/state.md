@@ -1,5 +1,5 @@
 ---
-title: "KubeElasti Flow Description - Scale-to-Zero Traffic Management"
+title: "KubeElasti State Description - Scale-to-Zero Traffic Management"
 description: "Learn how KubeElasti manages traffic flow during scale-to-zero operations. Understand proxy mode, serve mode, and traffic queueing mechanisms."
 keywords:
   - KubeElasti flow
@@ -8,9 +8,10 @@ keywords:
   - proxy mode serve mode
   - request queueing
   - Kubernetes traffic flow
+icon: lucide/git-branch
 ---
 
-# **Flow Description**
+# **State Description**
 
 ``` mermaid
 graph TB

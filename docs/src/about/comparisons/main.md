@@ -8,6 +8,7 @@ keywords:
   - KEDA HTTP comparison
   - scale to zero comparison
   - serverless solutions comparison
+icon: lucide/git-compare-arrows
 ---
 
 # Comparisons with Other Solutions
