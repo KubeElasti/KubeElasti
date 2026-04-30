@@ -27,7 +27,7 @@ jobs:
             - ✅ **Tests** — Run and add tests where it makes sense ([`DEVELOPMENT.md`](https://github.com/KubeElasti/KubeElasti/blob/main/DEVELOPMENT.md))
             - ✅ **PR description** — Clear summary and link to the related issue if there is one ([`CONTRIBUTING.md`](https://github.com/KubeElasti/KubeElasti/blob/main/CONTRIBUTING.md))
 
-            📬 If you're using KubeElasti in your organization, please [add yourself to our Adopters list](https://kubeelasti.dev/src/adopters/). 🙏 It helps the project gain momentum and credibility.
+            📬 If you're using KubeElasti in your organization, please take 30 seconds to [add yourself to our Adopters list](https://github.com/KubeElasti/KubeElasti/issues/new?template=adopter.yml). 🙏 It helps the project gain momentum and credibility.
 
             **Resources:**
             - 📖 [Documentation](https://kubeelasti.dev) — Guides, configuration, and architecture
