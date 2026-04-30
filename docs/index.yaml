@@ -11,11 +11,11 @@ entries:
       artifacthub.io/operator: "true"
     apiVersion: v2
     appVersion: 0.1.23
-    created: "2026-04-30T21:41:05.537470783Z"
+    created: "2026-04-30T23:20:52.189454759Z"
     description: KubeElasti is a Kubernetes-native solution that offers scale-to-zero
       functionality when there is no traffic and automatic scale up to 1 when traffic
       arrives.
-    digest: 24b5738f28a7c45633af941153f07f45b186174767e42b0548cd0dfc3830714d
+    digest: 90d774563987c4a7decb50163acfbd27327a4f7065f12a1d97ed14cf325e937f
     home: https://kubeelasti.dev
     icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/assets/images/logo/logo_theme_200x200.png
     keywords:
@@ -98,4 +98,4 @@ entries:
     urls:
     - https://github.com/KubeElasti/KubeElasti/releases/download/v0.1.20/elasti-0.1.20.tgz
     version: 0.1.20
-generated: "2026-04-30T21:41:05.536383797Z"
+generated: "2026-04-30T23:20:52.18838986Z"
