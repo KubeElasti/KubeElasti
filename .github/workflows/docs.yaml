@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - rt/docs-to-zensical
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
