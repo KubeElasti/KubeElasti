@@ -1,4 +1,4 @@
-> If you are using KubeElasti, please add yourself to the [Adopters List](https://kubeelasti.dev/src/adopters/). This will encourage us to continue working on it. ❤️
+> If you are using KubeElasti, please help us by giving us 30 seconds to add yourself to the [Adopters List](https://github.com/KubeElasti/KubeElasti/issues/new?template=adopter.yml). This will encourage us to continue working on it. ❤️
 
 <div align="center">
 <img src="./docs/images/logo/banner.png" alt="KubeElasti Banner">

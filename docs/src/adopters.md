@@ -28,3 +28,4 @@ If you would like to be included in this table, please open an issue and your in
 | Prodigal Tech | Development | [prodigaltech.com](https://prodigaltech.com/) | Evaluating KubeElasti for Kubernetes scale-to-zero workflows |
 | Zurich Lab | Production | [zurichlab.in](https://www.zurichlab.in) | Uses KubeElasti for scale-to-zero workloads |
 | Vxplain | Production | [vxplain.com](https://www.vxplain.com/) | Uses kubeelasti for scale to zero |
+| VCola AI | Development | [vcola.ai](https://vcola.ai/) | Evaluating KubeElasti for Kubernetes scale-to-zero for HTTP sites in AWS using AWS ALB's. |
