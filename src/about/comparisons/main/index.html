@@ -6,36 +6,42 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="KubeElasti is a Kubernetes operator that automatically scales-to-zero your services when they are idle and scales them back up when they receive traffic.">
+        <meta name="description" content="Compare KubeElasti with Knative, OpenFaaS, and KEDA HTTP Add-on. Feature comparison table for Kubernetes serverless and scale-to-zero solutions.">
       
       
         <meta name="author" content="KubeElasti Authors">
       
       
+        <link rel="canonical" href="https://kubeelasti.dev/src/about/comparisons/main/">
       
+      
+        <link rel="prev" href="../../adopters/">
+      
+      
+        <link rel="next" href="../kubeelasti-vs-keda/">
       
       
         
       
       
-      <link rel="icon" href="/assets/images/logo/favicon.ico">
+      <link rel="icon" href="../../../../assets/images/logo/favicon.ico">
       <meta name="generator" content="zensical-0.0.38">
     
     
       
-        <title>KubeElasti</title>
+        <title>KubeElasti vs Other Solutions - KubeElasti</title>
       
     
     
       
         
       
-      <link rel="stylesheet" href="/assets/stylesheets/modern/main.1e981d71.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/modern/main.1e981d71.min.css">
       
         
           
         
-        <link rel="stylesheet" href="/assets/stylesheets/modern/palette.dfe2e883.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/modern/palette.dfe2e883.min.css">
       
       
   
@@ -130,7 +136,7 @@
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/extra.css">
     
     <script>__md_scope=new URL("/",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
@@ -146,7 +152,7 @@
   
   <!-- Dynamic Keywords from Page Meta -->
   
-    <meta name="keywords" content="Kubernetes, Serverless, Auto-scaling, Scale-to-zero, Operator, Cloud Native, KubeElasti">
+    <meta name="keywords" content="KubeElasti vs Knative, Kubernetes serverless comparison, OpenFaaS vs KubeElasti, KEDA HTTP comparison, scale to zero comparison, serverless solutions comparison">
   
   
   <!-- Open Graph Meta Tags -->
@@ -154,17 +160,21 @@
   <meta property="og:site_name" content="KubeElasti Documentation">
   <meta property="og:locale" content="en_US">
   
-  <meta property="og:title" content="KubeElasti - Serverless for Kubernetes">
-  <meta property="og:description" content="KubeElasti is a Kubernetes operator that automatically scales-to-zero your services when they are idle and scales them back up when they receive traffic.">
+  <meta property="og:url" content="https://kubeelasti.dev/src/about/comparisons/main/">
+  
+  <meta property="og:title" content="KubeElasti vs Other Solutions">
+  <meta property="og:description" content="Compare KubeElasti with Knative, OpenFaaS, and KEDA HTTP Add-on. Feature comparison table for Kubernetes serverless and scale-to-zero solutions.">
   <meta property="og:image" content="https://kubeelasti.dev/assets/images/logo/logo_white_full.png">
   
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="KubeElasti - Serverless for Kubernetes">
-  <meta name="twitter:description" content="KubeElasti is a Kubernetes operator that automatically scales-to-zero your services when they are idle and scales them back up when they receive traffic.">
+  <meta name="twitter:title" content="KubeElasti vs Other Solutions">
+  <meta name="twitter:description" content="Compare KubeElasti with Knative, OpenFaaS, and KEDA HTTP Add-on. Feature comparison table for Kubernetes serverless and scale-to-zero solutions.">
   <meta name="twitter:image" content="https://kubeelasti.dev/assets/images/logo/logo_white_full.png">
   
   <!-- Canonical URL -->
+  
+  <link rel="canonical" href="https://kubeelasti.dev/src/about/comparisons/main/">
   
   
   <!-- PWA / browser chrome (hex from mkdocs extra.theme_color; matches documented primary) -->
@@ -232,7 +242,8 @@
     <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
     <div data-md-component="skip">
       
-        <a href="#__skip" class="md-skip">
+        
+        <a href="#comparisons-with-other-solutions" class="md-skip">
           Skip to content
         </a>
       
@@ -266,9 +277,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/" title="KubeElasti" class="md-header__button md-logo" aria-label="KubeElasti" data-md-component="logo">
+    <a href="../../../.." title="KubeElasti" class="md-header__button md-logo" aria-label="KubeElasti" data-md-component="logo">
       
-  <img src="/assets/images/logo/logo.svg" alt="KubeElasti">
+  <img src="../../../../assets/images/logo/logo.svg" alt="KubeElasti">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
@@ -285,7 +296,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              KubeElasti vs Other Solutions
             
           </span>
         </div>
@@ -369,7 +380,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/" class="md-tabs__link">
+      <a href="../../../.." class="md-tabs__link">
         
   
   Home
@@ -383,11 +394,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="/src/about/introduction/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../introduction/" class="md-tabs__link">
           
   
   About
@@ -406,7 +419,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/src/install/installation/" class="md-tabs__link">
+        <a href="../../../install/installation/" class="md-tabs__link">
           
   
   Install
@@ -432,7 +445,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/src/documentation/architecture/architecture/" class="md-tabs__link">
+        <a href="../../../documentation/architecture/architecture/" class="md-tabs__link">
           
   
   Documentation
@@ -454,7 +467,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/blog/posts/release-0.1.17/" class="md-tabs__link">
+        <a href="../../../../blog/posts/release-0.1.17/" class="md-tabs__link">
           
   
   Blog
@@ -487,9 +500,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/" title="KubeElasti" class="md-nav__button md-logo" aria-label="KubeElasti" data-md-component="logo">
+    <a href="../../../.." title="KubeElasti" class="md-nav__button md-logo" aria-label="KubeElasti" data-md-component="logo">
       
-  <img src="/assets/images/logo/logo.svg" alt="KubeElasti">
+  <img src="../../../../assets/images/logo/logo.svg" alt="KubeElasti">
 
     </a>
     KubeElasti
@@ -516,7 +529,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/" class="md-nav__link">
+      <a href="../../../.." class="md-nav__link">
         
   
   
@@ -542,39 +555,42 @@
       
   
   
-  
-  
     
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-      
-        
-        
-      
-    
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
-      
-        
   
   
   
-    <a href="/src/about/introduction/" class="md-nav__link">
+    
+    
       
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
   
   
   <span class="md-ellipsis">
@@ -588,12 +604,436 @@
   
   
 
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
   
 
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adopters/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-building-2" viewBox="0 0 24 24"><path d="M10 12h4M10 8h4M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Adopters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Comparisons
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Comparisons
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-git-compare-arrows" viewBox="0 0 24 24"><circle cx="5" cy="6" r="3"/><path d="M12 6h5a2 2 0 0 1 2 2v7"/><path d="m15 9-3-3 3-3"/><circle cx="19" cy="18" r="3"/><path d="M12 18H7a2 2 0 0 1-2-2V9"/><path d="m9 15 3 3-3 3"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-git-compare-arrows" viewBox="0 0 24 24"><circle cx="5" cy="6" r="3"/><path d="M12 6h5a2 2 0 0 1 2 2v7"/><path d="m15 9-3-3 3-3"/><circle cx="19" cy="18" r="3"/><path d="M12 18H7a2 2 0 0 1-2-2V9"/><path d="m9 15 3 3-3 3"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#feature-comparison-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <strong>Feature Comparison Table</strong>
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#knative" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <strong>Knative</strong>
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Knative">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Overview
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Key Differences
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openfaas" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <strong>OpenFaaS</strong>
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenFaaS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Overview
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-differences_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Key Differences
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keda-http-add-on" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <strong>KEDA HTTP Add-on</strong>
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KEDA HTTP Add-on">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Overview
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-differences_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Key Differences
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-choose-kubeelasti" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <strong>When to Choose KubeElasti</strong>
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubeelasti-vs-keda/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-git-compare-arrows" viewBox="0 0 24 24"><circle cx="5" cy="6" r="3"/><path d="M12 6h5a2 2 0 0 1 2 2v7"/><path d="m15 9-3-3 3-3"/><circle cx="19" cy="18" r="3"/><path d="M12 18H7a2 2 0 0 1-2-2V9"/><path d="m9 15 3 3-3 3"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    KubeElasti vs KEDA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubeelasti-vs-knative/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-git-compare-arrows" viewBox="0 0 24 24"><circle cx="5" cy="6" r="3"/><path d="M12 6h5a2 2 0 0 1 2 2v7"/><path d="m15 9-3-3 3-3"/><circle cx="19" cy="18" r="3"/><path d="M12 18H7a2 2 0 0 1-2-2V9"/><path d="m9 15 3 3-3 3"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    KubeElasti vs Knative
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -636,7 +1076,7 @@
   
   
   
-    <a href="/src/install/installation/" class="md-nav__link">
+    <a href="../../../install/installation/" class="md-nav__link">
       
   
   
@@ -701,7 +1141,7 @@
   
   
   
-    <a href="/src/documentation/architecture/architecture/" class="md-nav__link">
+    <a href="../../../documentation/architecture/architecture/" class="md-nav__link">
       
   
   
@@ -762,7 +1202,7 @@
   
   
   
-    <a href="/blog/posts/release-0.1.17/" class="md-nav__link">
+    <a href="../../../../blog/posts/release-0.1.17/" class="md-nav__link">
       
   
   
@@ -802,6 +1242,13 @@
                     
                     
                     
+                      
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
                     
                   
                   <div class="md-sidebar__inner">
@@ -812,6 +1259,155 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#feature-comparison-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <strong>Feature Comparison Table</strong>
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#knative" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <strong>Knative</strong>
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Knative">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Overview
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Key Differences
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openfaas" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <strong>OpenFaaS</strong>
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenFaaS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Overview
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-differences_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Key Differences
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keda-http-add-on" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <strong>KEDA HTTP Add-on</strong>
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KEDA HTTP Add-on">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Overview
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-differences_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Key Differences
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-choose-kubeelasti" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <strong>When to Choose KubeElasti</strong>
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -829,11 +1425,183 @@
   
 
 
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../introduction/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    About
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="././" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Comparisons
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
               
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
+  
+  
 
+
+<h1 id="comparisons-with-other-solutions">Comparisons with Other Solutions<a class="headerlink" href="#comparisons-with-other-solutions" title="Permanent link">&para;</a></h1>
+<p>This document compares KubeElasti with other popular serverless and scale-to-zero solutions in the Kubernetes ecosystem.</p>
+<h2 id="feature-comparison-table"><strong>Feature Comparison Table</strong><a class="headerlink" href="#feature-comparison-table" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>KubeElasti</th>
+<th>Knative</th>
+<th>OpenFaaS</th>
+<th>KEDA HTTP Add-on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale to Zero</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Works with Existing Services</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Resource Footprint</td>
+<td>🟢 Low</td>
+<td>🔺 High</td>
+<td>🔹 Medium</td>
+<td>🟢 Low</td>
+</tr>
+<tr>
+<td>Request queueing</td>
+<td>✅(Takes itself out of the path)</td>
+<td>✅ (Remains in the path)</td>
+<td>✅</td>
+<td>✅(Remains in the path)</td>
+</tr>
+<tr>
+<td>Setup Complexity</td>
+<td>🟢 Low</td>
+<td>🔺 High</td>
+<td>🔹 Medium</td>
+<td>🔹 Medium</td>
+</tr>
+</tbody>
+</table>
+<h2 id="knative"><strong>Knative</strong><a class="headerlink" href="#knative" title="Permanent link">&para;</a></h2>
+<h3 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h3>
+<p>Knative is a comprehensive platform for deploying and managing serverless workloads on Kubernetes. It provides a complete serverless experience with features like scale-to-zero, request-based autoscaling, and traffic management.</p>
+<h3 id="key-differences">Key Differences<a class="headerlink" href="#key-differences" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Complexity</strong>: Knative is a full-featured platform that requires significant setup and maintenance. KubeElasti is focused solely on scale-to-zero functionality and can be added to existing services with minimal configuration.</li>
+<li><strong>Integration</strong>: Knative requires services to be deployed as Knative services. KubeElasti works with existing Kubernetes resources without modification.</li>
+<li><strong>Learning Curve</strong>: Knative has a steeper learning curve due to its many concepts and components. KubeElasti follows familiar Kubernetes patterns with simple CRD-based configuration.</li>
+</ul>
+<h2 id="openfaas"><strong>OpenFaaS</strong><a class="headerlink" href="#openfaas" title="Permanent link">&para;</a></h2>
+<h3 id="overview_1">Overview<a class="headerlink" href="#overview_1" title="Permanent link">&para;</a></h3>
+<p>OpenFaaS is a framework for building serverless functions with Docker and Kubernetes, making it easy to deploy serverless functions to any cloud or on-premises.</p>
+<h3 id="key-differences_1">Key Differences<a class="headerlink" href="#key-differences_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Purpose</strong>: OpenFaaS is primarily designed for Function-as-a-Service (FaaS) workloads. KubeElasti is built for existing HTTP services.</li>
+<li><strong>Architecture</strong>: OpenFaaS requires functions to be written and packaged in a specific way. KubeElasti works with any HTTP service without code changes.</li>
+<li><strong>Scaling</strong>: OpenFaaS uses its own scaling mechanisms. KubeElasti integrates with existing autoscalers (HPA/KEDA) while adding scale-to-zero capability.</li>
+</ul>
+<h2 id="keda-http-add-on"><strong>KEDA HTTP Add-on</strong><a class="headerlink" href="#keda-http-add-on" title="Permanent link">&para;</a></h2>
+<h3 id="overview_2">Overview<a class="headerlink" href="#overview_2" title="Permanent link">&para;</a></h3>
+<p>KEDA HTTP Add-on is an extension to KEDA that enables HTTP-based scaling, including scale-to-zero functionality.</p>
+<h3 id="key-differences_2">Key Differences<a class="headerlink" href="#key-differences_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Request Handling</strong>: <ul>
+<li>KEDA http add-on inserts itself in the http path and handles requests even when the service has been scaled up.</li>
+<li>KubeElasti takes itself out of the http path once the service has been scaled up.</li>
+</ul>
+</li>
+<li><strong>Integration</strong>:<ul>
+<li>KEDA HTTP Add-on requires KEDA installation and configuration.</li>
+<li>KubeElasti can work standalone or integrate with KEDA if needed.</li>
+</ul>
+</li>
+</ul>
+<h2 id="when-to-choose-kubeelasti"><strong>When to Choose KubeElasti</strong><a class="headerlink" href="#when-to-choose-kubeelasti" title="Permanent link">&para;</a></h2>
+<p>KubeElasti is the best choice when you:</p>
+<ol>
+<li>Need to add scale-to-zero capability to existing HTTP services</li>
+<li>Want to ensure zero request loss during scaling operations</li>
+<li>Prefer a lightweight solution with minimal configuration</li>
+<li>Need integration with existing autoscalers (HPA/KEDA)</li>
+</ol>
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -854,6 +1622,44 @@
   
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../adopters/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Adopters">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--! Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l137.3-137.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Adopters
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../kubeelasti-vs-keda/" class="md-footer__link md-footer__link--next" aria-label="Next: KubeElasti vs KEDA">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                KubeElasti vs KEDA
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--! Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">
@@ -921,10 +1727,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate":{"json":[".s2"]},"base":"/","features":["content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.instant.progress","navigation.path","navigation.prune","navigation.sections","navigation.tabs","navigation.top","navigation.tracking","search.highlight","search.share","search.suggest","toc.follow"],"search":"/assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":{"json":[".s2"]},"base":"../../../..","features":["content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.instant.progress","navigation.path","navigation.prune","navigation.sections","navigation.tabs","navigation.top","navigation.tracking","search.highlight","search.share","search.suggest","toc.follow"],"search":"../../../../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="/assets/javascripts/bundle.dbc0afdc.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.dbc0afdc.min.js"></script>
       
     
   </body>

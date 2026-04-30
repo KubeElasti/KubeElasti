@@ -6,36 +6,40 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="KubeElasti is a Kubernetes operator that automatically scales-to-zero your services when they are idle and scales them back up when they receive traffic.">
+        <meta name="description" content="Learn how to implement true scale-to-zero for HTTP services in Kubernetes, avoid cold-start failures, and discover how KubeElasti achieves this better than Knative, KEDA, or OpenFaaS.">
       
       
-        <meta name="author" content="KubeElasti Authors">
+        <meta name="author" content="["Raman Tehlan"]">
       
       
+        <link rel="canonical" href="https://kubeelasti.dev/blog/posts/ScaleToZero/">
+      
+      
+        <link rel="prev" href="../release-0.1.17/">
       
       
       
         
       
       
-      <link rel="icon" href="/assets/images/logo/favicon.ico">
+      <link rel="icon" href="../../../assets/images/logo/favicon.ico">
       <meta name="generator" content="zensical-0.0.38">
     
     
       
-        <title>KubeElasti</title>
+        <title>What is Scale-to-Zero? - KubeElasti</title>
       
     
     
       
         
       
-      <link rel="stylesheet" href="/assets/stylesheets/modern/main.1e981d71.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/modern/main.1e981d71.min.css">
       
         
           
         
-        <link rel="stylesheet" href="/assets/stylesheets/modern/palette.dfe2e883.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/modern/palette.dfe2e883.min.css">
       
       
   
@@ -130,7 +134,7 @@
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/extra.css">
     
     <script>__md_scope=new URL("/",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
@@ -146,7 +150,7 @@
   
   <!-- Dynamic Keywords from Page Meta -->
   
-    <meta name="keywords" content="Kubernetes, Serverless, Auto-scaling, Scale-to-zero, Operator, Cloud Native, KubeElasti">
+    <meta name="keywords" content="Kubernetes, scale-to-zero, autoscaling, KEDA, Knative, KubeElasti, serverless, cost optimization, kubernetes scaling">
   
   
   <!-- Open Graph Meta Tags -->
@@ -154,17 +158,21 @@
   <meta property="og:site_name" content="KubeElasti Documentation">
   <meta property="og:locale" content="en_US">
   
-  <meta property="og:title" content="KubeElasti - Serverless for Kubernetes">
-  <meta property="og:description" content="KubeElasti is a Kubernetes operator that automatically scales-to-zero your services when they are idle and scales them back up when they receive traffic.">
+  <meta property="og:url" content="https://kubeelasti.dev/blog/posts/ScaleToZero/">
+  
+  <meta property="og:title" content="What is Scale-to-Zero?">
+  <meta property="og:description" content="Learn how to implement true scale-to-zero for HTTP services in Kubernetes, avoid cold-start failures, and discover how KubeElasti achieves this better than Knative, KEDA, or OpenFaaS.">
   <meta property="og:image" content="https://kubeelasti.dev/assets/images/logo/logo_white_full.png">
   
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="KubeElasti - Serverless for Kubernetes">
-  <meta name="twitter:description" content="KubeElasti is a Kubernetes operator that automatically scales-to-zero your services when they are idle and scales them back up when they receive traffic.">
+  <meta name="twitter:title" content="What is Scale-to-Zero?">
+  <meta name="twitter:description" content="Learn how to implement true scale-to-zero for HTTP services in Kubernetes, avoid cold-start failures, and discover how KubeElasti achieves this better than Knative, KEDA, or OpenFaaS.">
   <meta name="twitter:image" content="https://kubeelasti.dev/assets/images/logo/logo_white_full.png">
   
   <!-- Canonical URL -->
+  
+  <link rel="canonical" href="https://kubeelasti.dev/blog/posts/ScaleToZero/">
   
   
   <!-- PWA / browser chrome (hex from mkdocs extra.theme_color; matches documented primary) -->
@@ -232,7 +240,8 @@
     <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
     <div data-md-component="skip">
       
-        <a href="#__skip" class="md-skip">
+        
+        <a href="#scale-to-zero" class="md-skip">
           Skip to content
         </a>
       
@@ -266,9 +275,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/" title="KubeElasti" class="md-header__button md-logo" aria-label="KubeElasti" data-md-component="logo">
+    <a href="../../.." title="KubeElasti" class="md-header__button md-logo" aria-label="KubeElasti" data-md-component="logo">
       
-  <img src="/assets/images/logo/logo.svg" alt="KubeElasti">
+  <img src="../../../assets/images/logo/logo.svg" alt="KubeElasti">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
@@ -285,7 +294,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              What is Scale-to-Zero?
             
           </span>
         </div>
@@ -369,7 +378,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/" class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   Home
@@ -387,7 +396,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/src/about/introduction/" class="md-tabs__link">
+        <a href="../../../src/about/introduction/" class="md-tabs__link">
           
   
   About
@@ -406,7 +415,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/src/install/installation/" class="md-tabs__link">
+        <a href="../../../src/install/installation/" class="md-tabs__link">
           
   
   Install
@@ -432,7 +441,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/src/documentation/architecture/architecture/" class="md-tabs__link">
+        <a href="../../../src/documentation/architecture/architecture/" class="md-tabs__link">
           
   
   Documentation
@@ -450,11 +459,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="/blog/posts/release-0.1.17/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../release-0.1.17/" class="md-tabs__link">
           
   
   Blog
@@ -487,9 +498,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/" title="KubeElasti" class="md-nav__button md-logo" aria-label="KubeElasti" data-md-component="logo">
+    <a href="../../.." title="KubeElasti" class="md-nav__button md-logo" aria-label="KubeElasti" data-md-component="logo">
       
-  <img src="/assets/images/logo/logo.svg" alt="KubeElasti">
+  <img src="../../../assets/images/logo/logo.svg" alt="KubeElasti">
 
     </a>
     KubeElasti
@@ -516,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/" class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -573,7 +584,7 @@
   
   
   
-    <a href="/src/about/introduction/" class="md-nav__link">
+    <a href="../../../src/about/introduction/" class="md-nav__link">
       
   
   
@@ -636,7 +647,7 @@
   
   
   
-    <a href="/src/install/installation/" class="md-nav__link">
+    <a href="../../../src/install/installation/" class="md-nav__link">
       
   
   
@@ -701,7 +712,7 @@
   
   
   
-    <a href="/src/documentation/architecture/architecture/" class="md-nav__link">
+    <a href="../../../src/documentation/architecture/architecture/" class="md-nav__link">
       
   
   
@@ -733,37 +744,40 @@
       
   
   
-  
-  
     
-    
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-      
-        
-        
-      
-    
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
-      
-        
   
   
   
-    <a href="/blog/posts/release-0.1.17/" class="md-nav__link">
+    
+    
       
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
   
   
   <span class="md-ellipsis">
@@ -777,12 +791,88 @@
   
   
 
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Blog
   
 
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release-0.1.17/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release 0.1.17
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scale-to-Zero
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -802,6 +892,8 @@
                     
                     
                     
+                      
+                    
                     
                   
                   <div class="md-sidebar__inner">
@@ -811,6 +903,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="On this page">
   
   
+  
+    
   
   
 </nav>
@@ -829,11 +923,193 @@
   
 
 
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../release-0.1.17/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Blog
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
               
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
+  
+  
 
+
+<h1 id="scale-to-zero">Scale-to-Zero<a class="headerlink" href="#scale-to-zero" title="Permanent link">&para;</a></h1>
+<p>If you've ever deployed HTTP services on Kubernetes, you've probably dealt with <strong>idle pods</strong> that burn resources during off-hours or inactivity. </p>
+<p>In today's blog, we dive into the concept of <strong>Scale-to-Zero</strong>, why it matters, how existing tools implement it (and where they fall short), and how <a href="https://github.com/KubeElasti/KubeElasti"><strong>KubeElasti</strong></a> solves this problem with <strong>zero rewrites, zero request loss</strong>, and <strong>zero lingering proxies</strong>.</p>
+<!-- more -->
+
+<h1 id="what-is-scale-to-zero">What is Scale-to-Zero?<a class="headerlink" href="#what-is-scale-to-zero" title="Permanent link">&para;</a></h1>
+<p><strong>Scale-to-Zero</strong> refers to the ability to automatically scale down pod to zero replicas — effectively <strong>turning off</strong> the service — when it's idle, and scaling it back up when traffic resumes.</p>
+<p>This is ideal for:</p>
+<ul>
+<li>Internal or development environments</li>
+<li>Spiky workloads</li>
+<li>Scheduled batch jobs</li>
+<li>Cost-sensitive services (e.g., licensed software, GPU workloads)</li>
+</ul>
+<h2 id="why-use-scale-to-zero">Why Use Scale-to-Zero?<a class="headerlink" href="#why-use-scale-to-zero" title="Permanent link">&para;</a></h2>
+<p>There are many reasons to use scale-to-zero:</p>
+<ul>
+<li><strong>Cost savings</strong>: You're always paying for at least one pod</li>
+<li><strong>Cold-start savings</strong>: Cold-start savings are left on the table</li>
+<li><strong>Infrequently accessed services</strong>: Infrequently accessed services still waste memory and CPU</li>
+</ul>
+<p>Scale-to-Zero solves this by <strong>removing the pod</strong> entirely. But... it comes with a catch: if traffic arrives and no pod is running, you'll get a <strong>503 error</strong> unless something handles the scale-up <em>and</em> request buffering.</p>
+<h2 id="scale-to-zero-architectural-view">Scale-to-Zero: Architectural View<a class="headerlink" href="#scale-to-zero-architectural-view" title="Permanent link">&para;</a></h2>
+<p>Here's how a scale-to-zero system typically works:</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User
+    participant Proxy
+    participant Operator
+    participant Pod
+
+    User-&gt;&gt;Proxy: HTTP Request
+    Proxy--&gt;&gt;Operator: Pod is down, trigger scale-up
+    Operator-&gt;&gt;Pod: Scale replicas = 1
+    Proxy--&gt;&gt;Pod: Forward request after pod is ready</code></pre>
+<h3 id="challenges">Challenges<a class="headerlink" href="#challenges" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Traffic can arrive <strong>before</strong> the pod is ready.</li>
+<li>The request may <strong>time out</strong> unless it's <strong>queued</strong>.</li>
+<li>Proxy needs to <strong>exit the path</strong> once pod is alive (for performance).</li>
+</ul>
+<h2 id="how-kubeelasti-solves-scale-to-zero">How KubeElasti Solves Scale-to-Zero<a class="headerlink" href="#how-kubeelasti-solves-scale-to-zero" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/KubeElasti/KubeElasti"><strong>KubeElasti</strong></a> is a <strong>Kubernetes-native controller + proxy</strong> that adds scale-to-zero to <strong>your existing HTTP services</strong> — without any rewrites, packaging changes, or vendor lock-in.</p>
+<h3 id="how-it-works">How it works:<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Idle Timeout</strong>: If your service sees no traffic for N minutes, the KubeElasti operator <strong>scales it to 0</strong>.</li>
+<li><strong>Proxy Intercept</strong>: If traffic hits a downed service, the lightweight <strong>Elasti proxy queues</strong> the request.</li>
+<li><strong>Scale-Up Trigger</strong>: The operator is notified and scales the pod up (via HPA, KEDA, or native scaling).</li>
+<li><strong>Traffic Replay</strong>: Once the pod is ready, the proxy <strong>forwards the request</strong> and exits the path.</li>
+</ol>
+<pre class="mermaid"><code>flowchart TB
+  User[User] --&gt;|HTTP Request| ElastiProxy
+  ElastiProxy --&gt;|Pod Not Found| KubeElastiOperator
+  KubeElastiOperator --&gt;|Scale Up| Pod
+  ElastiProxy --&gt;|Forward| Pod</code></pre>
+<h2 id="what-makes-kubeelasti-different">What Makes KubeElasti Different?<a class="headerlink" href="#what-makes-kubeelasti-different" title="Permanent link">&para;</a></h2>
+<p>Unlike Knative, KEDA, or OpenFaaS — which require new runtimes, complex setups, or stay in the path — <strong>KubeElasti is minimal and transparent.</strong></p>
+<h3 id="feature-comparison">Feature Comparison<a class="headerlink" href="#feature-comparison" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th><strong>KubeElasti</strong></th>
+<th>Knative</th>
+<th>OpenFaaS</th>
+<th>KEDA HTTP Add-on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale to Zero</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Works with Existing Services</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Request Queueing</td>
+<td>✅ (exits path)</td>
+<td>✅ (stays in path)</td>
+<td>✅</td>
+<td>✅ (stays in path)</td>
+</tr>
+<tr>
+<td>Resource Footprint</td>
+<td>🟢 Low</td>
+<td>🔺 High</td>
+<td>🔹 Medium</td>
+<td>🟢 Low</td>
+</tr>
+<tr>
+<td>Setup Complexity</td>
+<td>🟢 Low</td>
+<td>🔺 High</td>
+<td>🔹 Medium</td>
+<td>🔹 Medium</td>
+</tr>
+</tbody>
+</table>
+<h2 id="trade-offs-and-limitations">Trade-offs and Limitations<a class="headerlink" href="#trade-offs-and-limitations" title="Permanent link">&para;</a></h2>
+<p>Like any focused tool, KubeElasti makes some trade-offs:</p>
+<ul>
+<li>✅ HTTP-only support (for now) — gRPC/TCP support is in roadmap.</li>
+<li>✅ Only Prometheus metrics are supported for traffic detection.</li>
+<li>✅ Works with <strong>Deployments, StatefulSets &amp; Argo Rollouts</strong> — To request support for other resources, please open an <a href="https://github.com/KubeElasti/KubeElasti/issues">issue on GitHub</a>.</li>
+</ul>
+<p>That said, it gives you <strong>production-ready scale-to-zero</strong> in under 5 minutes, with real observability and battle-tested scaling behavior.</p>
+<h2 id="final-thoughts">Final Thoughts<a class="headerlink" href="#final-thoughts" title="Permanent link">&para;</a></h2>
+<p>Scale-to-Zero is no longer a "nice-to-have" — it's a <strong>cost-saving, resilience-enhancing pattern</strong> for modern infrastructure.</p>
+<p>With KubeElasti, you can implement it <strong>without changing your service code</strong>, <strong>without managing extra FaaS platforms</strong>, and <strong>without request failures</strong>.</p>
+<p>Want to give it a spin? Start here:</p>
+<ul>
+<li>🧪 Quickstart: <a href="../../../src/install/demo-setup/">Install &amp; demo</a></li>
+<li>🧩 Source Code: <a href="https://github.com/KubeElasti/KubeElasti">KubeElasti on GitHub</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -854,6 +1130,28 @@
   
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../release-0.1.17/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Release 0.1.17">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--! Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l137.3-137.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Release 0.1.17
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">
@@ -921,10 +1219,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate":{"json":[".s2"]},"base":"/","features":["content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.instant.progress","navigation.path","navigation.prune","navigation.sections","navigation.tabs","navigation.top","navigation.tracking","search.highlight","search.share","search.suggest","toc.follow"],"search":"/assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":{"json":[".s2"]},"base":"../../..","features":["content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.instant.progress","navigation.path","navigation.prune","navigation.sections","navigation.tabs","navigation.top","navigation.tracking","search.highlight","search.share","search.suggest","toc.follow"],"search":"../../../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="/assets/javascripts/bundle.dbc0afdc.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.dbc0afdc.min.js"></script>
       
     
   </body>

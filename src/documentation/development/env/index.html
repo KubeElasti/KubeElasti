@@ -6,40 +6,42 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="KubeElasti automatically scales your Kubernetes services to zero when idle and scales up when traffic arrives. Save costs without losing traffic, no code changes required.">
+        <meta name="description" content="Set up your development environment for KubeElasti. Complete guide for Go, Docker, Kubernetes tools, and local development setup.">
       
       
         <meta name="author" content="KubeElasti Authors">
       
       
-        <link rel="canonical" href="https://kubeelasti.dev/">
+        <link rel="canonical" href="https://kubeelasti.dev/src/documentation/development/env/">
       
       
+        <link rel="prev" href="../../get-started/monitoring/">
       
-        <link rel="next" href="./src/about/introduction/">
+      
+        <link rel="next" href="../playground/">
       
       
         
       
       
-      <link rel="icon" href="./assets/images/logo/favicon.ico">
+      <link rel="icon" href="../../../../assets/images/logo/favicon.ico">
       <meta name="generator" content="zensical-0.0.38">
     
     
       
-        <title>KubeElasti - KubeElasti</title>
+        <title>KubeElasti Development Environment Setup - KubeElasti</title>
       
     
     
       
         
       
-      <link rel="stylesheet" href="./assets/stylesheets/modern/main.1e981d71.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/modern/main.1e981d71.min.css">
       
         
           
         
-        <link rel="stylesheet" href="./assets/stylesheets/modern/palette.dfe2e883.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/modern/palette.dfe2e883.min.css">
       
       
   
@@ -134,7 +136,7 @@
       
     
     
-      <link rel="stylesheet" href="./assets/stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/extra.css">
     
     <script>__md_scope=new URL("/",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
@@ -150,7 +152,7 @@
   
   <!-- Dynamic Keywords from Page Meta -->
   
-    <meta name="keywords" content="Kubernetes serverless, scale to zero, Kubernetes auto-scaling, cost optimization, serverless computing, Kubernetes operator, container orchestration, cloud native, DevOps automation, resource optimization">
+    <meta name="keywords" content="KubeElasti development, Go development setup, Kubernetes development, Docker development, local development environment, contributing to KubeElasti">
   
   
   <!-- Open Graph Meta Tags -->
@@ -158,21 +160,21 @@
   <meta property="og:site_name" content="KubeElasti Documentation">
   <meta property="og:locale" content="en_US">
   
-  <meta property="og:url" content="https://kubeelasti.dev/">
+  <meta property="og:url" content="https://kubeelasti.dev/src/documentation/development/env/">
   
-  <meta property="og:title" content="KubeElasti">
-  <meta property="og:description" content="KubeElasti automatically scales your Kubernetes services to zero when idle and scales up when traffic arrives. Save costs without losing traffic, no code changes required.">
+  <meta property="og:title" content="KubeElasti Development Environment Setup">
+  <meta property="og:description" content="Set up your development environment for KubeElasti. Complete guide for Go, Docker, Kubernetes tools, and local development setup.">
   <meta property="og:image" content="https://kubeelasti.dev/assets/images/logo/logo_white_full.png">
   
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="KubeElasti">
-  <meta name="twitter:description" content="KubeElasti automatically scales your Kubernetes services to zero when idle and scales up when traffic arrives. Save costs without losing traffic, no code changes required.">
+  <meta name="twitter:title" content="KubeElasti Development Environment Setup">
+  <meta name="twitter:description" content="Set up your development environment for KubeElasti. Complete guide for Go, Docker, Kubernetes tools, and local development setup.">
   <meta name="twitter:image" content="https://kubeelasti.dev/assets/images/logo/logo_white_full.png">
   
   <!-- Canonical URL -->
   
-  <link rel="canonical" href="https://kubeelasti.dev/">
+  <link rel="canonical" href="https://kubeelasti.dev/src/documentation/development/env/">
   
   
   <!-- PWA / browser chrome (hex from mkdocs extra.theme_color; matches documented primary) -->
@@ -240,7 +242,8 @@
     <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
     <div data-md-component="skip">
       
-        <a href="#__skip" class="md-skip">
+        
+        <a href="#dev-environment" class="md-skip">
           Skip to content
         </a>
       
@@ -274,9 +277,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="" title="KubeElasti" class="md-header__button md-logo" aria-label="KubeElasti" data-md-component="logo">
+    <a href="../../../.." title="KubeElasti" class="md-header__button md-logo" aria-label="KubeElasti" data-md-component="logo">
       
-  <img src="./assets/images/logo/logo.svg" alt="KubeElasti">
+  <img src="../../../../assets/images/logo/logo.svg" alt="KubeElasti">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
@@ -293,7 +296,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              KubeElasti
+              KubeElasti Development Environment Setup
             
           </span>
         </div>
@@ -375,11 +378,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="" class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../../../.." class="md-tabs__link">
         
   
   Home
@@ -397,7 +398,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="./src/about/introduction/" class="md-tabs__link">
+        <a href="../../../about/introduction/" class="md-tabs__link">
           
   
   About
@@ -416,7 +417,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="./src/install/installation/" class="md-tabs__link">
+        <a href="../../../install/installation/" class="md-tabs__link">
           
   
   Install
@@ -431,6 +432,8 @@
   
   
   
+    
+  
   
     
     
@@ -438,11 +441,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="./src/documentation/architecture/architecture/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../architecture/architecture/" class="md-tabs__link">
           
   
   Documentation
@@ -464,7 +469,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="./blog/posts/release-0.1.17/" class="md-tabs__link">
+        <a href="../../../../blog/posts/release-0.1.17/" class="md-tabs__link">
           
   
   Blog
@@ -486,9 +491,7 @@
           
             
               
-                
-              
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
@@ -499,9 +502,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="" title="KubeElasti" class="md-nav__button md-logo" aria-label="KubeElasti" data-md-component="logo">
+    <a href="../../../.." title="KubeElasti" class="md-nav__button md-logo" aria-label="KubeElasti" data-md-component="logo">
       
-  <img src="./assets/images/logo/logo.svg" alt="KubeElasti">
+  <img src="../../../../assets/images/logo/logo.svg" alt="KubeElasti">
 
     </a>
     KubeElasti
@@ -525,17 +528,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      
-      
-      
-      
-      <a href="" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
         
   
   
@@ -553,7 +549,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -593,7 +588,7 @@
   
   
   
-    <a href="./src/about/introduction/" class="md-nav__link">
+    <a href="../../../about/introduction/" class="md-nav__link">
       
   
   
@@ -656,7 +651,7 @@
   
   
   
-    <a href="./src/install/installation/" class="md-nav__link">
+    <a href="../../../install/installation/" class="md-nav__link">
       
   
   
@@ -686,6 +681,8 @@
       
   
   
+    
+  
   
   
     
@@ -701,28 +698,25 @@
     
     
       
+        
+        
+      
       
         
       
     
     
       
-        
-        
-      
     
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
-  
-  
-  
-    
-  
-  
-  
-    <a href="./src/documentation/architecture/architecture/" class="md-nav__link">
-      
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
   
   
   <span class="md-ellipsis">
@@ -736,14 +730,752 @@
   
   
 
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Documentation
   
 
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
   
 
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/architecture/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-layers" viewBox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/state/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-git-branch" viewBox="0 0 24 24"><path d="M15 6a9 9 0 0 0-9 9V3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    State
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/resolver/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-network" viewBox="0 0 24 24"><rect width="6" height="6" x="16" y="16" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="9" y="2" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Resolver
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/operator/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Operator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/faq/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-circle-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Components
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/triggers/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-activity" viewBox="0 0 24 24"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Triggers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/scalers/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-trending-up" viewBox="0 0 24 24"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Scalers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/monitoring/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-line-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-terminal" viewBox="0 0 24 24"><path d="M12 19h8M4 17l6-6-6-6"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dev Environment
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-terminal" viewBox="0 0 24 24"><path d="M12 19h8M4 17l6-6-6-6"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dev Environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-get-required-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        1. Get required tools
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-clone-the-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        2. Clone the Repository
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-repository-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        3. Repository Structure
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Repository Structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#main-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Main Modules
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-directories" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Other Directories
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../playground/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-test-tube" viewBox="0 0 24 24"><path d="M14.5 2v17.5c0 1.4-1.1 2.5-2.5 2.5s-2.5-1.1-2.5-2.5V2M8.5 2h7M14.5 16h-5"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Playground
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test-load/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-gauge" viewBox="0 0 24 24"><path d="m12 14 4-4M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Load Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test-e2e/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-clipboard-check" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    E2E Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributors/" class="md-nav__link">
+        
+  
+  
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3.128a4 4 0 0 1 0 7.744M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -782,7 +1514,7 @@
   
   
   
-    <a href="./blog/posts/release-0.1.17/" class="md-nav__link">
+    <a href="../../../../blog/posts/release-0.1.17/" class="md-nav__link">
       
   
   
@@ -816,14 +1548,19 @@
             
             
               
-                
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" hidden>
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
                   
                     
                     
                     
+                      
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
                     
                   
                   <div class="md-sidebar__inner">
@@ -834,6 +1571,77 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-get-required-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        1. Get required tools
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-clone-the-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        2. Clone the Repository
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-repository-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        3. Repository Structure
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Repository Structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#main-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Main Modules
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-directories" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Other Directories
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -846,12 +1654,76 @@
               
                 
 
+
+
   
 
 
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
 
+      </a>
+    </li>
   
 
+      
+      
+        
+  
+  
+    
+    
+      
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../architecture/architecture/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Documentation
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="././" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Development
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
 
               
               <article class="md-content__inner md-typeset">
@@ -861,293 +1733,89 @@
   
 
 
-<div class="landing">
-  <section class="landing-hero">
-    <div class="landing-hero__copy">
-      <p class="landing-badge"><span class="landing-badge__dot" aria-hidden="true"></span> CNCF Sandbox · Scale-to-zero for HTTP services</p>
-      <h1 class="landing-hero__title">Automatically scale your services to zero when idle and scale up when traffic arrives.</h1>
-      <p class="landing-hero__lead"></p>
-      <p class="landing-hero__body">
-        A Kubernetes-native operator that saves cost using scale-to-zero without losing any traffic, requires no code changes, and integrates with your existing Kubernetes infrastructure.
-      </p>
-      <div class="landing-hero__actions">
-        <a href="/src/install/installation/" class="md-button md-button--primary">Get started</a>
-        <a href="https://slack.cncf.io/" class="md-button" rel="noopener noreferrer">CNCF Slack · #kubeelasti</a>
-      </div>
-    </div>
-    <div class="landing-hero__visual">
-      <img src="assets/images/hero.png" width="960" height="720" alt="Illustration of KubeElasti scale-to-zero lifecycle" loading="eager" decoding="async">
-    </div>
-  </section>
-
-  <div class="landing-pillars" role="list">
-    <div class="landing-pillar" role="listitem">
-      <span class="landing-pillar__label">Traffic</span>
-      <p class="landing-pillar__text">Queue-aware resolver holds HTTP requests while the first pod comes online.</p>
-    </div>
-    <div class="landing-pillar" role="listitem">
-      <span class="landing-pillar__label">Signals</span>
-      <p class="landing-pillar__text">Prometheus queries and thresholds decide when it is safe to scale to zero.</p>
-    </div>
-    <div class="landing-pillar" role="listitem">
-      <span class="landing-pillar__label">Fit</span>
-      <p class="landing-pillar__text">Works with the ingress and mesh you already run, no new programming model.</p>
-    </div>
-  </div>
-
-  <section class="landing-section" aria-labelledby="features-title">
-    <header class="landing-section__head">
-      <p class="landing-section__eyebrow">Product</p>
-      <h2 class="landing-section__title" id="features-title">Built for real clusters</h2>
-      <p class="landing-section__desc">Scale-to-zero without replacing your ingress, mesh, or workloads.</p>
-    </header>
-    <div class="landing-bento">
-      <article class="landing-bento__item landing-bento__item--wide">
-        <div class="landing-bento__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        </div>
-        <h3>Save cost</h3>
-        <p>Turn off pods when triggers say the workload is idle. Cooldowns and optional windows keep behaviour predictable.</p>
-      </article>
-      <article class="landing-bento__item landing-bento__item--wide">
-        <div class="landing-bento__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        </div>
-        <h3>Wake path that preserves requests</h3>
-        <p>Proxy mode queues traffic at zero replicas, then hands off to pods in serve mode when ready.</p>
-      </article>
-      <article class="landing-bento__item">
-        <div class="landing-bento__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-        </div>
-        <h3>One CRD to adopt</h3>
-        <p><code>ElastiService</code> references your existing Service, Deployment, StatefulSet, or Argo Rollout.</p>
-      </article>
-      <article class="landing-bento__item">
-        <div class="landing-bento__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
-        </div>
-        <h3>HPA and KEDA friendly</h3>
-        <p>Scale from zero with KubeElasti; let HPA or KEDA own 1→N. Optional KEDA pause keeps ScaledObjects from fighting idle scale.</p>
-      </article>
-      <article class="landing-bento__item">
-        <div class="landing-bento__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-        </div>
-        <h3>Observable by default</h3>
-        <p>Prometheus metrics for operator and resolver; wire ServiceMonitors when you enable chart monitoring.</p>
-      </article>
-      <article class="landing-bento__item landing-bento__item--accent">
-        <div class="landing-bento__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <h3>Probe responses at zero replicas</h3>
-        <p>Answer health checks from the resolver so load balancers stay green without forcing a scale-up.</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="landing-section" aria-labelledby="flow-title">
-    <header class="landing-section__head">
-      <p class="landing-section__eyebrow">Lifecycle</p>
-      <h2 class="landing-section__title" id="flow-title">From steady traffic to cold start</h2>
-      <p class="landing-section__desc">Four beats that match how the controller and resolver cooperate.</p>
-    </header>
-    <div class="landing-split">
-      <div class="landing-split__media">
-        <img src="assets/images/modes.png" width="800" height="600" alt="Diagram illustrating KubeElasti proxy and serve modes" loading="lazy" decoding="async">
-      </div>
-      <div class="landing-flow" role="list">
-        <div class="landing-flow__row" role="listitem">
-          <div class="landing-flow__num">1</div>
-          <div class="landing-flow__body">
-            <h3>Scale down</h3>
-            <p>When triggers stay under threshold, replicas go to zero and the Service shifts to proxy mode.</p>
-          </div>
-        </div>
-        <div class="landing-flow__row" role="listitem">
-          <div class="landing-flow__num">2</div>
-          <div class="landing-flow__body">
-            <h3>Queue at the edge</h3>
-            <p>The resolver accepts HTTP, matches optional probe rules, and queues everything else.</p>
-          </div>
-        </div>
-        <div class="landing-flow__row" role="listitem">
-          <div class="landing-flow__num">3</div>
-          <div class="landing-flow__body">
-            <h3>Scale up</h3>
-            <p>First meaningful request notifies the operator; workloads return to <code>minTargetReplicas</code>.</p>
-          </div>
-        </div>
-        <div class="landing-flow__row" role="listitem">
-          <div class="landing-flow__num">4</div>
-          <div class="landing-flow__body">
-            <h3>Serve mode</h3>
-            <p>Endpoints point at live pods again; queued work drains and the data path stays direct.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="landing-section" aria-labelledby="install-title">
-    <header class="landing-section__head">
-      <p class="landing-section__eyebrow">Install</p>
-      <h2 class="landing-section__title" id="install-title">Scale-to-zero with just one file</h2>
-      <p class="landing-section__desc">Replace placeholders, apply, then follow the full Helm guide for production defaults.</p>
-    </header>
-    <div class="landing-code-wrap">
-      <div class="landing-code">
-        <div class="landing-code__chrome" aria-hidden="true">
-          <span class="landing-code__dot"></span>
-          <span class="landing-code__dot"></span>
-          <span class="landing-code__dot"></span>
-          <span class="landing-code__label">elasti-service.yaml</span>
-        </div>
-        <pre><code><span class="cc"># Create an ElastiService for the workload you want at zero when idle</span>
-<span class="cc"># Replace placeholders, then: kubectl apply -f elasti-service.yaml</span>
-kubectl apply -f - <span class="ck">&lt;&lt;</span><span class="cn">EOF</span>
-<span class="ck">apiVersion:</span> elasti.truefoundry.com/v1alpha1
-<span class="ck">kind:</span> ElastiService
-<span class="ck">metadata:</span>
-  <span class="ck">name:</span> <span class="cs">&lt;TARGET_SERVICE&gt;</span>
-  <span class="ck">namespace:</span> <span class="cs">&lt;TARGET_SERVICE_NAMESPACE&gt;</span>
-<span class="ck">spec:</span>
-  <span class="ck">minTargetReplicas:</span> <span class="cn">1</span>
-  <span class="ck">service:</span> <span class="cs">&lt;TARGET_SERVICE_NAME&gt;</span>
-  <span class="ck">cooldownPeriod:</span> <span class="cn">5</span>
-  <span class="ck">scaleTargetRef:</span>
-    <span class="ck">apiVersion:</span> apps/v1
-    <span class="ck">kind:</span> Deployment
-    <span class="ck">name:</span> <span class="cs">&lt;TARGET_DEPLOYMENT_NAME&gt;</span>
-  <span class="ck">triggers:</span>
-    - <span class="ck">type:</span> prometheus
-      <span class="ck">metadata:</span>
-        <span class="ck">query:</span> <span class="cs">sum(rate(nginx_ingress_controller_requests[1m])) or vector(0)</span>
-        <span class="ck">serverAddress:</span> <span class="cs">http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090</span>
-        <span class="ck">threshold:</span> <span class="cs">"0.5"</span>
-<span class="cn">EOF</span>
-</code></pre>
-      </div>
-      <div class="landing-cta-row">
-        <a href="/src/install/installation/" class="md-button md-button--primary">Full installation guide</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="landing-section" aria-labelledby="demo-title">
-    <header class="landing-section__head">
-      <p class="landing-section__eyebrow">Watch</p>
-      <h2 class="landing-section__title" id="demo-title">See KubeElasti in action</h2>
-      <p class="landing-section__desc">Walkthrough of install, triggers, and a live scale-to-zero path.</p>
-    </header>
-    <div class="landing-video">
-      <div class="landing-video__inner">
-        <iframe
-          src="https://www.loom.com/embed/53b7b524b4c342f99ba44fd5d8104265?sid=c88660d1-a569-470c-8224-b1fffde9a2c6"
-          title="KubeElasti demo video"
-          allowfullscreen></iframe>
-      </div>
-    </div>
-  </section>
-
-  <section class="landing-section" aria-labelledby="community-title">
-    <header class="landing-section__head">
-      <p class="landing-section__eyebrow">Community</p>
-      <h2 class="landing-section__title" id="community-title">Build with us</h2>
-      <p class="landing-section__desc">Issues, design notes, and adopters all land in the open.</p>
-    </header>
-    <div class="landing-community">
-      <a class="landing-community__link" href="https://github.com/KubeElasti/KubeElasti" rel="noopener noreferrer">
-        <span class="landing-community__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.01-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.775.417-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57A12.034 12.034 0 0 0 24 12.297c0-6.627-5.373-12-12-12"/></svg>
-        </span>
-        <span class="landing-community__label">GitHub</span>
-      </a>
-      <a class="landing-community__link" href="https://slack.cncf.io/" rel="noopener noreferrer">
-        <span class="landing-community__icon" aria-hidden="true">
-          <svg class="landing-community__icon-svg--slack" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 270" fill="currentColor" focusable="false">
-            <g>
-              <g>
-                <path d="M99.4,151.2c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h12.9V151.2z"/>
-                <path d="M105.9,151.2c0-7.1,5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v32.3c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9C105.9,183.5,105.9,151.2,105.9,151.2z"/>
-              </g>
-              <g>
-                <path d="M118.8,99.4c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v12.9H118.8z"/>
-                <path d="M118.8,105.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9H86.5c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9C86.5,105.9,118.8,105.9,118.8,105.9z"/>
-              </g>
-              <g>
-                <path d="M170.6,118.8c0-7.1,5.8-12.9,12.9-12.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9h-12.9V118.8z"/>
-                <path d="M164.1,118.8c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9V86.5c0-7.1,5.8-12.9,12.9-12.9c7.1,0,12.9,5.8,12.9,12.9V118.8z"/>
-              </g>
-              <g>
-                <path d="M151.2,170.6c7.1,0,12.9,5.8,12.9,12.9c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9v-12.9H151.2z"/>
-                <path d="M151.2,164.1c-7.1,0-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h32.3c7.1,0,12.9,5.8,12.9,12.9c0,7.1-5.8,12.9-12.9,12.9H151.2z"/>
-              </g>
-            </g>
-          </svg>
-        </span>
-        <span class="landing-community__label">CNCF Slack</span>
-      </a>
-      <a class="landing-community__link" href="https://github.com/KubeElasti/KubeElasti/issues" rel="noopener noreferrer">
-        <span class="landing-community__icon" aria-hidden="true">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.75 3 6.77 3 4.5 3 2.6 5.02 1 7.5 1c1.22 0 2.4.45 3.3 1.2"/><path d="M17.47 9c1.93-.25 3.53-2.23 3.53-4.5C21 2.6 18.98 1 16.5 1c-1.22 0-2.4.45-3.3 1.2"/></svg>
-        </span>
-        <span class="landing-community__label">Report an issue</span>
-      </a>
-    </div>
-  </section>
-
-
-
-  <div class="landing-footer-cta">
-    <h2>Ready to optimize your Kubernetes workloads?</h2>
-    <a href="/src/install/installation/" class="md-button md-button--primary">Get started with KubeElasti</a>
-  </div>
+<h1 id="dev-environment">Dev Environment<a class="headerlink" href="#dev-environment" title="Permanent link">&para;</a></h1>
+<p>Setting up your development environment for KubeElasti involves preparing your local setup for building, testing, and contributing to the project. Follow these steps to get started:</p>
+<h2 id="1-get-required-tools">1. Get required tools<a class="headerlink" href="#1-get-required-tools" title="Permanent link">&para;</a></h2>
+<p>Ensure you have the following tools installed:</p>
+<ul>
+<li><strong>Go:</strong> The programming language used for KubeElasti. Download and install it from <a href="https://golang.org/dl/">golang.org</a>.</li>
+<li><strong>Docker:</strong> For containerization and building Docker images. Install it from <a href="https://www.docker.com/get-started">docker.com</a>.</li>
+<li><strong>kubectl:</strong> Command-line tool for interacting with Kubernetes. Install it from <a href="https://kubernetes.io/docs/tasks/tools/">kubernetes.io</a>.</li>
+<li><strong>Helm:</strong> Package manager for Kubernetes. Install it from <a href="https://helm.sh/docs/intro/install/">helm.sh</a>.</li>
+<li><strong>Docker Desktop/Kind/Minikube:</strong> A local kubernetes cluster. Make sure you have the local cluster running before development.</li>
+<li><strong>Make:</strong> Helps in working with the project.</li>
+<li><strong>Istio:</strong> Required to test the project with istio. Install from <a href="https://istio.io/">istio.io</a></li>
+<li><strong>k6:</strong> Required to load test the project. Install from <a href="https://k6.io/">k6.io</a></li>
+</ul>
+<h2 id="2-clone-the-repository">2. Clone the Repository<a class="headerlink" href="#2-clone-the-repository" title="Permanent link">&para;</a></h2>
+<p>Clone the KubeElasti repository from GitHub to your local machine:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/KubeElasti/KubeElasti.git
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>KubeElasti
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Make sure you check out the documentation and architecture before making your changes.</p>
 </div>
+<h2 id="3-repository-structure">3. Repository Structure<a class="headerlink" href="#3-repository-structure" title="Permanent link">&para;</a></h2>
+<p>Understanding the repository structure will help you navigate and contribute effectively to the KubeElasti project. Below is an overview of the key directories and files in the repository:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>.
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>├──<span class="w"> </span>LICENSE
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>├──<span class="w"> </span>Makefile
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>├──<span class="w"> </span>README.md
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>├──<span class="w"> </span>charts
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>├──<span class="w"> </span>docs
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>├──<span class="w"> </span>go.work
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>├──<span class="w"> </span>go.work.sum
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>├──<span class="w"> </span>kustomization.yaml
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>├──<span class="w"> </span>operator
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>├──<span class="w"> </span>pkg
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>├──<span class="w"> </span>playground
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>├──<span class="w"> </span>resolver
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>└──<span class="w"> </span>tests
+</span></code></pre></div>
+<h3 id="main-modules">Main Modules<a class="headerlink" href="#main-modules" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>./operator</code>:</strong> Contains the code for Kubernetes operator, created using kubebuilder.
+  <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>.
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>├──<span class="w"> </span>Dockerfile
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>├──<span class="w"> </span>Makefile
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>├──<span class="w"> </span>api
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>├──<span class="w"> </span>cmd
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>├──<span class="w"> </span>config
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>├──<span class="w"> </span>go.mod
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>├──<span class="w"> </span>go.sum
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>├──<span class="w"> </span>internal
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>└──<span class="w"> </span><span class="nb">test</span>
+</span></code></pre></div></li>
+<li><strong><code>./api</code>:</strong> Contains the folder named after the apiVersion, and has custom resource type description.</li>
+<li><strong><code>./config</code>:</strong> Kubernetes manifest files.</li>
+<li><strong><code>./cmd</code>:</strong> Main files for the tool.</li>
+<li><strong><code>./internal</code>:</strong> Internal packages of the program.</li>
+<li><strong><code>./Makefile</code>:</strong> Helps with working with the program. Use <code>make help</code> to see all the available commands.</li>
+<li><strong><code>./resolver</code>:</strong> Contains the code for resolver.</li>
+<li>File structure of it is similar to that of Operator.</li>
+</ul>
+<h3 id="other-directories">Other Directories<a class="headerlink" href="#other-directories" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>./playground</code>:</strong> Code to setup a playground to try and test KubeElasti.</li>
+<li><strong><code>./tests</code>:</strong> End-to-end tests (<code>tests/e2e/</code>, KUTTL based) and load testing scripts (<code>tests/load/</code>).</li>
+<li><strong><code>./pkg</code>:</strong> Common packages, shared by the operator and resolver.</li>
+<li><strong><code>./charts</code>:</strong> Helm chart template.</li>
+<li><strong><code>./docs</code>:</strong> Detailed documentation on the HLD, LLD and architecture of KubeElasti.</li>
+</ul>
 
-<div class="landing-cncf">
-    <p class="landing-cncf__eyebrow">Project status</p>
-    <h2>We are a Cloud Native Computing Foundation sandbox project.</h2>
-    <p>KubeElasti was originally created by TrueFoundry.</p>
-    <p>KubeElasti is developed in the open with community discussions, issues, and pull requests in the project repository.</p>
-    <div class="landing-cncf__meta">
-      <a href="https://www.cncf.io/" target="_blank" rel="noopener noreferrer">
-        <img
-          class="landing-cncf__logo"
-          src="https://raw.githubusercontent.com/cncf/artwork/master/other/cncf/horizontal/color/cncf-color.svg#only-light"
-          alt="Cloud Native Computing Foundation logo"
-          width="320"
-          height="48"
-          loading="lazy">
-        <img
-          class="landing-cncf__logo"
-          src="https://raw.githubusercontent.com/cncf/artwork/master/other/cncf/horizontal/white/cncf-white.svg#only-dark"
-          alt="Cloud Native Computing Foundation logo"
-          width="320"
-          height="48"
-          loading="lazy">
-      </a>
-    </div>
-  </div>
 
+
+
+
+
+
+
+
+  
   
 
 
 
-
-
-
-
-
-
-  
-  
-
-
-
-
-  
 
 
 
@@ -1174,19 +1842,33 @@ kubectl apply -f - <span class="ck">&lt;&lt;</span><span class="cn">EOF</span>
   
     
       
-        
-      
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../get-started/monitoring/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Monitoring">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--! Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l137.3-137.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Monitoring
+              </div>
+            </div>
+          </a>
         
         
           
-          <a href="./src/about/introduction/" class="md-footer__link md-footer__link--next" aria-label="Next: Introduction">
+          <a href="../playground/" class="md-footer__link md-footer__link--next" aria-label="Next: Playground">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Introduction
+                Playground
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1263,10 +1945,10 @@ kubectl apply -f - <span class="ck">&lt;&lt;</span><span class="cn">EOF</span>
     
       
       
-      <script id="__config" type="application/json">{"annotate":{"json":[".s2"]},"base":".","features":["content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.instant.progress","navigation.path","navigation.prune","navigation.sections","navigation.tabs","navigation.top","navigation.tracking","search.highlight","search.share","search.suggest","toc.follow"],"search":"./assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":{"json":[".s2"]},"base":"../../../..","features":["content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.instant.progress","navigation.path","navigation.prune","navigation.sections","navigation.tabs","navigation.top","navigation.tracking","search.highlight","search.share","search.suggest","toc.follow"],"search":"../../../../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="./assets/javascripts/bundle.dbc0afdc.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.dbc0afdc.min.js"></script>
       
     
   </body>
