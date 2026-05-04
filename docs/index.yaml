@@ -11,13 +11,13 @@ entries:
       artifacthub.io/operator: "true"
     apiVersion: v2
     appVersion: 0.1.23
-    created: "2026-04-15T22:27:09.627357764Z"
+    created: "2026-05-04T06:50:34.526422816Z"
     description: KubeElasti is a Kubernetes-native solution that offers scale-to-zero
       functionality when there is no traffic and automatic scale up to 1 when traffic
       arrives.
-    digest: a02f9e132660d1d459c8ded1f749664e8f2e33da3721c854db1a1defe344c9d2
+    digest: f9db066df76446be36785ecb9bb7628cdfb9e2a598418e1b06bbaac6abf42165
     home: https://kubeelasti.dev
-    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/images/logo/logo_theme_200x200.png
+    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/assets/images/logo/logo_theme_200x200.png
     keywords:
     - Scale-to-zero
     - Operator
@@ -46,7 +46,7 @@ entries:
       arrives.
     digest: d062f2be6f42897a2a6305490b106f7583cc09d2eefbbfa4129390ab37cc7bfe
     home: https://kubeelasti.dev
-    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/images/logo/logo_theme_200x200.png
+    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/assets/images/logo/logo_theme_200x200.png
     keywords:
     - Scale-to-zero
     - Operator
@@ -75,7 +75,7 @@ entries:
       arrives.
     digest: d311a24007a90e05a69e9193f0258a0bf939b81d6c078c310eaa6a17fb831b47
     home: https://kubeelasti.dev
-    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/images/logo/logo_theme_200x200.png
+    icon: https://raw.githubusercontent.com/KubeElasti/KubeElasti/refs/heads/main/docs/assets/images/logo/logo_theme_200x200.png
     keywords:
     - Scale-to-zero
     - Operator
@@ -98,4 +98,4 @@ entries:
     urls:
     - https://github.com/KubeElasti/KubeElasti/releases/download/v0.1.20/elasti-0.1.20.tgz
     version: 0.1.20
-generated: "2026-04-15T22:27:09.626283114Z"
+generated: "2026-05-04T06:50:34.525241929Z"

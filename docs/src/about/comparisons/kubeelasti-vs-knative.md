@@ -8,6 +8,7 @@ keywords:
 - scale-to-zero architecture
 - serverless Kubernetes comparison
 - Knative custom resources
+icon: lucide/git-compare-arrows
 ---
 
 # KubeElasti vs Knative
@@ -22,7 +23,7 @@ This document provides a comprehensive technical comparison between KubeElasti a
 
 KubeElasti is designed as a non-invasive add-on that enhances existing Kubernetes workloads with scale-to-zero capabilities:
 
-- **Works with Native Kubernetes Resources:** Targets existing Deployment, Service, and Argo Rollouts resources without replacement.
+- **Works with Native Kubernetes Resources:** Targets existing Deployment, StatefulSet, Service, and Argo Rollouts resources without replacement.
 - **ElastiService CRD:** Single lightweight CRD that references your existing deployment—does not replace it.
 - **Operator/Controller:** Watches ElastiService CRDs and orchestrates 0↔1 scaling based on Prometheus or custom triggers.
 - **Resolver (Proxy):** HTTP proxy activated only during scale-from-zero; bypassed entirely when pods are running (Serve Mode).
@@ -207,7 +208,7 @@ Client → Networking Layer (Kourier/Istio) →
 
 **Limitations:**
 - **HTTP-only** (TCP/UDP coming)
-- **Limited to Deployment/Argo Rollouts**
+- **Limited to Deployment, StatefulSet, and Argo Rollouts**
 - **Smaller ecosystem**—newer project
 - **No built-in eventing**—pure scaling solution
 

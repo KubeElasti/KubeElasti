@@ -31,7 +31,7 @@ jobs:
 
             **Resources:**
             - 📖 [Documentation](https://kubeelasti.dev) — Guides, configuration, and architecture
-            - 🧭 [Getting Started](https://github.com/KubeElasti/KubeElasti/blob/main/docs/src/gs-setup.md) — Install and first steps
+            - 🧭 [Getting Started](https://github.com/KubeElasti/KubeElasti/blob/main/docs/src/install/installation.md) — Install and first steps
             - 💬 [Discussions](https://github.com/KubeElasti/KubeElasti/discussions) — Ideas and Q&A
             - 🤝 [Contributing](https://github.com/KubeElasti/KubeElasti/blob/main/CONTRIBUTING.md)
 
@@ -50,7 +50,7 @@ jobs:
             **Find something to contribute:**
             - [`good first issue`](https://github.com/search?q=repo%3AKubeElasti%2FKubeElasti+is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) | [`help wanted`](https://github.com/search?q=repo%3AKubeElasti%2FKubeElasti+is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
 
-            📬 If you're using KubeElasti in your organization, please [add yourself to our Adopters list](https://kubeelasti.dev/src/adopters/). 🙏 It helps the project gain momentum and credibility.
+            📬 If you're using KubeElasti in your organization, please take 30 seconds to [add yourself to our Adopters list](https://github.com/KubeElasti/KubeElasti/issues/new?template=adopter.yml). 🙏 It helps the project gain momentum and credibility.
 
             **Resources:**
             - 📖 [Documentation](https://kubeelasti.dev) — Guides, configuration, and architecture

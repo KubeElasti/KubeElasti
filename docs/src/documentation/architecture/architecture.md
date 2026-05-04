@@ -8,11 +8,11 @@ keywords:
   - controller resolver proxy
   - Kubernetes components
   - scale to zero design
+icon: lucide/layers
 ---
 
 # KubeElasti Architecture
 
-<!-- ![Unified Architecture of KubeElasti](../../images/hld.png) -->
 
 ``` mermaid
 graph TB

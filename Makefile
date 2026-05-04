@@ -48,19 +48,19 @@ test-pkg: ## Run pkg tests
 
 .PHONY: serve-docs 
 serve-docs: ## Serve docs
-	@command -v mkdocs >/dev/null 2>&1 || { \
-	  echo "mkdocs not found - please install it (pip install mkdocs-material)"; exit 1; } ; \
-	mkdocs serve
+	@command -v zensical >/dev/null 2>&1 || { \
+	  echo "mkdocs not found - please install it (pip install zensical)"; exit 1; } ; \
+	zensical serve
 	
 .PHONY: build-docs
 build-docs: ## Build docs
-	@command -v mkdocs >/dev/null 2>&1 || { \
-	  echo "mkdocs not found - please install it (pip install mkdocs-material)"; exit 1; } ; \
-	mkdocs build
+	@command -v zensical >/dev/null 2>&1 || { \
+	  echo "mkdocs not found - please install it (pip install zensical)"; exit 1; } ; \
+	zensical build
 
 .PHONY: fetch-contributors
 fetch-contributors: ## Fetch contributors
-	python3 docs/scripts/fetch_contributors.py
+	python3 docs/assets/scripts/fetch_contributors.py
 
 .PHONY: index-helm
 index-helm: ## Index helm chart (usage: make index-helm RELEASE-NAME=v1.0.0)

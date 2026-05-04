@@ -6,7 +6,6 @@ on:
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
-      - 'docs-requirements.txt'
 
 # Concurrency protection to prevent multiple workflow runs from executing simultaneously
 concurrency:
@@ -15,29 +14,23 @@ concurrency:
 
 permissions:
   contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-      - uses: actions/cache@v4
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: .cache
-          restore-keys: |
-            mkdocs-material-
-      - run: pip install -r docs-requirements.txt
+      - run: pip install zensical
       - name: Fetch contributors
-        run: |
-          python docs/scripts/fetch_contributors.py
+        run: python docs/assets/scripts/fetch_contributors.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: mkdocs gh-deploy --force
+      - run: zensical build --clean
+      - name: Push site to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site

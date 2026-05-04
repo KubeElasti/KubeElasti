@@ -8,6 +8,7 @@ keywords:
   - service discovery
   - proxy architecture
   - Kubernetes proxy
+icon: lucide/network
 ---
 
 # Resolver Architecture
@@ -70,7 +71,7 @@ the resolver cannot tell which service the request was meant for and will not
 forward the request.
 
 The ingress example in
-[Getting Started, Setup](./gs-setup.md#3-deploy-a-target-application)
+[Demo setup](../../install/demo-setup.md)
 shows one way to satisfy this: the NGINX annotation
 `nginx.ingress.kubernetes.io/upstream-vhost` rewrites the Host header to the
 service FQDN before the request reaches the resolver.

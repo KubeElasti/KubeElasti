@@ -1,5 +1,5 @@
 ---
-title: "KubeElasti Architecture FAQ - Design Decisions and Technical Questions"
+title: "Architecture FAQ"
 description: "Common questions about KubeElasti's architecture decisions, component separation, and design choices for Kubernetes serverless scaling."
 keywords:
   - KubeElasti FAQ
@@ -8,6 +8,7 @@ keywords:
   - resolver operator separation
   - Kubernetes architecture
   - technical FAQ
+icon: lucide/circle-help
 ---
 
 # Architecture FAQ

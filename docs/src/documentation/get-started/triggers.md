@@ -8,6 +8,7 @@ keywords:
   - metrics-based scaling
   - ElastiService triggers
   - Kubernetes metrics
+icon: lucide/activity
 ---
 
 # Triggers
@@ -24,9 +25,13 @@ ElastiService uses Prometheus queries to determine when to scale down services t
       - Processing rates
       - Custom application metrics
 
-2. **Access Prometheus UI**: 
-      - Connect to your Prometheus instance (typically available at `http://<prometheus-service>.<namespace>.svc.cluster.local:9090`)
-      - For local development, you may need to port-forward: `kubectl port-forward svc/prometheus-server -n monitoring 9090:9090`
+2. **Access Prometheus UI**:
+      - Connect to your Prometheus instance (typically available at `http://<prometheus-service>.<namespace>.svc.cluster.local:9090`).
+      - For local development, port-forward the service. If you installed `kube-prometheus-stack` from the [Prerequisites](../../install/pre-requisites.md), the service is named `kube-prometheus-stack-prometheus`:
+
+         ```bash
+         kubectl port-forward svc/kube-prometheus-stack-prometheus -n monitoring 9090:9090
+         ```
 
 3. **Explore Available Metrics**:
       - In the Prometheus UI, go to the "Graph" tab

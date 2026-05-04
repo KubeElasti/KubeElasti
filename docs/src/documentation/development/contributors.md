@@ -8,6 +8,9 @@ keywords:
   - project contributors
   - development team
   - community support
+icon: lucide/users
+hide:
+  - toc
 ---
 
 This page recognizes all the dedicated and incredible people who have contributed to the KubeElasti project. We appreciate all contributions, from code to documentation, testing, and community support.

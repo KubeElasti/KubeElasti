@@ -9,6 +9,7 @@ keywords:
   - proxy mode
   - automatic scaling
   - resource optimization
+icon: lucide/book-open
 ---
 
 # Introduction
@@ -99,4 +100,4 @@ flowchart TB
 - **Only HTTP is supported:** KubeElasti currently supports requests that are routed to the service via HTTP. In the future we will support more protocols like TCP, UDP etc.
 - **Prometheus Trigger:** The only trigger currently supported is Prometheus
 
-Please checkout the comparison [here](comp-main.md) to see how KubeElasti compares to other Kubernetes autoscaling solutions.
+Please checkout the comparison [here](comparisons/main.md) to see how KubeElasti compares to other Kubernetes autoscaling solutions.

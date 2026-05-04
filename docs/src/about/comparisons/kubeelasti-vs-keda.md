@@ -9,6 +9,7 @@ keywords:
 - scale to zero architecture
 - HTTP proxy scaling
 - event-driven autoscaling
+icon: lucide/git-compare-arrows
 ---
 
 

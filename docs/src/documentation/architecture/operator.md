@@ -8,6 +8,7 @@ keywords:
   - operator architecture
   - controller pattern
   - Kubernetes operator design
+icon: lucide/bot
 ---
 
 # Operator Architecture
