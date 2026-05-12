@@ -22,7 +22,13 @@ func main() {
 
 	if *wait {
 		fmt.Println("grpc-client ready")
-		select {}
+		// Block forever without triggering the Go deadlock detector.
+		// select{} with no cases causes a runtime panic ("all goroutines are
+		// asleep - deadlock!") which crashes the container; an infinite sleep
+		// loop avoids that.
+		for {
+			time.Sleep(24 * time.Hour)
+		}
 	}
 
 	if *addr == "" {
