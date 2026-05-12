@@ -1,0 +1,15 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  # Upgrade Elasti Helm release to enable H2C on the resolver
+  - command: helm upgrade --wait --timeout 400s --install --create-namespace elasti ../../../../charts/elasti -n elasti -f ../../manifest/global/values-elasti-h2c.yaml
+  - command: kubectl rollout status deployment/elasti-resolver -n elasti --timeout=120s
+  # Deploy gRPC client pod in the test namespace
+  - command: kubectl apply -f ../../manifest/test-grpc/grpc-client-pod.yaml
+    namespaced: true
+  - command: kubectl wait --for=condition=Ready pods -l app=grpc-client-pod --timeout=120s
+    namespaced: true
+  # Deploy gRPC server + ElastiService + KEDA ScaledObject
+  - command: ../../manifest/setup-grpc.sh --manifest-dir ../../manifest --namespace $NAMESPACE
+    namespaced: true
+  - command: sleep 5

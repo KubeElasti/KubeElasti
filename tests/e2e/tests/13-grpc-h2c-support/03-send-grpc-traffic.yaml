@@ -1,0 +1,6 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  # Send gRPC unary traffic through the resolver (triggers scale-up from 0)
+  - command: bash ../../manifest/send_grpc_traffic.sh --addr "target-grpc.$NAMESPACE.svc.cluster.local:50051" --test unary --namespace $NAMESPACE --target-resource deployments --target-name target-grpc
+    namespaced: true

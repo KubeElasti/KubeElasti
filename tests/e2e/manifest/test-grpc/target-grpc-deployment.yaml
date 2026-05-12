@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: target-grpc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: target-grpc
+spec:
+  type: ClusterIP
+  selector:
+    app: target-grpc
+  ports:
+    - protocol: TCP
+      port: 50051
+      targetPort: 50051
+      name: grpc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: target-grpc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: target-grpc
+  template:
+    metadata:
+      labels:
+        app: target-grpc
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /stats/prometheus
+        prometheus.io/port: "15020"
+        sidecar.istio.io/statsInclusionPrefixes: "cluster,listener,server,http,tcp"
+    spec:
+      serviceAccountName: target-grpc
+      containers:
+        - name: target-grpc
+          image: local/grpc-test-service:v1alpha1
+          ports:
+            - containerPort: 50051
+              name: grpc
+          readinessProbe:
+            tcpSocket:
+              port: 50051
+            initialDelaySeconds: 5
+            periodSeconds: 10

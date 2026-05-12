@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: grpc-client-pod
+  labels:
+    app: grpc-client-pod
+spec:
+  containers:
+    - name: grpc-client
+      image: local/grpc-test-service:v1alpha1
+      command: ["/grpc-client", "--wait"]
+  terminationGracePeriodSeconds: 0

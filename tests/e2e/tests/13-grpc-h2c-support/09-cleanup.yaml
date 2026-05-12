@@ -1,0 +1,6 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  # Restore Elasti Helm release to default (H2C disabled)
+  - command: helm upgrade --wait --timeout 400s --install --create-namespace elasti ../../../../charts/elasti -n elasti -f ../../manifest/global/values-elasti.yaml
+  - command: kubectl rollout status deployment/elasti-resolver -n elasti --timeout=120s
