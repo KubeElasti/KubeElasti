@@ -1,4 +1,5 @@
 #!/bin/sh
+set -eu
 
 echo "Current directory: $(pwd)"
 
@@ -47,19 +48,19 @@ apply_template() {
   echo "Applying template: $(basename "$template_file")"
   
   # Substitute all variables and apply
-  sed -e "s/\${NAMESPACE}/$target_namespace/g" "$template_file" | kubectl apply -n $target_namespace -f - 
+  sed -e "s/\${NAMESPACE}/$target_namespace/g" "$template_file" | kubectl apply -n "$target_namespace" -f - 
 }
 
 # 1. Apply target gRPC deployment
 apply_template "$MANIFEST_DIR/test-grpc/target-grpc-deployment.yaml" "$NAMESPACE"
-kubectl wait --for=condition=Ready pods -l app=target-grpc -n $NAMESPACE --timeout=${TIMEOUT}s
+kubectl wait --for=condition=Ready pods -l app=target-grpc -n "$NAMESPACE" --timeout="${TIMEOUT}s"
 
 # 2. Apply keda ScaledObject in KEDA for Target  
 apply_template "$MANIFEST_DIR/test-grpc/keda-scaledObject-Target.yaml" "$NAMESPACE"
-kubectl wait --for=condition=Ready scaledobject/target-grpc-scaled-object -n $NAMESPACE --timeout=${TIMEOUT}s
+kubectl wait --for=condition=Ready scaledobject/target-grpc-scaled-object -n "$NAMESPACE" --timeout="${TIMEOUT}s"
 
 # 3. Apply ElastiService
 apply_template "$MANIFEST_DIR/test-grpc/target-grpc-elastiservice.yaml" "$NAMESPACE"
 
 # Label namespace for istio injection
-kubectl label namespace $NAMESPACE istio-injection=enabled --overwrite
+kubectl label namespace "$NAMESPACE" istio-injection=enabled --overwrite
