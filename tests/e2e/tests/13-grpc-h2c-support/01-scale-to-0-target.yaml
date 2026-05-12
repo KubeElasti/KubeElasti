@@ -1,0 +1,7 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  - command: kubectl scale deployment/target-grpc --replicas=0
+    namespaced: true
+  - command: kubectl wait --for=delete pods -l app=target-grpc --timeout=400s
+    namespaced: true
