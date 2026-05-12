@@ -95,15 +95,15 @@ log_failure_details() {
 }
 
 # --- Configuration Banner ---
-echo "${CYAN}=== gRPC Traffic Test Configuration ===${NC}"
-echo "  ${CYAN}Target Address:${NC}  $ADDR"
-echo "  ${CYAN}Test Type:${NC}       $TEST_TYPE"
-echo "  ${CYAN}Client Pod:${NC}      $CLIENT_POD_NAME (in $CLIENT_NAMESPACE namespace)"
-echo "  ${CYAN}Target:${NC}          ${TARGET_RESOURCE}/${TARGET_NAME} (in $CLIENT_NAMESPACE namespace)"
-echo "  ${CYAN}Retries:${NC}         $MAX_RETRIES"
-echo "  ${CYAN}Retry Sleep:${NC}     ${RETRY_SLEEP}s"
-echo "  ${CYAN}Timestamp:${NC}       $(date)"
-echo "${CYAN}========================================${NC}"
+printf "${CYAN}=== gRPC Traffic Test Configuration ===${NC}\n"
+printf "  ${CYAN}Target Address:${NC}  %s\n" "$ADDR"
+printf "  ${CYAN}Test Type:${NC}       %s\n" "$TEST_TYPE"
+printf "  ${CYAN}Client Pod:${NC}      %s (in %s namespace)\n" "$CLIENT_POD_NAME" "$CLIENT_NAMESPACE"
+printf "  ${CYAN}Target:${NC}          %s/%s (in %s namespace)\n" "${TARGET_RESOURCE}" "${TARGET_NAME}" "$CLIENT_NAMESPACE"
+printf "  ${CYAN}Retries:${NC}         %s\n" "$MAX_RETRIES"
+printf "  ${CYAN}Retry Sleep:${NC}     %ss\n" "${RETRY_SLEEP}"
+printf "  ${CYAN}Timestamp:${NC}       %s\n" "$(date)"
+printf "${CYAN}========================================${NC}\n"
 
 # --- Check Client Pod ---
 echo "Checking gRPC client pod status..."
@@ -122,49 +122,49 @@ if [ "$POD_STATUS" != "Running" ]; then
 fi
 
 echo ""
-echo "${CYAN}--- Starting gRPC Traffic Test ---${NC}"
+printf "${CYAN}--- Starting gRPC Traffic Test ---${NC}\n"
 
-success_count=0
+failure_count=0
 
 for i in $(seq 1 $MAX_RETRIES); do
-    echo "\n${CYAN}--- Request $i/$MAX_RETRIES ---${NC}"
-    echo "  ${CYAN}Time:${NC} $(date)"
+    printf "\n${CYAN}--- Request %d/%d ---${NC}\n" "$i" "$MAX_RETRIES"
+    printf "  ${CYAN}Time:${NC} %s\n" "$(date)"
 
-    echo "  ${CYAN}Executing: kubectl exec -n $CLIENT_NAMESPACE $CLIENT_POD_NAME -- /grpc-client --addr=$ADDR --test=$TEST_TYPE${NC}"
+    printf "  ${CYAN}Executing: kubectl exec -n %s %s -- /grpc-client --addr=%s --test=%s${NC}\n" "$CLIENT_NAMESPACE" "$CLIENT_POD_NAME" "$ADDR" "$TEST_TYPE"
     start_time_rfc=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     start_time=$(date +%s)
 
     if kubectl exec -n "$CLIENT_NAMESPACE" "$CLIENT_POD_NAME" -- /grpc-client --addr="$ADDR" --test="$TEST_TYPE" 2>&1; then
         end_time=$(date +%s)
         duration=$((end_time - start_time))
-        echo "${GREEN}SUCCESS: Request $i completed successfully (${duration}s)${NC}"
-        success_count=$((success_count + 1))
+        printf "${GREEN}SUCCESS: Request %d completed successfully (%ds)${NC}\n" "$i" "$duration"
     else
         end_time=$(date +%s)
         duration=$((end_time - start_time))
-        echo "${RED}FAILED: Request $i failed (${duration}s)${NC}"
+        printf "${RED}FAILED: Request %d failed (%ds)${NC}\n" "$i" "$duration"
 
         log_failure_details "${start_time_rfc}"
+        failure_count=$((failure_count + 1))
     fi
 
     if [ $i -lt $MAX_RETRIES ]; then
-        echo "  ${CYAN}Sleeping ${RETRY_SLEEP}s before next retry...${NC}"
+        printf "  ${CYAN}Sleeping %ss before next request...${NC}\n" "${RETRY_SLEEP}"
         sleep $RETRY_SLEEP
     fi
     echo ""
 done
 
-echo "\n${CYAN}=== Test Summary ===${NC}"
-echo "  ${CYAN}Successes:${NC}    $success_count / $MAX_RETRIES"
-echo "  ${CYAN}Target:${NC}       $ADDR"
-echo "  ${CYAN}Completed at:${NC} $(date)"
+printf "\n${CYAN}=== Test Summary ===${NC}\n"
+printf "  ${CYAN}Failures:${NC}     %d / %d\n" "$failure_count" "$MAX_RETRIES"
+printf "  ${CYAN}Target:${NC}       %s\n" "$ADDR"
+printf "  ${CYAN}Completed at:${NC} %s\n" "$(date)"
 
-if [ "$success_count" -gt 0 ]; then
-    echo "${GREEN}Test PASSED: $success_count/$MAX_RETRIES requests succeeded.${NC}"
-    echo "${CYAN}====================${NC}"
-    exit 0
-else
-    echo "${RED}Test FAILED: All $MAX_RETRIES requests failed.${NC}"
-    echo "${CYAN}====================${NC}"
+if [ "$failure_count" -gt 0 ]; then
+    printf "${RED}Test FAILED with %d failed requests out of %d.${NC}\n" "$failure_count" "$MAX_RETRIES"
+    printf "${CYAN}====================${NC}\n"
     exit 1
+else
+    printf "${GREEN}All %d requests completed successfully.${NC}\n" "$MAX_RETRIES"
+    printf "${CYAN}====================${NC}\n"
+    exit 0
 fi

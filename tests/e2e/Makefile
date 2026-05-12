@@ -29,6 +29,7 @@ chmod-scripts:
 	@chmod +x ./manifest/setup-statefulset.sh
 	@chmod +x ./manifest/setup-grpc.sh
 	@chmod +x ./manifest/send_grpc_traffic.sh
+	@chmod +x ./manifest/send_mixed_traffic.sh
 	@chmod +x ./manifest/check_probe_response.sh
 
 .PHONY: build-images

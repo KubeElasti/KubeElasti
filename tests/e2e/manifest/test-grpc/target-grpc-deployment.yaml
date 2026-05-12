@@ -45,7 +45,7 @@ spec:
             - containerPort: 50051
               name: grpc
           readinessProbe:
-            tcpSocket:
+            grpc:
               port: 50051
             initialDelaySeconds: 5
             periodSeconds: 10
