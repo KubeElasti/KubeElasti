@@ -1,0 +1,6 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  # Send both unary and streaming gRPC traffic (serve mode)
+  - command: bash ../../manifest/send_grpc_traffic.sh --addr "target-grpc.$NAMESPACE.svc.cluster.local:50051" --test both --namespace $NAMESPACE --target-resource deployments --target-name target-grpc
+    namespaced: true

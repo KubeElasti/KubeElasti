@@ -1,0 +1,12 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  # Deploy httpbin alongside gRPC to test mixed traffic
+  - command: ../../manifest/setup.sh --manifest-dir ../../manifest --namespace $NAMESPACE
+    namespaced: true
+  - command: sleep 5
+  # Wait for the global curl pod used by send_traffic.sh
+  - command: kubectl wait --for=condition=Ready pod/curl-target-gw -n default --timeout=120s
+  # Send HTTP/1.1 and gRPC traffic concurrently to validate H2C doesn't break HTTP/1.1
+  - command: bash ../../manifest/send_mixed_traffic.sh --http-url "http://target-deployment.$NAMESPACE.svc.cluster.local/status/200" --grpc-addr "target-grpc.$NAMESPACE.svc.cluster.local:50051" --namespace $NAMESPACE --target-resource deployments --target-name target-deployment --grpc-target-resource deployments --grpc-target-name target-grpc
+    namespaced: true
