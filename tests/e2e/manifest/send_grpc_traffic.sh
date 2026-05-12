@@ -19,6 +19,11 @@ TARGET_NAME=""
 CLIENT_POD_NAME="grpc-client-pod"
 MAX_RETRIES=5
 RETRY_SLEEP=10
+# MAX_FAILURES: number of failed requests that are tolerated before declaring the
+# test as failed.  The default (0) means all requests must succeed.  Use 1 for
+# proxy-trigger steps where the very first request may arrive before the target
+# pod's Istio sidecar is ready (cold-start window of ~25–45 s).
+MAX_FAILURES=0
 
 # --- Argument Parsing ---
 while [ "$#" -gt 0 ]; do
@@ -43,9 +48,13 @@ while [ "$#" -gt 0 ]; do
             TARGET_NAME="$2"
             shift 2
             ;;
+        --max-failures)
+            MAX_FAILURES="$2"
+            shift 2
+            ;;
         *)
             echo "${RED}Unknown option: $1${NC}"
-            echo "Usage: $0 --addr <host:port> --namespace <ns> --target-resource <type> --target-name <name> [--test <unary|stream|both>]"
+            echo "Usage: $0 --addr <host:port> --namespace <ns> --target-resource <type> --target-name <name> [--test <unary|stream|both>] [--max-failures <n>]"
             exit 1
             ;;
     esac
@@ -102,6 +111,7 @@ printf "  ${CYAN}Client Pod:${NC}      %s (in %s namespace)\n" "$CLIENT_POD_NAME
 printf "  ${CYAN}Target:${NC}          %s/%s (in %s namespace)\n" "${TARGET_RESOURCE}" "${TARGET_NAME}" "$CLIENT_NAMESPACE"
 printf "  ${CYAN}Retries:${NC}         %s\n" "$MAX_RETRIES"
 printf "  ${CYAN}Retry Sleep:${NC}     %ss\n" "${RETRY_SLEEP}"
+printf "  ${CYAN}Max Failures:${NC}    %s\n" "$MAX_FAILURES"
 printf "  ${CYAN}Timestamp:${NC}       %s\n" "$(date)"
 printf "${CYAN}========================================${NC}\n"
 
@@ -155,16 +165,20 @@ for i in $(seq 1 $MAX_RETRIES); do
 done
 
 printf "\n${CYAN}=== Test Summary ===${NC}\n"
-printf "  ${CYAN}Failures:${NC}     %d / %d\n" "$failure_count" "$MAX_RETRIES"
+printf "  ${CYAN}Failures:${NC}     %d / %d (max tolerated: %d)\n" "$failure_count" "$MAX_RETRIES" "$MAX_FAILURES"
 printf "  ${CYAN}Target:${NC}       %s\n" "$ADDR"
 printf "  ${CYAN}Completed at:${NC} %s\n" "$(date)"
 
-if [ "$failure_count" -gt 0 ]; then
-    printf "${RED}Test FAILED with %d failed requests out of %d.${NC}\n" "$failure_count" "$MAX_RETRIES"
+if [ "$failure_count" -gt "$MAX_FAILURES" ]; then
+    printf "${RED}Test FAILED with %d failed requests out of %d (max tolerated: %d).${NC}\n" "$failure_count" "$MAX_RETRIES" "$MAX_FAILURES"
     printf "${CYAN}====================${NC}\n"
     exit 1
 else
-    printf "${GREEN}All %d requests completed successfully.${NC}\n" "$MAX_RETRIES"
+    if [ "$failure_count" -gt 0 ]; then
+        printf "${YELLOW}%d request(s) failed but within the tolerated limit of %d — test PASSED.${NC}\n" "$failure_count" "$MAX_FAILURES"
+    else
+        printf "${GREEN}All %d requests completed successfully.${NC}\n" "$MAX_RETRIES"
+    fi
     printf "${CYAN}====================${NC}\n"
     exit 0
 fi
