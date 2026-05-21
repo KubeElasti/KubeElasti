@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"truefoundry/elasti/operator/api/v1alpha1"
 	"truefoundry/elasti/operator/internal/crddirectory"
@@ -12,6 +13,7 @@ import (
 	"github.com/truefoundry/elasti/pkg/k8shelper"
 	"github.com/truefoundry/elasti/pkg/values"
 	"go.uber.org/zap"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
@@ -76,7 +78,7 @@ func (r *ElastiServiceReconciler) addCRDFinalizer(ctx context.Context, es *v1alp
 func (r *ElastiServiceReconciler) finalizeCRD(ctx context.Context, es *v1alpha1.ElastiService, req ctrl.Request) error {
 	r.Logger.Info("ElastiService is being deleted", zap.String("name", es.Name), zap.Any("deletionTimestamp", es.DeletionTimestamp))
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(4)
 	// Stop all active informers related to this CRD in background
 	go func() {
 		defer wg.Done()
@@ -91,7 +93,7 @@ func (r *ElastiServiceReconciler) finalizeCRD(ctx context.Context, es *v1alpha1.
 		Name:      es.Spec.Service,
 		Namespace: es.Namespace,
 	}
-	var err1, err2 error
+	var err1, err2, err3 error
 	go func() {
 		defer wg.Done()
 		// Delete EndpointSlice to resolver
@@ -108,13 +110,31 @@ func (r *ElastiServiceReconciler) finalizeCRD(ctx context.Context, es *v1alpha1.
 			r.Logger.Info("[Done] Private service deleted", zap.String("service", targetNamespacedName.String()))
 		}
 	}()
+	go func() {
+		defer wg.Done()
+		// Unpause the KEDA ScaledObject if elasti had paused it for scale-to-zero.
+		// Why: handleScaleToZero stamps autoscaling.keda.sh/paused=true and paused-replicas=0
+		// on the ScaledObject. If the ES is deleted while the target is at zero, those
+		// annotations would otherwise linger and KEDA would never resume scaling.
+		if es.Spec.Autoscaler == nil || !strings.EqualFold(es.Spec.Autoscaler.Type, "keda") {
+			return
+		}
+		err3 = r.ScaleHandler.UpdateKedaScaledObjectPausedState(ctx, es.Spec.Autoscaler.Name, es.Namespace, false)
+		if apierrors.IsNotFound(err3) {
+			// ScaledObject already gone — nothing to unpause.
+			err3 = nil
+		}
+		if err3 == nil {
+			r.Logger.Info("[Done] KEDA ScaledObject unpaused", zap.String("scaledObject", es.Spec.Autoscaler.Name), zap.String("namespace", es.Namespace))
+		}
+	}()
 	wg.Wait()
 	// Remove CRD details from service directory
 	crddirectory.RemoveCRD(targetNamespacedName.String())
 	r.Logger.Info("[Done] CRD removed from service directory", zap.String("es", req.String()))
 
-	if err1 != nil || err2 != nil {
-		return fmt.Errorf("failed to finalize CRD. \n Error 1: %w \n Error 2: %w", err1, err2)
+	if err1 != nil || err2 != nil || err3 != nil {
+		return fmt.Errorf("failed to finalize CRD. \n delete endpointslice: %w \n delete private service: %w \n unpause keda scaledobject: %w", err1, err2, err3)
 	}
 	r.Logger.Info("[SERVE MODE ENABLED]")
 	return nil
