@@ -8,6 +8,15 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+## v0.1.24 (2026-05-29)
+
+### Fixes
+
+* fix: unpause KEDA ScaledObject when ElastiService is deleted by @shubhamrai1993 in [#283](https://github.com/KubeElasti/KubeElasti/pull/283)
+
+### Other
+* docs: move to zensical for docs and landing page. by @ramantehlan in [#279](https://github.com/KubeElasti/KubeElasti/pull/279)
+
 
 ## v0.1.23 (2026-04-15)
 
