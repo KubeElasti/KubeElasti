@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Fixes
+
+* fix: retry the resolver backoff dialer on "connection refused" (not only on timeouts), avoiding a 502 on the first request after scale-from-zero when the target pod or kube-proxy route is not ready yet by `@sandrotaje`
+
 ## v0.1.24 (2026-05-29)
 
 ### Fixes
