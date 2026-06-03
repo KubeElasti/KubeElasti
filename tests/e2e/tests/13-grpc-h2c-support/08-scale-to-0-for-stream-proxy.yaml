@@ -1,0 +1,8 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  # Second scale-to-zero cycle: test streaming gRPC through the H2C resolver proxy
+  - command: kubectl scale deployment/target-grpc --replicas=0
+    namespaced: true
+  - command: kubectl wait --for=delete pods -l app=target-grpc --timeout=400s
+    namespaced: true

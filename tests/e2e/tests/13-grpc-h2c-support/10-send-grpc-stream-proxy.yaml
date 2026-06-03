@@ -1,0 +1,12 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+commands:
+  # Send gRPC streaming traffic through the resolver (triggers scale-up from 0).
+  # This validates the H2C proxy path for server-streaming RPCs, closing the
+  # coverage gap where only unary was tested through the proxy.
+  # --max-failures 1: the very first request may arrive during the Istio sidecar
+  # cold-start window (~25-45 s after the target pod is scheduled); subsequent
+  # requests all succeed once the sidecar is ready.  This mirrors the HTTP proxy
+  # tests which use curl --retry 2 to absorb the same transient failure.
+  - command: bash ../../manifest/send_grpc_traffic.sh --addr "target-grpc.$NAMESPACE.svc.cluster.local:50051" --test stream --namespace $NAMESPACE --target-resource deployments --target-name target-grpc --max-failures 1
+    namespaced: true

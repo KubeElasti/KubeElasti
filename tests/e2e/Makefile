@@ -27,18 +27,27 @@ test:
 chmod-scripts:
 	@chmod +x ./manifest/setup.sh
 	@chmod +x ./manifest/setup-statefulset.sh
+	@chmod +x ./manifest/setup-grpc.sh
+	@chmod +x ./manifest/send_grpc_traffic.sh
+	@chmod +x ./manifest/send_mixed_traffic.sh
 	@chmod +x ./manifest/check_probe_response.sh
 
 .PHONY: build-images
 build-images: ## Build and push images
 	$(MAKE) -C ../../operator docker-build IMG=local/elasti-operator:v1alpha1
 	$(MAKE) -C ../../resolver docker-build IMG=local/elasti-resolver:v1alpha1
+	$(MAKE) build-grpc-test-image
+
+.PHONY: build-grpc-test-image
+build-grpc-test-image: ## Build gRPC test service image
+	docker build -t local/grpc-test-service:v1alpha1 ./grpc-test-service/
 
 .PHONY: reload-images
 reload-images: ## Reload images into kind and restart deployments
 	@echo "Loading images into kind cluster..."
 	@kind load docker-image local/elasti-operator:v1alpha1 --name $(CLUSTER_NAME)
 	@kind load docker-image local/elasti-resolver:v1alpha1 --name $(CLUSTER_NAME)
+	@kind load docker-image local/grpc-test-service:v1alpha1 --name $(CLUSTER_NAME)
 	@echo "Restarting elasti operator deployment..."
 	@kubectl rollout restart deployment elasti-operator-controller-manager -n $(ELASTI_NAMESPACE)
 	@echo "Restarting elasti resolver deployment..."
@@ -58,6 +67,7 @@ kind-up: ## Create Kind cluster
 	fi
 	kind load docker-image local/elasti-operator:v1alpha1 --name elasti-e2e
 	kind load docker-image local/elasti-resolver:v1alpha1 --name elasti-e2e
+	kind load docker-image local/grpc-test-service:v1alpha1 --name elasti-e2e
 	kubectl scale --replicas=1 deployment/coredns -n kube-system
 
 .PHONY: kind-down
