@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"syscall"
 	"time"
 
 	"golang.org/x/net/http2"
@@ -92,7 +93,15 @@ func dialBackOffHelper(ctx context.Context, network, address string, bo wait.Bac
 		}
 		if err != nil {
 			var errNet net.Error
-			if errors.As(err, &errNet) && errNet.Timeout() {
+			isTimeout := errors.As(err, &errNet) && errNet.Timeout()
+			// "connection refused" is expected during a scale-from-zero: the
+			// target pod may not be accepting connections yet, or kube-proxy
+			// may not have programmed the route to the freshly-ready endpoint.
+			// Retrying within the backoff window (instead of failing fast)
+			// avoids surfacing a 502 to the client on the first request after
+			// wake-up.
+			isConnRefused := errors.Is(err, syscall.ECONNREFUSED)
+			if isTimeout || isConnRefused {
 				if bo.Steps < 1 {
 					break
 				}
