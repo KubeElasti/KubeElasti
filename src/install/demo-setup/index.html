@@ -255,12 +255,6 @@
             
             
   <div class="site-announce md-typeset">
-    <span class="site-announce__title">Monthly Community Sync</span>
-    <span class="site-announce__sep" aria-hidden="true">·</span>
-    <strong class="site-announce__time">Every 4th @ 3:00 PM UTC</strong>
-    <span class="site-announce__sep" aria-hidden="true">·</span>
-    <a href="https://calendar.google.com/calendar/u/0?cid=Y18xNDMzZTE2ZjZkMzM4ZWRhZGViOGNhYjAxNGE1M2IxZmQ2MzZiMjdkOWJlMWNlOTc4Mjk4ODBjMmE5YjEyZDkxQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20" target="_blank" rel="noopener noreferrer">Add to Calendar</a>
-    <span class="site-announce__sep" aria-hidden="true">·</span>
     <a href="https://slack.cncf.io/" target="_blank" rel="noopener noreferrer">Join CNCF Slack #kubeelasti</a>
     <span class="site-announce__sep" aria-hidden="true">·</span>
     <a href="https://github.com/KubeElasti/KubeElasti" target="_blank" rel="noopener noreferrer">Star on GitHub</a>
@@ -461,6 +455,8 @@
   
     
       
+      
+        
       
         
       
@@ -967,6 +963,8 @@
       
         
       
+        
+      
     
     
     
@@ -1242,9 +1240,10 @@
 
 
 <h1 id="demo-setup">Demo setup<a class="headerlink" href="#demo-setup" title="Permanent link">&para;</a></h1>
-<p>Follow these steps after <a href=".././installation/">Installation</a> and when your cluster meets the <a href=".././pre-requisites/">Prerequisites</a>. You will run a minimal <strong>httpbin</strong> workload behind ingress, attach an <strong>ElastiService</strong>, apply it, and <strong>curl</strong> through the ingress to see scale-from-zero and idle scale-down.</p>
+<p>Follow these steps after <a href=".././installation/">Installation</a> and when your cluster meets the <a href=".././pre-requisites/">Prerequisites</a>. You will run a minimal <strong>httpbin</strong> workload behind ingress or a gateway, attach an <strong>ElastiService</strong>, apply it, and <strong>curl</strong> through the edge to see scale-from-zero and idle scale-down.</p>
+<p>For <strong>NGINX</strong>, <strong>Istio</strong>, or <strong>Envoy Gateway</strong> install and routing details, use the <a href="../../documentation/integrations/">Gateway and ingress integrations</a> guides.</p>
 <h3 id="1-deploy-a-target-application"><strong>1. Deploy a Target Application</strong><a class="headerlink" href="#1-deploy-a-target-application" title="Permanent link">&para;</a></h3>
-<p>Before creating an ElastiService, you need a target deployment, service, and ingress for KubeElasti to manage. Below is a sample httpbin application you can use.</p>
+<p>Before creating an ElastiService, you need a target deployment, service, and a route from your ingress or gateway. The example below uses <strong>NGINX Ingress</strong>; for other edges, deploy the Deployment and Service from this manifest, then apply the route from <a href="../../documentation/integrations/istio/">Istio</a> or <a href="../../documentation/integrations/envoy-gateway/">Envoy Gateway</a>.</p>
 <p>Create a file named <code>target-deployment.yaml</code>:</p>
 <div class="language-yaml highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">target-deployment.yaml</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1"> 1</a></span>
 <span class="normal"><a href="#__codelineno-0-2"> 2</a></span>
@@ -1368,13 +1367,8 @@
 </span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="w">                </span><span class="nt">port</span><span class="p">:</span>
 </span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="w">                  </span><span class="nt">number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
 </span></code></pre></div></td></tr></table></div>
-<p>The <code>nginx.ingress.kubernetes.io/upstream-vhost</code> annotation above is
-important for elasti: it sets the <code>Host</code> header on the request NGINX
-forwards upstream, and the resolver reads that header to decide which
-target service to route to. See
-<a href="../../documentation/architecture/resolver/#request-routing">Resolver Architecture &gt; Request Routing</a>
-for details on how routing works and how to override the header.</p>
-<p>Apply it:</p>
+<p>The <code>upstream-vhost</code> annotation sets the routing header the resolver expects. See <a href="../../documentation/integrations/nginx/">NGINX Ingress integration</a> and <a href="../../documentation/architecture/resolver/#request-routing">Request routing</a>.</p>
+<p>Apply the manifest:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>target-deployment.yaml
 </span></code></pre></div>
 <p>Verify the target is running:</p>
@@ -1447,18 +1441,17 @@ for details on how routing works and how to override the header.</p>
 <p>The pod will be scaled down to 0 replicas if there is no traffic.</p>
 <p><br></p>
 <h3 id="4-test-the-setup"><strong>4. Test the setup</strong><a class="headerlink" href="#4-test-the-setup" title="Permanent link">&para;</a></h3>
-<p>You can test the setup by sending requests to the nginx load balancer service.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># For NGINX</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl<span class="w"> </span>port-forward<span class="w"> </span>svc/nginx-ingress-ingress-nginx-controller<span class="w"> </span>-n<span class="w"> </span>nginx<span class="w"> </span><span class="m">8080</span>:80
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># For Istio</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>kubectl<span class="w"> </span>port-forward<span class="w"> </span>svc/istio-ingressgateway<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span><span class="m">8080</span>:80
-</span></code></pre></div>
+<p>Port-forward your edge Service to localhost (commands per integration):</p>
+<ul>
+<li><a href="../../documentation/integrations/nginx/#test-port-forward">NGINX Ingress</a></li>
+<li><a href="../../documentation/integrations/istio/#test-port-forward">Istio</a></li>
+<li><a href="../../documentation/integrations/envoy-gateway/#test-port-forward">Envoy Gateway</a></li>
+</ul>
 <p>Start a watch on the target deployment.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>&lt;NAMESPACE&gt;<span class="w"> </span>-w
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>&lt;NAMESPACE&gt;<span class="w"> </span>-w
 </span></code></pre></div>
 <p>Send a request to the service.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl<span class="w"> </span>-v<span class="w"> </span>http://localhost:8080/httpbin
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>curl<span class="w"> </span>-v<span class="w"> </span>http://localhost:8080/httpbin
 </span></code></pre></div>
 <p>You should see the pods being created and scaled up to 1 replica. A response from the   target service should be visible for the curl command.
 The target service should be scaled down to 0 replicas if there is no traffic for <code>cooldownPeriod</code> seconds.</p>

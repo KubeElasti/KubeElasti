@@ -55,6 +55,15 @@
         <loc>https://kubeelasti.dev/src/documentation/get-started/monitoring/</loc>
       </url>
       <url>
+        <loc>https://kubeelasti.dev/src/documentation/integrations/nginx/</loc>
+      </url>
+      <url>
+        <loc>https://kubeelasti.dev/src/documentation/integrations/istio/</loc>
+      </url>
+      <url>
+        <loc>https://kubeelasti.dev/src/documentation/integrations/envoy-gateway/</loc>
+      </url>
+      <url>
         <loc>https://kubeelasti.dev/src/documentation/development/env/</loc>
       </url>
       <url>

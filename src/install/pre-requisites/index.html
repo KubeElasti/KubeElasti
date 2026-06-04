@@ -255,12 +255,6 @@
             
             
   <div class="site-announce md-typeset">
-    <span class="site-announce__title">Monthly Community Sync</span>
-    <span class="site-announce__sep" aria-hidden="true">·</span>
-    <strong class="site-announce__time">Every 4th @ 3:00 PM UTC</strong>
-    <span class="site-announce__sep" aria-hidden="true">·</span>
-    <a href="https://calendar.google.com/calendar/u/0?cid=Y18xNDMzZTE2ZjZkMzM4ZWRhZGViOGNhYjAxNGE1M2IxZmQ2MzZiMjdkOWJlMWNlOTc4Mjk4ODBjMmE5YjEyZDkxQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20" target="_blank" rel="noopener noreferrer">Add to Calendar</a>
-    <span class="site-announce__sep" aria-hidden="true">·</span>
     <a href="https://slack.cncf.io/" target="_blank" rel="noopener noreferrer">Join CNCF Slack #kubeelasti</a>
     <span class="site-announce__sep" aria-hidden="true">·</span>
     <a href="https://github.com/KubeElasti/KubeElasti" target="_blank" rel="noopener noreferrer">Star on GitHub</a>
@@ -461,6 +455,8 @@
   
     
       
+      
+        
       
         
       
@@ -886,6 +882,8 @@
       
         
       
+        
+      
     
     
     
@@ -1128,51 +1126,24 @@
 </span></code></pre></div>
 </details>
 <ul>
-<li><strong>Ingress Controller:</strong> You should have an ingress controller installed in your cluster.</li>
-</ul>
-<details class="example">
-<summary>Installing Ingress Controller</summary>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="prerequisites-nginx" name="__tabbed_1" type="radio" /><input id="prerequisites-istio" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="prerequisites-nginx">NGINX</label><label for="prerequisites-istio">Istio</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">  </span>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>ingress-nginx<span class="w"> </span>https://kubernetes.github.io/ingress-nginx
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>helm<span class="w"> </span>repo<span class="w"> </span>update
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>nginx-ingress<span class="w"> </span>ingress-nginx/ingress-nginx<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span>--namespace<span class="w"> </span>nginx<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span>--set<span class="w"> </span>controller.metrics.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span>--set<span class="w"> </span>controller.metrics.serviceMonitor.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span>--create-namespace
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Download the latest Istio release from the official Istio website.</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://istio.io/downloadIstio<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh<span class="w"> </span>-
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># Move it to home directory</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>mv<span class="w"> </span>istio-x.xx.x<span class="w"> </span>~/.istioctl
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.istioctl/bin:<span class="nv">$PATH</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>istioctl<span class="w"> </span>install<span class="w"> </span>--set<span class="w"> </span><span class="nv">profile</span><span class="o">=</span>default<span class="w"> </span>-y
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="c1"># Label the namespace where you want to deploy your application to enable Istio sidecar Injection</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>&lt;NAMESPACE&gt;
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>kubectl<span class="w"> </span>label<span class="w"> </span>namespace<span class="w"> </span>&lt;NAMESPACE&gt;<span class="w"> </span>istio-injection<span class="o">=</span>enabled
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="c1"># Create a gateway</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>./playground/config/gateway.yaml<span class="w"> </span>-n<span class="w"> </span>&lt;NAMESPACE&gt;
-</span></code></pre></div>
-</div>
-</div>
-</div>
-</details>
+<li>
+<p><strong>Ingress / Gateway:</strong> Install one edge integration so traffic reaches the resolver with the correct routing header. See <a href="../../documentation/integrations/">Gateway and ingress integrations</a>:</p>
 <ul>
-<li><strong>KEDA:</strong> [Optional] You can have a KEDA installed in your cluster, else HPA can be used.</li>
+<li><a href="../../documentation/integrations/nginx/#install-nginx-ingress">NGINX Ingress</a></li>
+<li><a href="../../documentation/integrations/istio/#install-istio">Istio</a></li>
+<li><a href="../../documentation/integrations/envoy-gateway/#install-envoy-gateway">Envoy Gateway</a></li>
+</ul>
+</li>
+<li>
+<p><strong>KEDA:</strong> [Optional] You can have a KEDA installed in your cluster, else HPA can be used.</p>
+</li>
 </ul>
 <details class="example">
 <summary>Installing KEDA</summary>
 <p>We will setup a sample KEDA to scale the target deployment.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>kedacore<span class="w"> </span>https://kedacore.github.io/charts
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>helm<span class="w"> </span>repo<span class="w"> </span>update
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>keda<span class="w"> </span>kedacore/keda<span class="w"> </span>--namespace<span class="w"> </span>keda<span class="w"> </span>--create-namespace<span class="w"> </span>--wait<span class="w"> </span>--timeout<span class="w"> </span>180s
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>kedacore<span class="w"> </span>https://kedacore.github.io/charts
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>helm<span class="w"> </span>repo<span class="w"> </span>update
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>keda<span class="w"> </span>kedacore/keda<span class="w"> </span>--namespace<span class="w"> </span>keda<span class="w"> </span>--create-namespace<span class="w"> </span>--wait<span class="w"> </span>--timeout<span class="w"> </span>180s
 </span></code></pre></div>
 </details>
 
