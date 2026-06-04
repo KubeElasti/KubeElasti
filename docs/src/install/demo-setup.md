@@ -91,6 +91,46 @@ target service to route to. See
 [Resolver Architecture > Request Routing](../documentation/architecture/resolver.md#request-routing)
 for details on how routing works and how to override the header.
 
+#### Routing with Envoy Gateway
+
+If you front the workload with [Envoy Gateway](https://gateway.envoyproxy.io/)
+instead of NGINX, use an `HTTPRoute` with the standard Gateway API `URLRewrite`
+filter to rewrite the upstream `Host` header to the service FQDN. This assumes
+you have a `Gateway` named `eg` (see
+[Prerequisites](./pre-requisites.md), or apply
+`playground/config/envoy-gateway.yaml`).
+
+```yaml title="httpbin-httproute.yaml" linenums="1"
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin
+  namespace: target
+spec:
+  parentRefs:
+    - name: eg
+      namespace: envoy-gateway-system
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            hostname: target-deployment.target.svc.cluster.local
+      backendRefs:
+        - name: target-deployment
+          port: 80
+```
+
+The `urlRewrite.hostname` field rewrites the upstream `Host` header to the
+service FQDN, and the resolver reads that header to route the request — the same
+role the NGINX `upstream-vhost` annotation plays above. Envoy Gateway does **not**
+set the `X-Envoy-Decorator-Operation` header (that is an Istio/Envoy-sidecar
+header), so leave the resolver's `headerForHost` at its default `Host` when using
+Envoy Gateway.
+
 Apply it:
 
 ```bash
@@ -167,6 +207,10 @@ kubectl port-forward svc/nginx-ingress-ingress-nginx-controller -n nginx 8080:80
 
 # For Istio
 kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
+
+# For Envoy Gateway (find the generated service name with:
+#   kubectl get svc -n envoy-gateway-system)
+kubectl port-forward -n envoy-gateway-system svc/<envoy-gateway-service> 8080:80
 ```
 
 Start a watch on the target deployment.

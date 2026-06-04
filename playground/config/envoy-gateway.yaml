@@ -1,0 +1,24 @@
+# Envoy Gateway equivalent of the Istio playground/config/gateway.yaml.
+# Defines a GatewayClass backed by the Envoy Gateway controller and a Gateway
+# with a single HTTP listener that accepts routes from any namespace.
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: eg
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: eg
+  namespace: envoy-gateway-system
+spec:
+  gatewayClassName: eg
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All

@@ -76,6 +76,14 @@ shows one way to satisfy this: the NGINX annotation
 `nginx.ingress.kubernetes.io/upstream-vhost` rewrites the Host header to the
 service FQDN before the request reaches the resolver.
 
+Envoy Gateway achieves the same with the standard Gateway API `URLRewrite`
+filter (`urlRewrite.hostname`) on an `HTTPRoute`, which rewrites the upstream
+`Host` header to the service FQDN. Note that Envoy Gateway does not inject the
+`X-Envoy-Decorator-Operation` header, so leave `headerForHost` at the default
+`Host` when fronting the resolver with Envoy Gateway. See the Envoy Gateway
+example in
+[Demo setup > Routing with Envoy Gateway](../../install/demo-setup.md#routing-with-envoy-gateway).
+
 To use a different header (for example, a custom one set by your edge proxy),
 override the Helm value at install time:
 

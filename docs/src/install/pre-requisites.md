@@ -64,6 +64,21 @@ hide:
         kubectl apply -f ./playground/config/gateway.yaml -n <NAMESPACE>
         ```
 
+    === "Envoy Gateway"
+        ```bash
+        # Install Envoy Gateway via its Helm chart.
+        helm install eg oci://docker.io/envoyproxy/gateway-helm \
+          --version v1.5.9 \
+          -n envoy-gateway-system --create-namespace
+
+        # Wait for the controller to become ready.
+        kubectl wait --timeout=5m -n envoy-gateway-system \
+          deployment/envoy-gateway --for=condition=Available
+
+        # Create a GatewayClass and Gateway.
+        kubectl apply -f ./playground/config/envoy-gateway.yaml
+        ```
+
 - **KEDA:** [Optional] You can have a KEDA installed in your cluster, else HPA can be used.
 ??? example "Installing KEDA"
     We will setup a sample KEDA to scale the target deployment.
