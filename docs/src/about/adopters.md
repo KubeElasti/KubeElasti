@@ -32,3 +32,4 @@ This page contains a list of organizations who are using KubeElasti in productio
 | Zurich Lab | Production | [zurichlab.in](https://www.zurichlab.in) | Uses KubeElasti for scale-to-zero workloads |
 | Vxplain | Production | [vxplain.com](https://www.vxplain.com/) | Uses kubeelasti for scale to zero |
 | VCola AI | Development | [vcola.ai](https://vcola.ai/) | Evaluating KubeElasti for Kubernetes scale-to-zero for HTTP sites in AWS using AWS ALB's. |
+| Buildo S.R.L | Production | [buildo.com](https://www.buildo.com/) | We use KubeElasti together with Karpenter to reduce the cost of our EKS cluster, specifically within clustero, our internal developer platform.
