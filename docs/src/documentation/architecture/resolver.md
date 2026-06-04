@@ -70,11 +70,11 @@ the target service's in-cluster FQDN format (for example,
 the resolver cannot tell which service the request was meant for and will not
 forward the request.
 
-The ingress example in
-[Demo setup](../../install/demo-setup.md)
-shows one way to satisfy this: the NGINX annotation
-`nginx.ingress.kubernetes.io/upstream-vhost` rewrites the Host header to the
-service FQDN before the request reaches the resolver.
+Integration-specific setup lives under [Gateway and ingress integrations](../integrations/index.md):
+
+- [NGINX Ingress](../integrations/nginx.md) — `nginx.ingress.kubernetes.io/upstream-vhost`
+- [Istio](../integrations/istio.md) — `X-Envoy-Decorator-Operation` (Helm default)
+- [Envoy Gateway](../integrations/envoy-gateway.md) — `HTTPRoute` `URLRewrite` (`urlRewrite.hostname`); use `headerForHost: Host`
 
 To use a different header (for example, a custom one set by your edge proxy),
 override the Helm value at install time:

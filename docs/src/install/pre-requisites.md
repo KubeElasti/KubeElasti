@@ -32,37 +32,10 @@ hide:
       --set grafana.enabled=false \
       --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false
     ```
-- **Ingress Controller:** You should have an ingress controller installed in your cluster.
-??? example "Installing Ingress Controller"
-    
-    === "NGINX"
-        ```bash
-          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-          helm repo update
-          helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-            --namespace nginx \
-            --set controller.metrics.enabled=true \
-            --set controller.metrics.serviceMonitor.enabled=true \
-            --create-namespace
-        ```
-
-    === "Istio"
-        ```shell
-        # Download the latest Istio release from the official Istio website.
-        curl -L https://istio.io/downloadIstio | sh -
-        # Move it to home directory
-        mv istio-x.xx.x ~/.istioctl
-        export PATH=$HOME/.istioctl/bin:$PATH
-
-        istioctl install --set profile=default -y
-
-        # Label the namespace where you want to deploy your application to enable Istio sidecar Injection
-        kubectl create namespace <NAMESPACE>
-        kubectl label namespace <NAMESPACE> istio-injection=enabled
-
-        # Create a gateway
-        kubectl apply -f ./playground/config/gateway.yaml -n <NAMESPACE>
-        ```
+- **Ingress / Gateway:** Install one edge integration so traffic reaches the resolver with the correct routing header. See [Gateway and ingress integrations](../documentation/integrations/index.md):
+    - [NGINX Ingress](../documentation/integrations/nginx.md#install-nginx-ingress)
+    - [Istio](../documentation/integrations/istio.md#install-istio)
+    - [Envoy Gateway](../documentation/integrations/envoy-gateway.md#install-envoy-gateway)
 
 - **KEDA:** [Optional] You can have a KEDA installed in your cluster, else HPA can be used.
 ??? example "Installing KEDA"

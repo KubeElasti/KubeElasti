@@ -50,6 +50,8 @@ ElastiService uses Prometheus queries to determine when to scale down services t
 
 ### Example Queries
 
+See [Gateway and ingress integrations](../integrations/index.md) for routing setup per edge.
+
 === "NGINX Ingress Controller Requests"
 
     ```promql

@@ -271,6 +271,10 @@ nav:
           - Triggers: src/documentation/get-started/triggers.md
           - Scalers: src/documentation/get-started/scalers.md
           - Monitoring: src/documentation/get-started/monitoring.md
+      - Integrations:
+          - NGINX Ingress: src/documentation/integrations/nginx.md
+          - Istio: src/documentation/integrations/istio.md
+          - Envoy Gateway: src/documentation/integrations/envoy-gateway.md
       - Development:
           - Dev Environment: src/documentation/development/env.md
           - Playground: src/documentation/development/playground.md
