@@ -70,19 +70,11 @@ the target service's in-cluster FQDN format (for example,
 the resolver cannot tell which service the request was meant for and will not
 forward the request.
 
-The ingress example in
-[Demo setup](../../install/demo-setup.md)
-shows one way to satisfy this: the NGINX annotation
-`nginx.ingress.kubernetes.io/upstream-vhost` rewrites the Host header to the
-service FQDN before the request reaches the resolver.
+Integration-specific setup lives under [Gateway and ingress integrations](../integrations/index.md):
 
-Envoy Gateway achieves the same with the standard Gateway API `URLRewrite`
-filter (`urlRewrite.hostname`) on an `HTTPRoute`, which rewrites the upstream
-`Host` header to the service FQDN. Note that Envoy Gateway does not inject the
-`X-Envoy-Decorator-Operation` header, so leave `headerForHost` at the default
-`Host` when fronting the resolver with Envoy Gateway. See the Envoy Gateway
-example in
-[Demo setup > Routing with Envoy Gateway](../../install/demo-setup.md#routing-with-envoy-gateway).
+- [NGINX Ingress](../integrations/nginx.md) — `nginx.ingress.kubernetes.io/upstream-vhost`
+- [Istio](../integrations/istio.md) — `X-Envoy-Decorator-Operation` (Helm default)
+- [Envoy Gateway](../integrations/envoy-gateway.md) — `HTTPRoute` `URLRewrite` (`urlRewrite.hostname`); use `headerForHost: Host`
 
 To use a different header (for example, a custom one set by your edge proxy),
 override the Helm value at install time:

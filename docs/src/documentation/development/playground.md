@@ -79,44 +79,13 @@ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
   --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false
 ```
 
-## 5. Install Ingress Controller
+## 5. Install ingress or gateway
 
-=== "NGINX"
+Install one edge from [Gateway and ingress integrations](../integrations/index.md):
 
-      Install the NGINX Ingress Controller using Helm:
-      ```bash
-      helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-      helm repo update
-      helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
-        --namespace nginx \
-        --set controller.metrics.enabled=true \
-        --set controller.metrics.serviceMonitor.enabled=true \
-        --create-namespace
-      ```
-
-      This will deploy an NGINX ingress controller in the `nginx` namespace.
-
-=== "Istio"
-
-      Install the Istio Ingress Controller using Helm:
-      ```shell
-      # Download the latest Istio release from the official Istio website.
-      curl -L https://istio.io/downloadIstio | sh -
-      # Move it to home directory
-      mv istio-x.xx.x ~/.istioctl
-      export PATH=$HOME/.istioctl/bin:$PATH
-
-      istioctl install --set profile=default -y
-
-      # Label the namespace where you want to deploy your application to enable Istio sidecar Injection
-      kubectl create namespace target
-      kubectl label namespace target istio-injection=enabled
-
-      # Create a gateway
-      kubectl apply -f ./playground/config/gateway.yaml
-      ```
-
-      This will deploy an Istio ingress controller in the `istio-system` namespace.
+- [NGINX Ingress](../integrations/nginx.md#install-nginx-ingress)
+- [Istio](../integrations/istio.md#install-istio) (label namespace `target` with `istio-injection=enabled` before deploying the demo)
+- [Envoy Gateway](../integrations/envoy-gateway.md#install-envoy-gateway)
 
 ## 6. Deploy KubeElasti Locally
 
@@ -138,13 +107,7 @@ kubectl create namespace target
 kubectl apply -f ./playground/config/demo-deployment-target.yaml -n target
 ```
 
-Add virtual service if you are using istio.
-
-```bash
-# ONLY IF YOU ARE USING ISTIO
-# Create a Virtual Service to expose the demo service
-kubectl apply -f ./playground/config/demo-virtualService.yaml
-```
+Expose the demo through your edge (for example Istio `VirtualService` or Envoy `HTTPRoute`). See [Istio](../integrations/istio.md#route-traffic-to-the-target) or [Envoy Gateway](../integrations/envoy-gateway.md#route-traffic-to-the-target).
 
 This will deploy a `target-deployment` (httpbin) Service, Deployment, and Ingress in the `target` namespace.
 
@@ -171,15 +134,9 @@ kubectl -n target scale deployment target-deployment --replicas=0
 kubectl run -it --rm curl --image=alpine/curl -- http://target-deployment.target.svc.cluster.local/headers
 ```
 
-### 9.3 Portforward Ingress
+### 9.3 Port-forward ingress or gateway
 
-```bash
-# NGINX (release name "nginx-ingress" installed in the "nginx" namespace)
-kubectl port-forward svc/nginx-ingress-ingress-nginx-controller 8080:80 -n nginx
-
-# or Istio
-kubectl port-forward -n istio-system svc/istio-ingressgateway 8080:80
-```
+Use the port-forward command for your integration ([NGINX](../integrations/nginx.md#test-port-forward), [Istio](../integrations/istio.md#test-port-forward), or [Envoy Gateway](../integrations/envoy-gateway.md#test-port-forward)).
 
 You should see the target service pod getting scaled up and response from the new pod.
 

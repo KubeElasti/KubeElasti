@@ -12,11 +12,13 @@ icon: lucide/flask-conical
 
 # Demo setup
 
-Follow these steps after [Installation](./installation.md) and when your cluster meets the [Prerequisites](./pre-requisites.md). You will run a minimal **httpbin** workload behind ingress, attach an **ElastiService**, apply it, and **curl** through the ingress to see scale-from-zero and idle scale-down.
+Follow these steps after [Installation](./installation.md) and when your cluster meets the [Prerequisites](./pre-requisites.md). You will run a minimal **httpbin** workload behind ingress or a gateway, attach an **ElastiService**, apply it, and **curl** through the edge to see scale-from-zero and idle scale-down.
+
+For **NGINX**, **Istio**, or **Envoy Gateway** install and routing details, use the [Gateway and ingress integrations](../documentation/integrations/index.md) guides.
 
 ### **1. Deploy a Target Application**
 
-Before creating an ElastiService, you need a target deployment, service, and ingress for KubeElasti to manage. Below is a sample httpbin application you can use.
+Before creating an ElastiService, you need a target deployment, service, and a route from your ingress or gateway. The example below uses **NGINX Ingress**; for other edges, deploy the Deployment and Service from this manifest, then apply the route from [Istio](../documentation/integrations/istio.md) or [Envoy Gateway](../documentation/integrations/envoy-gateway.md).
 
 Create a file named `target-deployment.yaml`:
 
@@ -84,54 +86,9 @@ spec:
                   number: 80
 ```
 
-The `nginx.ingress.kubernetes.io/upstream-vhost` annotation above is
-important for elasti: it sets the `Host` header on the request NGINX
-forwards upstream, and the resolver reads that header to decide which
-target service to route to. See
-[Resolver Architecture > Request Routing](../documentation/architecture/resolver.md#request-routing)
-for details on how routing works and how to override the header.
+The `upstream-vhost` annotation sets the routing header the resolver expects. See [NGINX Ingress integration](../documentation/integrations/nginx.md) and [Request routing](../documentation/architecture/resolver.md#request-routing).
 
-#### Routing with Envoy Gateway
-
-If you front the workload with [Envoy Gateway](https://gateway.envoyproxy.io/)
-instead of NGINX, use an `HTTPRoute` with the standard Gateway API `URLRewrite`
-filter to rewrite the upstream `Host` header to the service FQDN. This assumes
-you have a `Gateway` named `eg` (see
-[Prerequisites](./pre-requisites.md), or apply
-`playground/config/envoy-gateway.yaml`).
-
-```yaml title="httpbin-httproute.yaml" linenums="1"
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: httpbin
-  namespace: target
-spec:
-  parentRefs:
-    - name: eg
-      namespace: envoy-gateway-system
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            hostname: target-deployment.target.svc.cluster.local
-      backendRefs:
-        - name: target-deployment
-          port: 80
-```
-
-The `urlRewrite.hostname` field rewrites the upstream `Host` header to the
-service FQDN, and the resolver reads that header to route the request — the same
-role the NGINX `upstream-vhost` annotation plays above. Envoy Gateway does **not**
-set the `X-Envoy-Decorator-Operation` header (that is an Istio/Envoy-sidecar
-header), so leave the resolver's `headerForHost` at its default `Host` when using
-Envoy Gateway.
-
-Apply it:
+Apply the manifest:
 
 ```bash
 kubectl apply -f target-deployment.yaml
@@ -199,19 +156,11 @@ The pod will be scaled down to 0 replicas if there is no traffic.
 
 ### **4. Test the setup**
 
-You can test the setup by sending requests to the nginx load balancer service.
+Port-forward your edge Service to localhost (commands per integration):
 
-```bash
-# For NGINX
-kubectl port-forward svc/nginx-ingress-ingress-nginx-controller -n nginx 8080:80
-
-# For Istio
-kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
-
-# For Envoy Gateway (find the generated service name with:
-#   kubectl get svc -n envoy-gateway-system)
-kubectl port-forward -n envoy-gateway-system svc/<envoy-gateway-service> 8080:80
-```
+- [NGINX Ingress](../documentation/integrations/nginx.md#test-port-forward)
+- [Istio](../documentation/integrations/istio.md#test-port-forward)
+- [Envoy Gateway](../documentation/integrations/envoy-gateway.md#test-port-forward)
 
 Start a watch on the target deployment.
 
