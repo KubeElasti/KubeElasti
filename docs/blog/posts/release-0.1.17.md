@@ -11,6 +11,8 @@ keywords:
 author: 
     - KubeElasti Team
 slug: release-0.1.17
+hide:
+    - toc
 ---
 
 # Release 0.1.17

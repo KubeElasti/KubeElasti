@@ -10,6 +10,8 @@ keywords:
 author: 
     - KubeElasti Team
 slug: probe-response
+hide:
+    - toc
 ---
 
 # Your Kubernetes Health Checks Are Accidentally Waking Your Services. Here's the Fix.
@@ -59,9 +61,9 @@ The result is that services which should be at zero replicas spend most of their
 
 ## KubeElasti: a Kubernetes-native scale-to-zero operator
 
-This is the problem [KubeElasti](https://github.com/KubeElasti/KubeElasti) was built to solve. It's an open-source Kubernetes operator (CNCF Sandbox project) that adds scale-to-zero to any existing HTTP service — no code changes, no new programming model.
+This is the problem [KubeElasti](https://github.com/KubeElasti/KubeElasti) was built to solve. It adds scale-to-zero to any existing HTTP service — no code changes, no new programming model.
 
-You define an `ElastiService` resource pointing at your deployment. KubeElasti polls a Prometheus metric to decide when traffic has truly gone idle, then scales your pods to zero. When a real request arrives, a lightweight resolver intercepts it, queues it in memory, triggers scale-up, and forwards it once the pod is ready. The whole process is transparent to the caller.
+<!-- You define an `ElastiService` resource pointing at your deployment. KubeElasti polls a Prometheus metric to decide when traffic has truly gone idle, then scales your pods to zero. When a real request arrives, a lightweight resolver intercepts it, queues it in memory, triggers scale-up, and forwards it once the pod is ready. The whole process is transparent to the caller. -->
 
 KubeElasti operates in two distinct modes depending on whether pods are running:
 
