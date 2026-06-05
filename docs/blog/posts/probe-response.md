@@ -3,10 +3,16 @@ date: 2026-06-05
 pin: true
 title: Your Kubernetes Health Checks Are Accidentally Waking Your Services. Here's the Fix.
 description: Scale-to-zero breaks when health checks scale you back up. Learn how KubeElasti's ProbeResponse lets Kubernetes services stay genuinely idle — while keeping load balancers and uptime monitors happy.
-keywords: 
-    - Probe Response
-    - scale-to-zero
-    - kubernetes scaling
+keywords:
+    - kubernetes health checks scale to zero
+    - health checks waking pods on scale-to-zero
+    - load balancer health check kubernetes
+    - kubernetes liveness probe autoscaling
+    - KubeElasti ProbeResponse
+    - synthetic health check response
+    - ElastiService probeResponse
+    - kubernetes idle workload cost optimization
+    - scale-to-zero production kubernetes
 author: 
     - KubeElasti Team
 slug: probe-response
