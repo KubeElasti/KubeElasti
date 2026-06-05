@@ -1,6 +1,6 @@
 ---
 date: 2025-10-14
-pin: true
+pin: false
 title: Release 0.1.17
 description: Release 0.1.17 of KubeElasti is now available. This release includes a number of new features and improvements.
 keywords: 

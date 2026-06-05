@@ -283,5 +283,6 @@ nav:
           - Contributors: src/documentation/development/contributors.md
 
   - Blog:
+      - Probe Response: blog/posts/probe-response.md
       - Release 0.1.17: blog/posts/release-0.1.17.md
       - Scale-to-Zero: blog/posts/ScaleToZero.md
