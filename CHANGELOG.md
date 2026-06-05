@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Improvements
+
+* helm: support nodeSelector, tolerations, and affinity on elastiController and elastiResolver by @mcastellini in [#292](https://github.com/KubeElasti/KubeElasti/pull/292)
+
 ## v0.1.25 (2026-06-05)
 
 ### Fixes

@@ -143,6 +143,15 @@ elastiController:
   ## @param elastiController.deploymentAnnotations [object] annotations to apply to elastiController deployment
   ##
   deploymentAnnotations: {}
+  ## @param elastiController.affinity [object] affinity rules for pod assignment
+  ##
+  affinity: {}
+  ## @param elastiController.nodeSelector [object] node labels for pod assignment
+  ##
+  nodeSelector: {}
+  ## @param elastiController.tolerations [array] tolerations for pod assignment
+  ##
+  tolerations: []
   serviceAccount:
     ## @param elastiController.serviceAccount.annotations [object] annotations to use for the deployment
     ##
@@ -264,6 +273,15 @@ elastiResolver:
   ## @param elastiResolver.deploymentAnnotations [object] annotations to apply to elastiResolver deployment
   ##
   deploymentAnnotations: {}
+  ## @param elastiResolver.affinity [object] affinity rules for pod assignment
+  ##
+  affinity: {}
+  ## @param elastiResolver.nodeSelector [object] node labels for pod assignment
+  ##
+  nodeSelector: {}
+  ## @param elastiResolver.tolerations [array] tolerations for pod assignment
+  ##
+  tolerations: []
   serviceAccount:
     ## @param elastiResolver.serviceAccount.annotations [object] annotations to use for the deployment
     ##
