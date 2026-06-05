@@ -8,9 +8,17 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+## v0.1.25 (2026-06-05)
+
 ### Fixes
 
-* fix: retry the resolver backoff dialer on "connection refused" (not only on timeouts), avoiding a 502 on the first request after scale-from-zero when the target pod or kube-proxy route is not ready yet by `@sandrotaje`
+* fix: retry the resolver backoff dialer on "connection refused" (not only on timeouts), avoiding a 502 on the first request after scale-from-zero when the target pod or kube-proxy route is not ready yet by `@sandrotaje` in [#286](https://github.com/KubeElasti/KubeElasti/pull/286)
+
+### Other
+
+* feat: add E2E gRPC integration tests with H2C support by `@vorflux` in [#281](https://github.com/KubeElasti/KubeElasti/pull/281)
+* adopter: add buildo by `@ramantehlan` in [#288](https://github.com/KubeElasti/KubeElasti/pull/288)
+* docs: add Envoy Gateway routing support and integration docs by `@ramantehlan` in [#289](https://github.com/KubeElasti/KubeElasti/pull/289)
 
 ## v0.1.24 (2026-05-29)
 
