@@ -6,42 +6,42 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Understand KubeElasti resolver architecture for traffic proxying, request queueing, and service discovery in Kubernetes serverless environments.">
+        <meta name="description" content="Scale-to-zero breaks when health checks scale you back up. Learn how KubeElasti's ProbeResponse lets Kubernetes services stay genuinely idle — while keeping load balancers and uptime monitors happy.">
       
       
-        <meta name="author" content="KubeElasti Authors">
+        <meta name="author" content="["KubeElasti Team"]">
       
       
-        <link rel="canonical" href="https://kubeelasti.dev/src/documentation/architecture/resolver/">
+        <link rel="canonical" href="https://kubeelasti.dev/blog/posts/probe-response/">
       
       
-        <link rel="prev" href="../state/">
+        <link rel="prev" href="../../../src/documentation/development/contributors/">
       
       
-        <link rel="next" href="../operator/">
+        <link rel="next" href="../release-0.1.17/">
       
       
         
       
       
-      <link rel="icon" href="../../../../assets/images/logo/favicon.ico">
+      <link rel="icon" href="../../../assets/images/logo/favicon.ico">
       <meta name="generator" content="zensical-0.0.44">
     
     
       
-        <title>KubeElasti Resolver Architecture - Proxy and Traffic Management - KubeElasti</title>
+        <title>Your Kubernetes Health Checks Are Accidentally Waking Your Services. Here's the Fix. - KubeElasti</title>
       
     
     
       
         
       
-      <link rel="stylesheet" href="../../../../assets/stylesheets/modern/main.fba56155.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/modern/main.fba56155.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../../../assets/stylesheets/modern/palette.dfe2e883.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/modern/palette.dfe2e883.min.css">
       
       
   
@@ -136,7 +136,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/extra.css">
     
     <script>__md_scope=new URL("/",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
@@ -152,7 +152,7 @@
   
   <!-- Dynamic Keywords from Page Meta -->
   
-    <meta name="keywords" content="KubeElasti resolver, traffic proxy, request queueing, service discovery, proxy architecture, Kubernetes proxy">
+    <meta name="keywords" content="kubernetes health checks scale to zero, health checks waking pods on scale-to-zero, load balancer health check kubernetes, kubernetes liveness probe autoscaling, KubeElasti ProbeResponse, synthetic health check response, ElastiService probeResponse, kubernetes idle workload cost optimization, scale-to-zero production kubernetes">
   
   
   <!-- Open Graph Meta Tags -->
@@ -160,21 +160,21 @@
   <meta property="og:site_name" content="KubeElasti Documentation">
   <meta property="og:locale" content="en_US">
   
-  <meta property="og:url" content="https://kubeelasti.dev/src/documentation/architecture/resolver/">
+  <meta property="og:url" content="https://kubeelasti.dev/blog/posts/probe-response/">
   
-  <meta property="og:title" content="KubeElasti Resolver Architecture - Proxy and Traffic Management">
-  <meta property="og:description" content="Understand KubeElasti resolver architecture for traffic proxying, request queueing, and service discovery in Kubernetes serverless environments.">
+  <meta property="og:title" content="Your Kubernetes Health Checks Are Accidentally Waking Your Services. Here's the Fix.">
+  <meta property="og:description" content="Scale-to-zero breaks when health checks scale you back up. Learn how KubeElasti's ProbeResponse lets Kubernetes services stay genuinely idle — while keeping load balancers and uptime monitors happy.">
   <meta property="og:image" content="https://kubeelasti.dev/assets/images/logo/logo_white_full.png">
   
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="KubeElasti Resolver Architecture - Proxy and Traffic Management">
-  <meta name="twitter:description" content="Understand KubeElasti resolver architecture for traffic proxying, request queueing, and service discovery in Kubernetes serverless environments.">
+  <meta name="twitter:title" content="Your Kubernetes Health Checks Are Accidentally Waking Your Services. Here's the Fix.">
+  <meta name="twitter:description" content="Scale-to-zero breaks when health checks scale you back up. Learn how KubeElasti's ProbeResponse lets Kubernetes services stay genuinely idle — while keeping load balancers and uptime monitors happy.">
   <meta name="twitter:image" content="https://kubeelasti.dev/assets/images/logo/logo_white_full.png">
   
   <!-- Canonical URL -->
   
-  <link rel="canonical" href="https://kubeelasti.dev/src/documentation/architecture/resolver/">
+  <link rel="canonical" href="https://kubeelasti.dev/blog/posts/probe-response/">
   
   
   <!-- PWA / browser chrome (hex from mkdocs extra.theme_color; matches documented primary) -->
@@ -243,7 +243,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#resolver-architecture" class="md-skip">
+        <a href="#your-kubernetes-health-checks-are-accidentally-waking-your-services-heres-the-fix" class="md-skip">
           Skip to content
         </a>
       
@@ -271,9 +271,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../.." title="KubeElasti" class="md-header__button md-logo" aria-label="KubeElasti" data-md-component="logo">
+    <a href="../../.." title="KubeElasti" class="md-header__button md-logo" aria-label="KubeElasti" data-md-component="logo">
       
-  <img src="../../../../assets/images/logo/logo.svg" alt="KubeElasti">
+  <img src="../../../assets/images/logo/logo.svg" alt="KubeElasti">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
@@ -290,7 +290,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              KubeElasti Resolver Architecture - Proxy and Traffic Management
+              Your Kubernetes Health Checks Are Accidentally Waking Your Services. Here's the Fix.
             
           </span>
         </div>
@@ -374,7 +374,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../.." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   Home
@@ -403,7 +403,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../about/introduction/" class="md-tabs__link">
+        <a href="../../../src/about/introduction/" class="md-tabs__link">
           
   
   About
@@ -435,7 +435,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../install/installation/" class="md-tabs__link">
+        <a href="../../../src/install/installation/" class="md-tabs__link">
           
   
   Install
@@ -450,8 +450,6 @@
   
   
   
-    
-  
   
     
       
@@ -472,8 +470,6 @@
   
   
   
-    
-  
   
     
       
@@ -492,8 +488,8 @@
     
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../architecture/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../../src/documentation/architecture/architecture/" class="md-tabs__link">
           
   
   Documentation
@@ -511,6 +507,8 @@
   
   
   
+    
+  
   
     
       
@@ -525,8 +523,8 @@
     
     
     
-      <li class="md-tabs__item">
-        <a href="../../../../blog/posts/probe-response/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="././" class="md-tabs__link">
           
   
   Blog
@@ -548,6 +546,8 @@
           
             
               
+                
+              
               <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
@@ -559,9 +559,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../.." title="KubeElasti" class="md-nav__button md-logo" aria-label="KubeElasti" data-md-component="logo">
+    <a href="../../.." title="KubeElasti" class="md-nav__button md-logo" aria-label="KubeElasti" data-md-component="logo">
       
-  <img src="../../../../assets/images/logo/logo.svg" alt="KubeElasti">
+  <img src="../../../assets/images/logo/logo.svg" alt="KubeElasti">
 
     </a>
     KubeElasti
@@ -588,7 +588,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -644,7 +644,7 @@
   
   
   
-    <a href="../../../about/introduction/" class="md-nav__link">
+    <a href="../../../src/about/introduction/" class="md-nav__link">
       
   
   
@@ -706,7 +706,7 @@
   
   
   
-    <a href="../../../install/installation/" class="md-nav__link">
+    <a href="../../../src/install/installation/" class="md-nav__link">
       
   
   
@@ -735,902 +735,12 @@
       
   
   
-    
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Documentation
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-  Documentation
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Architecture
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_1">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-  Architecture
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-layers" viewBox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Overview
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../state/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-git-branch" viewBox="0 0 24 24"><path d="M15 6a9 9 0 0 0-9 9V3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  State
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-network" viewBox="0 0 24 24"><rect width="6" height="6" x="16" y="16" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="9" y="2" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Resolver
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="././" class="md-nav__link md-nav__link--active">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-network" viewBox="0 0 24 24"><rect width="6" height="6" x="16" y="16" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="9" y="2" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Resolver
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-
-<nav class="md-nav md-nav--secondary" aria-label="On this page">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#request-routing" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Request Routing
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../operator/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Operator
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../faq/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-circle-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Architecture FAQ
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Components
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-  Components
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../get-started/triggers/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-activity" viewBox="0 0 24 24"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
-  
-  <span class="md-ellipsis">
-    
   
-  Triggers
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../get-started/scalers/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-trending-up" viewBox="0 0 24 24"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Scalers
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../get-started/monitoring/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-line-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Monitoring
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Integrations
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-  Integrations
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../integrations/nginx/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-network" viewBox="0 0 24 24"><rect width="6" height="6" x="16" y="16" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="9" y="2" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  NGINX Ingress
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../integrations/istio/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-network" viewBox="0 0 24 24"><rect width="6" height="6" x="16" y="16" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="9" y="2" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Istio
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../integrations/envoy-gateway/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-network" viewBox="0 0 24 24"><rect width="6" height="6" x="16" y="16" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="9" y="2" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Envoy Gateway
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
     
     
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Development
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-  Development
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/env/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-terminal" viewBox="0 0 24 24"><path d="M12 19h8M4 17l6-6-6-6"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Dev Environment
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/playground/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-test-tube" viewBox="0 0 24 24"><path d="M14.5 2v17.5c0 1.4-1.1 2.5-2.5 2.5s-2.5-1.1-2.5-2.5V2M8.5 2h7M14.5 16h-5"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Playground
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/test-load/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-gauge" viewBox="0 0 24 24"><path d="m12 14 4-4M3.34 19a10 10 0 1 1 17.32 0"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Load Testing
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/test-e2e/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-clipboard-check" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  E2E Testing
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/contributors/" class="md-nav__link">
         
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3.128a4 4 0 0 1 0 7.744M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Contributors
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
       
         
       
@@ -1658,14 +768,18 @@
   
   
   
-    <a href="../../../../blog/posts/probe-response/" class="md-nav__link">
+    
+  
+  
+  
+    <a href="../../../src/documentation/architecture/architecture/" class="md-nav__link">
       
   
   
   <span class="md-ellipsis">
     
   
-  Blog
+  Documentation
 
     
   </span>
@@ -1678,6 +792,285 @@
     </a>
   
 
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Blog
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Blog
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Probe Response
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Probe Response
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-idea-scale-services-to-zero-when-no-traffic-is-flowing" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        The idea: scale services to zero when no traffic is flowing
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-production-problem-health-checks-never-stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        The production problem: health checks never stop
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubeelasti-a-kubernetes-native-scale-to-zero-operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        KubeElasti: a Kubernetes-native scale-to-zero operator
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-fix-proberesponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        The fix: ProbeResponse
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-means-in-practice" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        What this means in practice
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Setting it up
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Key takeaways
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release-0.1.17/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Release 0.1.17
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ScaleToZero/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Scale-to-Zero
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -1691,7 +1084,9 @@
             
             
               
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" hidden>
                 <div class="md-sidebar__scrollwrap">
                   
                     
@@ -1724,10 +1119,76 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#request-routing" class="md-nav__link">
+  <a href="#the-idea-scale-services-to-zero-when-no-traffic-is-flowing" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Request Routing
+        The idea: scale services to zero when no traffic is flowing
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-production-problem-health-checks-never-stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        The production problem: health checks never stop
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubeelasti-a-kubernetes-native-scale-to-zero-operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        KubeElasti: a Kubernetes-native scale-to-zero operator
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-fix-proberesponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        The fix: ProbeResponse
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-means-in-practice" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        What this means in practice
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Setting it up
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Key takeaways
       </span>
     </span>
   </a>
@@ -1747,6 +1208,8 @@
               
                 
 
+  
+
 
 
   
@@ -1759,7 +1222,7 @@
   
   
     <li class="md-path__item">
-      <a href="../../../.." class="md-path__link">
+      <a href="../../.." class="md-path__link">
         
   
   <span class="md-ellipsis">
@@ -1784,75 +1247,16 @@
       
         
       
-        
-      
-    
-    
-    
-    
-      
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
     
     
     
     
       <li class="md-path__item">
-        <a href="../architecture/" class="md-path__link">
+        <a href="././" class="md-path__link">
           
   
   <span class="md-ellipsis">
-    Documentation
-  </span>
-
-        </a>
-      </li>
-    
-  
-
-    
-  
-
-      
-        
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-    
-      <li class="md-path__item">
-        <a href="../architecture/" class="md-path__link">
-          
-  
-  <span class="md-ellipsis">
-    Architecture
+    Blog
   </span>
 
         </a>
@@ -1872,67 +1276,81 @@
   
 
 
-<h1 id="resolver-architecture">Resolver Architecture<a class="headerlink" href="#resolver-architecture" title="Permanent link">&para;</a></h1>
+<h1 id="your-kubernetes-health-checks-are-accidentally-waking-your-services-heres-the-fix">Your Kubernetes Health Checks Are Accidentally Waking Your Services. Here's the Fix.<a class="headerlink" href="#your-kubernetes-health-checks-are-accidentally-waking-your-services-heres-the-fix" title="Permanent link">&para;</a></h1>
+<p>Every pod you run costs money. When a service isn't receiving any real user traffic — at 2 AM, over a weekend, between batch jobs — those pods are burning CPU and memory for no reason.</p>
+<p>The obvious fix: scale idle services down to zero pods. No pods, no bill.</p>
+<p>It works beautifully in staging. Then you try it in production, and something keeps waking your services up.</p>
+<h2 id="the-idea-scale-services-to-zero-when-no-traffic-is-flowing">The idea: scale services to zero when no traffic is flowing<a class="headerlink" href="#the-idea-scale-services-to-zero-when-no-traffic-is-flowing" title="Permanent link">&para;</a></h2>
+<p>Kubernetes can run a deployment with zero replicas. If nobody is sending requests to your service, why keep a pod alive? This pattern is called scale-to-zero, and the principle is straightforward — traffic flowing means run pods, no traffic means scale to zero and save money, and when traffic resumes you scale back up and serve the request.</p>
 <pre class="mermaid"><code>flowchart LR
-  %% ── USER &amp; ENTRY ─────────────────────
-  User(("Client")) --&gt; RP["Proxy&lt;br/&gt;:8012"] --&gt; Main["Main&lt;br/&gt;cmd/main.go"] --&gt; IS["Metrics&lt;br/&gt;:8013"]
+    A[Traffic flowing\nPods running] --&gt; B[No traffic\nScale to zero]
+    B --&gt; C[Traffic resumes\nScale up, serve]
+    C --&gt; A</code></pre>
+<p>The catch is what happens during that "no traffic" window. Some traffic is always flowing — just not from real users.</p>
+<hr />
+<h2 id="the-production-problem-health-checks-never-stop">The production problem: health checks never stop<a class="headerlink" href="#the-production-problem-health-checks-never-stop" title="Permanent link">&para;</a></h2>
+<p>In any real Kubernetes environment, your service sits behind a load balancer. Load balancers have one rule: before sending real traffic to an upstream, verify it's alive. They do this by hitting a health check endpoint — typically <code>GET /healthz</code> — every 15 to 30 seconds. If the check fails, the upstream is marked down.</p>
+<p>This is correct behavior. But it creates a direct conflict with scale-to-zero.</p>
+<pre class="mermaid"><code>flowchart TD
+    LB[Load balancer\nevery 30 seconds] --&gt;|GET /healthz| SVC[Service]
+    SVC -.-&gt;|no pods to answer| ZERO[Pods = 0]
 
-  %% ── CORE MODULES ─────────────────────
-  subgraph Mods["Core Modules"]
-    Handler["Handler"]:::core
-    Hosts["Hosts"]:::core
-    Thr["Throttle"]:::core
-    Oper["Operator Comm"]:::core
-    Obs["Observability"]:::core
-  end
-  Main -- uses --&gt; Handler &amp; Hosts &amp; Thr &amp; Oper &amp; Obs
+    SVC --&gt; RESOLVER[Scale-to-zero system\nsees a request]
+    RESOLVER --&gt; WAKEUP[Triggers scale-up\nPod wakes up]
+    WAKEUP --&gt; COST[You were never idle\nPod runs forever]</code></pre>
+<p>Load balancers aren't the only culprit. Kubernetes liveness probes, service mesh health checks from Istio or Linkerd, and uptime monitors like Prometheus Blackbox Exporter all behave the same way — they hit your service continuously, not because they need your application, but because infrastructure requires constant proof of life.</p>
+<p>The result is that services which should be at zero replicas spend most of their time at one replica, responding to infrastructure noise.</p>
+<hr />
+<h2 id="kubeelasti-a-kubernetes-native-scale-to-zero-operator">KubeElasti: a Kubernetes-native scale-to-zero operator<a class="headerlink" href="#kubeelasti-a-kubernetes-native-scale-to-zero-operator" title="Permanent link">&para;</a></h2>
+<p>This is the problem <a href="https://github.com/KubeElasti/KubeElasti">KubeElasti</a> was built to solve. It adds scale-to-zero to any existing HTTP service — no code changes, no new programming model.</p>
+<!-- You define an `ElastiService` resource pointing at your deployment. KubeElasti polls a Prometheus metric to decide when traffic has truly gone idle, then scales your pods to zero. When a real request arrives, a lightweight resolver intercepts it, queues it in memory, triggers scale-up, and forwards it once the pod is ready. The whole process is transparent to the caller. -->
 
-  %% Request flow (compact arrows)
-  Handler --&gt; Hosts
-  Handler --&gt; Thr
-  Thr --&gt; Handler
-  Handler --&gt; Obs
-  Handler -.-&gt; Sentry["Sentry"]
+<p>KubeElasti operates in two distinct modes depending on whether pods are running:</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph SERVE["Serve mode — pods &gt; 0"]
+        direction LR
+        C1[Client] --&gt; S1[Service] --&gt; P1[Pods]
+    end
 
-  %% Operator comm
-  Handler -.-&gt; Oper
-  Oper -.-&gt; OpSvc["Operator Svc"]
-
-  %% External deps
-  Thr -.-&gt; K8sAPI["K8s API"]
-  Obs -.-&gt; Prom["Prometheus"]
-</code></pre>
-<h2 id="request-routing">Request Routing<a class="headerlink" href="#request-routing" title="Permanent link">&para;</a></h2>
-<p>The resolver identifies the target service by reading a single header on each
-incoming request. Two things decide which header is read:</p>
-<ul>
-<li>By default, the resolver binary reads the standard HTTP <code>Host</code> header
-  (<code>resolver/cmd/main.go:51</code>, <code>HeaderForHost string ... default:"Host"</code>).</li>
-<li>The shipped Helm chart overrides that default to <code>X-Envoy-Decorator-Operation</code>
-  (<code>charts/elasti/values.yaml</code>, <code>elastiResolver.proxy.env.headerForHost</code>) so
-  that deployments fronted by Envoy, Istio, or similar proxies that rewrite the
-  Host header keep working.</li>
-</ul>
-<p>Whichever header is selected, its value is parsed into <code>namespace</code> and
-<code>service</code> by <code>GetHost</code> in <code>hostmanager.go</code> and used to look up the target
-service to forward the request to.</p>
-<p>This has a practical consequence. Whatever routes traffic to the resolver,
-whether an Ingress controller, a service mesh, a <code>Service</code> selector, or a
-direct client, must arrive at the resolver with a header value that matches
-the target service's in-cluster FQDN format (for example,
-<code>target-deployment.target.svc.cluster.local</code>). If the header does not match,
-the resolver cannot tell which service the request was meant for and will not
-forward the request.</p>
-<p>Integration-specific setup lives under <a href="../../integrations/">Gateway and ingress integrations</a>:</p>
-<ul>
-<li><a href="../../integrations/nginx/">NGINX Ingress</a> — <code>nginx.ingress.kubernetes.io/upstream-vhost</code></li>
-<li><a href="../../integrations/istio/">Istio</a> — <code>X-Envoy-Decorator-Operation</code> (Helm default)</li>
-<li><a href="../../integrations/envoy-gateway/">Envoy Gateway</a> — <code>HTTPRoute</code> <code>URLRewrite</code> (<code>urlRewrite.hostname</code>); use <code>headerForHost: Host</code></li>
-</ul>
-<p>To use a different header (for example, a custom one set by your edge proxy),
-override the Helm value at install time:</p>
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>--set<span class="w"> </span>elastiResolver.proxy.env.headerForHost<span class="o">=</span>X-My-Custom-Host
+    subgraph PROXY["Proxy mode — pods = 0"]
+        direction LR
+        C2[Client] --&gt; R[Resolver\nqueues request] --&gt; P2[Pods\nscaling up]
+    end</code></pre>
+<p>This works well for real user requests. But health checks expose a gap: the resolver can't distinguish a <code>GET /healthz</code> from a load balancer from a <code>GET /healthz</code> from a real user. It sees a request. It scales up. Health checks were the single biggest blocker to teams adopting scale-to-zero in production.</p>
+<hr />
+<h2 id="the-fix-proberesponse">The fix: ProbeResponse<a class="headerlink" href="#the-fix-proberesponse" title="Permanent link">&para;</a></h2>
+<p>ProbeResponse teaches the resolver to recognize infrastructure probes and answer them directly — without ever waking the workload.</p>
+<p>You define matching rules in your <code>ElastiService</code>. When a request arrives and the service is at zero replicas, the resolver checks these rules first. A match returns your configured response immediately. No scale-up. The pod stays at zero.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">probeResponse</span><span class="p">:</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GET</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">path</span><span class="p">:</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PathPrefix</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">      </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/healthz</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nt">response</span><span class="p">:</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">      </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span><span class="nt">body</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{&quot;ok&quot;:true}&#39;</span>
 </span></code></pre></div>
+<p>Rules can match on HTTP method, path (exact, prefix, or regex), headers, and query parameters — all ANDed together. First match wins. If nothing matches, normal behavior applies: the request queues and triggers scale-up.</p>
+<pre class="mermaid"><code>flowchart TD
+    REQ[Request arrives\nProxy mode active] --&gt; CHECK{Check probe rules}
+
+    CHECK --&gt;|Match| SYNTH[Return synthetic response\n200 OK — pod stays at zero]
+    CHECK --&gt;|No match| QUEUE[Queue request\nNotify operator]
+
+    QUEUE --&gt; SCALE[Scale up pod]
+    SCALE --&gt; FWD[Forward to live pod]</code></pre>
+<hr />
+<h2 id="what-this-means-in-practice">What this means in practice<a class="headerlink" href="#what-this-means-in-practice" title="Permanent link">&para;</a></h2>
+<p>An important architectural point: ProbeResponse rules only apply when the resolver is active — that is, when your service is at zero replicas. The moment your service has live pods, KubeElasti switches to serve mode and the resolver exits the request path entirely. No overhead, no interception, no latency penalty when traffic is actually flowing.</p>
+<p>This matters most for workloads where genuine idle time is expensive to miss: GPU inference pods, enterprise licensed software charged per running instance, and internal developer tools that mostly sit unused between working hours.</p>
+<h2 id="setting-it-up">Setting it up<a class="headerlink" href="#setting-it-up" title="Permanent link">&para;</a></h2>
+<p>After <a href="https://kubeelasti.dev/src/install/installation/">installing KubeElasti</a>, add a <code>probeResponse</code> block to your <code>ElastiService</code>. The best first step is to audit your health check sources — your cloud load balancer configuration, Kubernetes ingress annotations, and any uptime monitoring — and create a matching rule for each. For most services, a single <code>PathPrefix: /health</code> rule covers everything.</p>
+<p>Full configuration reference: <a href="https://kubeelasti.dev/src/install/configure-elastiservice/#3-proberesponse">kubeelasti.dev/src/install/configure-elastiservice/#3-proberesponse</a></p>
+<hr />
+<h2 id="key-takeaways">Key takeaways<a class="headerlink" href="#key-takeaways" title="Permanent link">&para;</a></h2>
+<p>Idle services still cost money because health checks keep waking them up. KubeElasti scales pods to zero when real traffic stops and queues requests on the way back up, but health checks were triggering that scale-up even with no real user demand. ProbeResponse returns a configured synthetic response for matched probe paths, keeping pods at zero. And since the resolver only intercepts traffic during proxy mode, there is zero overhead once your pods are running.</p>
+
+  
 
 
 
@@ -1947,6 +1365,8 @@ override the Helm value at install time:</p>
 
 
 
+
+  
 
 
 
@@ -1973,10 +1393,12 @@ override the Helm value at install time:</p>
   
     
       
+        
+      
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../state/" class="md-footer__link md-footer__link--prev" aria-label="Previous: State">
+          <a href="../../../src/documentation/development/contributors/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Contributors">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--! Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l137.3-137.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
@@ -1986,20 +1408,20 @@ override the Helm value at install time:</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                State
+                Contributors
               </div>
             </div>
           </a>
         
         
           
-          <a href="../operator/" class="md-footer__link md-footer__link--next" aria-label="Next: Operator">
+          <a href="../release-0.1.17/" class="md-footer__link md-footer__link--next" aria-label="Next: Release 0.1.17">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Operator
+                Release 0.1.17
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2076,10 +1498,10 @@ override the Helm value at install time:</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate":{"json":[".s2"]},"base":"../../../..","features":["content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.instant.progress","navigation.path","navigation.prune","navigation.sections","navigation.tabs","navigation.top","navigation.tracking","search.highlight","search.share","search.suggest","toc.follow"],"search":"../../../../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":{"json":[".s2"]},"base":"../../..","features":["content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.instant.progress","navigation.path","navigation.prune","navigation.sections","navigation.tabs","navigation.top","navigation.tracking","search.highlight","search.share","search.suggest","toc.follow"],"search":"../../../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.6e5f0216.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.6e5f0216.min.js"></script>
       
     
   </body>
