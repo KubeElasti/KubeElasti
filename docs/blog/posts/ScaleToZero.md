@@ -16,6 +16,8 @@ keywords:
 author: 
     - Raman Tehlan
 slug: scale-to-zero
+hide:
+    - toc
 ---
 
 # Scale-to-Zero
