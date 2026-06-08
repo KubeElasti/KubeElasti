@@ -78,6 +78,18 @@ spec:
       terminationGracePeriodSeconds: 10
       imagePullSecrets:
         {{- include "elasti.imagePullSecrets" . | nindent 8 }}
+      {{- with .Values.elastiController.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.elastiController.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.elastiController.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -170,3 +182,15 @@ spec:
       imagePullSecrets:
         {{- include "elasti.imagePullSecrets" . | nindent 8 }}
       serviceAccountName: {{ include "elasti.fullname" . }}-resolver
+      {{- with .Values.elastiResolver.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.elastiResolver.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.elastiResolver.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

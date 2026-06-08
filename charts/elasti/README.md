@@ -49,6 +49,9 @@ KubeElasti is a Kubernetes-native solution that offers scale-to-zero functionali
 | `elastiController.podAnnotations`                   | annotations to apply to elastiController pods          | `{}`                         |
 | `elastiController.deploymentLabels`                 | labels to apply to elastiController deployment         | `{}`                         |
 | `elastiController.deploymentAnnotations`            | annotations to apply to elastiController deployment    | `{}`                         |
+| `elastiController.affinity`                         | affinity rules for pod assignment                      | `{}`                         |
+| `elastiController.nodeSelector`                     | node labels for pod assignment                         | `{}`                         |
+| `elastiController.tolerations`                      | tolerations for pod assignment                         | `[]`                         |
 | `elastiController.serviceAccount.annotations`       | annotations to use for the deployment                  | `{}`                         |
 | `elastiController.serviceAccount.labels`            | labels to use for the service account                  | `{}`                         |
 | `elastiController.metricsService`                   | metrics service to use for the deployment              | `{}`                         |
@@ -82,6 +85,9 @@ KubeElasti is a Kubernetes-native solution that offers scale-to-zero functionali
 | `elastiResolver.podAnnotations`                             | annotations to apply to elastiResolver pods                 | `{}`                         |
 | `elastiResolver.deploymentLabels`                           | labels to apply to elastiResolver deployment                | `{}`                         |
 | `elastiResolver.deploymentAnnotations`                      | annotations to apply to elastiResolver deployment           | `{}`                         |
+| `elastiResolver.affinity`                                   | affinity rules for pod assignment                           | `{}`                         |
+| `elastiResolver.nodeSelector`                               | node labels for pod assignment                              | `{}`                         |
+| `elastiResolver.tolerations`                                | tolerations for pod assignment                              | `[]`                         |
 | `elastiResolver.serviceAccount.annotations`                 | annotations to use for the deployment                       | `{}`                         |
 | `elastiResolver.serviceAccount.labels`                      | labels to use for the service account                       | `{}`                         |
 | `elastiResolver.autoscaling.enabled`                        | whether to enable autoscaling                               | `false`                      |
