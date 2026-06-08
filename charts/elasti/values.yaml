@@ -87,7 +87,7 @@ elastiController:
       repository: tfy-images/elasti-operator
       ## @param elastiController.manager.image.tag tag to use for the deployment
       ##
-      tag: 879b8ce9c3515bbbc08b85ae02f7cfe2fde826c4
+      tag: c6ca7d9a702fd2b82616eeb1f92ddab2054f0e09
     ## @param elastiController.manager.imagePullPolicy image pull policy
     ##
     imagePullPolicy: IfNotPresent
@@ -141,6 +141,15 @@ elastiController:
   ## @param elastiController.deploymentAnnotations [object] annotations to apply to elastiController deployment
   ##
   deploymentAnnotations: {}
+  ## @param elastiController.affinity [object] affinity rules for pod assignment
+  ##
+  affinity: {}
+  ## @param elastiController.nodeSelector [object] node labels for pod assignment
+  ##
+  nodeSelector: {}
+  ## @param elastiController.tolerations [array] tolerations for pod assignment
+  ##
+  tolerations: []
   serviceAccount:
     ## @param elastiController.serviceAccount.annotations [object] annotations to use for the deployment
     ##
@@ -200,7 +209,7 @@ elastiResolver:
       repository: tfy-images/elasti-resolver
       ## @param elastiResolver.proxy.image.tag tag to use for the deployment
       ##
-      tag: 879b8ce9c3515bbbc08b85ae02f7cfe2fde826c4
+      tag: c6ca7d9a702fd2b82616eeb1f92ddab2054f0e09
     ## @param elastiResolver.proxy.imagePullPolicy image pull policy
     ##
     imagePullPolicy: IfNotPresent
@@ -257,6 +266,15 @@ elastiResolver:
   ## @param elastiResolver.deploymentAnnotations [object] annotations to apply to elastiResolver deployment
   ##
   deploymentAnnotations: {}
+  ## @param elastiResolver.affinity [object] affinity rules for pod assignment
+  ##
+  affinity: {}
+  ## @param elastiResolver.nodeSelector [object] node labels for pod assignment
+  ##
+  nodeSelector: {}
+  ## @param elastiResolver.tolerations [array] tolerations for pod assignment
+  ##
+  tolerations: []
   serviceAccount:
     ## @param elastiResolver.serviceAccount.annotations [object] annotations to use for the deployment
     ##
