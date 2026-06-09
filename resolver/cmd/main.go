@@ -37,6 +37,7 @@ type config struct {
 	// This is also duration for which we don't recheck readiness of the service
 	TrafficReEnableDuration int `split_words:"true" default:"30"`
 	// TrafficDisableGraceDuration is the delay before disabling traffic after a proxied request completes
+	// This time is for EndpointSlice and CNI controller to converge and start to route requests directly
 	TrafficDisableGraceDuration int `split_words:"true" default:"15"`
 	// OperatorRetryDuration is the duration for which we don't inform the operator
 	// about the traffic on the same host

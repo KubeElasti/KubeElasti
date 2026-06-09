@@ -54,7 +54,6 @@ type (
 	// HostManager is to manage the hosts, and their traffic
 	HostManager interface {
 		GetHost(req *http.Request) (*messages.Host, error)
-		DisableTrafficForHost(service string)
 		ScheduleDisableTrafficForHost(service string)
 	}
 )
