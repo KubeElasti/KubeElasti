@@ -21,21 +21,21 @@ import (
 // It is used to process incoming requests and cache the host details in "hosts" map
 // For further requests, the cache is used to get the host details
 type HostManager struct {
-	logger                  *zap.Logger
-	hosts                   sync.Map
-	trafficReEnableDuration time.Duration
-	headerForHost           string
+	logger                     *zap.Logger
+	hosts                      sync.Map
+	trafficReEnableDuration    time.Duration
+	trafficDisableGraceDuration time.Duration
+	headerForHost              string
 }
 
-const proxyModeDrainDelay = 30 * time.Second
-
 // NewHostManager returns a new HostManager
-func NewHostManager(logger *zap.Logger, trafficReEnableDuration time.Duration, headerForHost string) *HostManager {
+func NewHostManager(logger *zap.Logger, trafficReEnableDuration, trafficDisableGraceDuration time.Duration, headerForHost string) *HostManager {
 	return &HostManager{
-		logger:                  logger.With(zap.String("component", "hostManager")),
-		hosts:                   sync.Map{},
-		trafficReEnableDuration: trafficReEnableDuration,
-		headerForHost:           headerForHost,
+		logger:                     logger.With(zap.String("component", "hostManager")),
+		hosts:                      sync.Map{},
+		trafficReEnableDuration:    trafficReEnableDuration,
+		trafficDisableGraceDuration: trafficDisableGraceDuration,
+		headerForHost:              headerForHost,
 	}
 }
 
@@ -106,8 +106,8 @@ func (hm *HostManager) ScheduleDisableTrafficForHost(hostName string) {
 	hm.hosts.Store(hostName, h)
 	hm.logger.Debug("Scheduled delayed disable for host",
 		zap.String("hostName", logger.MaskMiddle(hostName, 4, 4)),
-		zap.Duration("delay", proxyModeDrainDelay))
-	go time.AfterFunc(proxyModeDrainDelay, func() {
+		zap.Duration("delay", hm.trafficDisableGraceDuration))
+	go time.AfterFunc(hm.trafficDisableGraceDuration, func() {
 		if host, ok := hm.hosts.Load(hostName); ok {
 			h := host.(*messages.Host)
 			h.DisableScheduled = false

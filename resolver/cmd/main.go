@@ -36,6 +36,8 @@ type config struct {
 	// TrafficReEnableDuration is the duration for which the traffic is disabled for a host
 	// This is also duration for which we don't recheck readiness of the service
 	TrafficReEnableDuration int `split_words:"true" default:"30"`
+	// TrafficDisableGraceDuration is the delay before disabling traffic after a proxied request completes
+	TrafficDisableGraceDuration int `split_words:"true" default:"15"`
 	// OperatorRetryDuration is the duration for which we don't inform the operator
 	// about the traffic on the same host
 	OperatorRetryDuration int `split_words:"true" default:"30"`
@@ -93,7 +95,7 @@ func main() {
 	// Get components required for the handler
 	k8sUtil := k8shelper.NewOps(logger, config)
 	newOperatorRPC := operator.NewOperatorClient(logger, time.Duration(env.OperatorRetryDuration)*time.Second)
-	newHostManager := hostmanager.NewHostManager(logger, time.Duration(env.TrafficReEnableDuration)*time.Second, env.HeaderForHost)
+	newHostManager := hostmanager.NewHostManager(logger, time.Duration(env.TrafficReEnableDuration)*time.Second, time.Duration(env.TrafficDisableGraceDuration)*time.Second, env.HeaderForHost)
 	crdCache := crdcache.New(logger, newOperatorRPC, time.Duration(env.CRDCachePollIntervalMinutes)*time.Minute)
 	crdCache.StartBackground()
 	newTransport := throttler.NewProxyAutoTransport(env.MaxIdleProxyConns, env.MaxIdleProxyConnsPerHost)
