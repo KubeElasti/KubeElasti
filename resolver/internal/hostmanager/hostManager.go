@@ -27,6 +27,8 @@ type HostManager struct {
 	headerForHost           string
 }
 
+const proxyModeDrainDelay = 30 * time.Second
+
 // NewHostManager returns a new HostManager
 func NewHostManager(logger *zap.Logger, trafficReEnableDuration time.Duration, headerForHost string) *HostManager {
 	return &HostManager{
@@ -86,6 +88,33 @@ func (hm *HostManager) DisableTrafficForHost(hostName string) {
 		})
 		prom.TrafficSwitchCounter.WithLabelValues(hostName, "disabled").Inc()
 	}
+}
+
+// ScheduleDisableTrafficForHost schedules a delayed disable of traffic for the host.
+// The disable fires after a fixed delay, and only one timer is scheduled per host
+// regardless of how many requests arrive during the delay window.
+func (hm *HostManager) ScheduleDisableTrafficForHost(hostName string) {
+	host, ok := hm.hosts.Load(hostName)
+	if !ok {
+		return
+	}
+	h := host.(*messages.Host)
+	if h.DisableScheduled {
+		return
+	}
+	h.DisableScheduled = true
+	hm.hosts.Store(hostName, h)
+	hm.logger.Debug("Scheduled delayed disable for host",
+		zap.String("hostName", logger.MaskMiddle(hostName, 4, 4)),
+		zap.Duration("delay", proxyModeDrainDelay))
+	go time.AfterFunc(proxyModeDrainDelay, func() {
+		if host, ok := hm.hosts.Load(hostName); ok {
+			h := host.(*messages.Host)
+			h.DisableScheduled = false
+			hm.hosts.Store(hostName, h)
+		}
+		hm.DisableTrafficForHost(hostName)
+	})
 }
 
 // enableTrafficForHost enables the traffic for the host

@@ -55,6 +55,7 @@ type (
 	HostManager interface {
 		GetHost(req *http.Request) (*messages.Host, error)
 		DisableTrafficForHost(service string)
+		ScheduleDisableTrafficForHost(service string)
 	}
 )
 
@@ -152,7 +153,7 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 				hub.CaptureException(err)
 				return err
 			}
-			h.hostManager.DisableTrafficForHost(host.IncomingHost)
+			h.hostManager.ScheduleDisableTrafficForHost(host.IncomingHost)
 			return nil
 		}, func() {
 			h.operatorRPC.SendIncomingRequestInfo(host.Namespace, host.SourceService)
