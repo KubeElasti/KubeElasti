@@ -101,10 +101,10 @@ func (hm *HostManager) ScheduleDisableTrafficForHost(hostName string) {
 		return
 	}
 	h := host.(*messages.Host)
-	if h.DisableScheduled {
+	if h.TrafficDisableScheduled {
 		return
 	}
-	h.DisableScheduled = true
+	h.TrafficDisableScheduled = true
 	hm.hosts.Store(hostName, h)
 	hm.logger.Debug("Scheduled delayed disable for host",
 		zap.String("hostName", logger.MaskMiddle(hostName, 4, 4)),
@@ -112,7 +112,7 @@ func (hm *HostManager) ScheduleDisableTrafficForHost(hostName string) {
 	go time.AfterFunc(hm.trafficDisableGraceDuration, func() {
 		if host, ok := hm.hosts.Load(hostName); ok {
 			h := host.(*messages.Host)
-			h.DisableScheduled = false
+			h.TrafficDisableScheduled = false
 			hm.hosts.Store(hostName, h)
 		}
 		hm.disableTrafficForHost(hostName)
