@@ -12,7 +12,7 @@ import (
 
 func TestGetHost(t *testing.T) {
 	logger, _ := zap.NewDevelopment()
-	hm := NewHostManager(logger, 10*time.Second, "X-Envoy-Decorator-Operation")
+	hm := NewHostManager(logger, 10*time.Second, 15*time.Second, "X-Envoy-Decorator-Operation")
 
 	tests := []struct {
 		name          string

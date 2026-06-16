@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Fixes
+
+* fix: add grace period for CNI to converge before disabling resolver proxy during scale-from-zero events by `@chaserhkj` in [#293](https://github.com/KubeElasti/KubeElasti/pull/293). Fixes [#280](https://github.com/KubeElasti/KubeElasti/issues/280)
+
 ### Improvements
 
 * helm: support nodeSelector, tolerations, and affinity on elastiController and elastiResolver by @mcastellini in [#292](https://github.com/KubeElasti/KubeElasti/pull/292)

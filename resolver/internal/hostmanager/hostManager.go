@@ -21,19 +21,21 @@ import (
 // It is used to process incoming requests and cache the host details in "hosts" map
 // For further requests, the cache is used to get the host details
 type HostManager struct {
-	logger                  *zap.Logger
-	hosts                   sync.Map
-	trafficReEnableDuration time.Duration
-	headerForHost           string
+	logger                      *zap.Logger
+	hosts                       sync.Map
+	trafficReEnableDuration     time.Duration
+	trafficDisableGraceDuration time.Duration
+	headerForHost               string
 }
 
 // NewHostManager returns a new HostManager
-func NewHostManager(logger *zap.Logger, trafficReEnableDuration time.Duration, headerForHost string) *HostManager {
+func NewHostManager(logger *zap.Logger, trafficReEnableDuration, trafficDisableGraceDuration time.Duration, headerForHost string) *HostManager {
 	return &HostManager{
-		logger:                  logger.With(zap.String("component", "hostManager")),
-		hosts:                   sync.Map{},
-		trafficReEnableDuration: trafficReEnableDuration,
-		headerForHost:           headerForHost,
+		logger:                      logger.With(zap.String("component", "hostManager")),
+		hosts:                       sync.Map{},
+		trafficReEnableDuration:     trafficReEnableDuration,
+		trafficDisableGraceDuration: trafficDisableGraceDuration,
+		headerForHost:               headerForHost,
 	}
 }
 
@@ -74,7 +76,7 @@ func (hm *HostManager) GetHost(req *http.Request) (*messages.Host, error) {
 }
 
 // DisableTrafficForHost disables the traffic for the host
-func (hm *HostManager) DisableTrafficForHost(hostName string) {
+func (hm *HostManager) disableTrafficForHost(hostName string) {
 	if host, ok := hm.hosts.Load(hostName); ok && host.(*messages.Host).TrafficAllowed {
 		host.(*messages.Host).TrafficAllowed = false
 		hm.hosts.Store(hostName, host)
@@ -86,6 +88,35 @@ func (hm *HostManager) DisableTrafficForHost(hostName string) {
 		})
 		prom.TrafficSwitchCounter.WithLabelValues(hostName, "disabled").Inc()
 	}
+}
+
+// ScheduleDisableTrafficForHost schedules a delayed disable of traffic for the host.
+// The disable fires after TrafficDisableGraceDuration, and only one timer is scheduled per host
+// regardless of how many requests arrive during the delay window.
+// This allows a grace period for EndpointSlice and CNI controller to converge on route changes
+// before the resolver stops routing requests
+func (hm *HostManager) ScheduleDisableTrafficForHost(hostName string) {
+	host, ok := hm.hosts.Load(hostName)
+	if !ok {
+		return
+	}
+	h := host.(*messages.Host)
+	if h.TrafficDisableScheduled {
+		return
+	}
+	h.TrafficDisableScheduled = true
+	hm.hosts.Store(hostName, h)
+	hm.logger.Debug("Scheduled delayed disable for host",
+		zap.String("hostName", logger.MaskMiddle(hostName, 4, 4)),
+		zap.Duration("delay", hm.trafficDisableGraceDuration))
+	go time.AfterFunc(hm.trafficDisableGraceDuration, func() {
+		if host, ok := hm.hosts.Load(hostName); ok {
+			h := host.(*messages.Host)
+			h.TrafficDisableScheduled = false
+			hm.hosts.Store(hostName, h)
+		}
+		hm.disableTrafficForHost(hostName)
+	})
 }
 
 // enableTrafficForHost enables the traffic for the host
