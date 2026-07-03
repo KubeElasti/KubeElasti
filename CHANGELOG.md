@@ -10,6 +10,7 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ### Fixes
 
+* fix: switch proxy-mode services to serve mode when resolver deployment is deleted, preventing silent traffic loss by `@goodmorningsaksham` in [#TBD](https://github.com/KubeElasti/KubeElasti/pull/TBD). Fixes [#296](https://github.com/KubeElasti/KubeElasti/issues/296)
 * fix: add grace period for CNI to converge before disabling resolver proxy during scale-from-zero events by `@chaserhkj` in [#293](https://github.com/KubeElasti/KubeElasti/pull/293). Fixes [#280](https://github.com/KubeElasti/KubeElasti/issues/280)
 
 ### Improvements
