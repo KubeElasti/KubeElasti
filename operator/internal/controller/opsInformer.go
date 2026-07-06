@@ -71,32 +71,11 @@ func (r *ElastiServiceReconciler) getResolverChangeHandler(ctx context.Context) 
 // resolver deployment is deleted. This prevents silent traffic loss caused by
 // hijacked EndpointSlices pointing at now-dead resolver pod IPs.
 func (r *ElastiServiceReconciler) handleResolverDeletion(ctx context.Context) {
-	// Count proxy-mode services for the log message
-	var proxyModeCount int
-	crddirectory.CRDDirectory.Services.Range(func(_, value interface{}) bool {
-		crdDetails, ok := value.(*crddirectory.CRDDetails)
-		if !ok {
-			r.Logger.Error("Unexpected value type in CRDDirectory")
-			return true
-		}
-		if crdDetails == nil {
-			return true
-		}
-		if crdDetails.Status.Mode == values.ProxyMode {
-			proxyModeCount++
-		}
-		return true
-	})
-
 	r.Logger.Warn("Resolver deployment deleted, switching proxy-mode services to serve mode",
 		zap.String("deployment_name", config.GetResolverConfig().DeploymentName),
-		zap.Int("proxy_mode_services", proxyModeCount),
 	)
 
-	if proxyModeCount == 0 {
-		return
-	}
-
+	var switchedCount int
 	crddirectory.CRDDirectory.Services.Range(func(key, value interface{}) bool {
 		crdDetails, ok := value.(*crddirectory.CRDDetails)
 		if !ok {
@@ -133,10 +112,15 @@ func (r *ElastiServiceReconciler) handleResolverDeletion(ctx context.Context) {
 				zap.String("es", req.String()),
 				zap.Error(err))
 		} else {
+			switchedCount++
 			r.Logger.Info("Switched service to serve mode after resolver deletion", zap.String("es", req.String()))
 		}
 		return true
 	})
+
+	r.Logger.Info("Finished switching proxy-mode services to serve mode after resolver deletion",
+		zap.Int("count", switchedCount),
+	)
 }
 
 func (r *ElastiServiceReconciler) getPublicServiceChangeHandler(ctx context.Context, es *v1alpha1.ElastiService, req ctrl.Request) cache.ResourceEventHandlerFuncs {
