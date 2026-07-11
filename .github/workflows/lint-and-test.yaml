@@ -17,6 +17,9 @@ on:
       - 'go.work'
       - 'go.work.sum'
 
+permissions:
+  contents: read
+
 env:
   GO_VERSION: 1.25.9
 

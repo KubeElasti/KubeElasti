@@ -1,0 +1,12 @@
+# gitleaks configuration (OSPS-BR-07.01).
+# Extends the default ruleset and adds project-specific allowlisting.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Global allowlist for KubeElasti"
+# PostHog project API keys (phc_...) are public, client-side analytics
+# identifiers, not secrets. Do not treat them as leaked credentials.
+regexes = [
+  '''phc_[A-Za-z0-9]{40,}''',
+]

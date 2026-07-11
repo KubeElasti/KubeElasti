@@ -1,0 +1,9 @@
+# Known false positives for gitleaks (OSPS-BR-07.01).
+# Each entry is a finding fingerprint: <commit>:<file>:<rule>:<line>
+#
+# The values below are PostHog *project* API keys (phc_...). These are public,
+# client-side analytics identifiers meant to be embedded in shipped code — they
+# grant only event-ingestion, not account access — so they are not secrets.
+# The key was also since removed from the current chart values.
+2c472c64378055c6e0d2ad6c1331c7fcbfb79b67:charts/elasti/values.yaml:generic-api-key:317
+255879551b837feccf76d9b3c3fe774ddf34d01e:charts/elasti/values.yaml:generic-api-key:9
