@@ -6,9 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
-
 	"github.com/getsentry/sentry-go"
 
 	sentryhttp "github.com/getsentry/sentry-go/http"
@@ -136,8 +133,10 @@ func main() {
 	}
 
 	if env.EnableH2C {
-		h2s := &http2.Server{}
-		reverseProxyServer.Handler = h2c.NewHandler(reverseProxyServerMux, h2s)
+		protocols := new(http.Protocols)
+		protocols.SetHTTP1(true)
+		protocols.SetUnencryptedHTTP2(true)
+		reverseProxyServer.Protocols = protocols
 	}
 
 	logger.Info("Reverse Proxy Server starting at ", zap.String("port", reverseProxyPort))
