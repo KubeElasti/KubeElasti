@@ -1,0 +1,37 @@
+name: Secret Scan (gitleaks)
+
+# OSPS-BR-07.01: detect and prevent secrets/credentials from being committed.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: Scan for secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # The gitleaks GitHub Action requires a paid license for organization
+      # repositories, so we run the open-source binary directly instead.
+      - name: Install gitleaks
+        run: |
+          VERSION=8.21.2
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${VERSION}/gitleaks_${VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /usr/local/bin gitleaks
+          gitleaks version
+
+      - name: Run gitleaks
+        run: gitleaks detect --source . --config .gitleaks.toml --redact --verbose --exit-code 1

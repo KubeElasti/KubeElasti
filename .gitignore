@@ -19,3 +19,14 @@ db-go-service
 .codeql-db
 *.sarif
 venv
+
+# Secrets / local env (resolver/.env is intentionally tracked: non-secret tuning defaults)
+.env
+*.env
+!resolver/.env
+.env.local
+*.pem
+*.key
+
+# Logs
+*.log

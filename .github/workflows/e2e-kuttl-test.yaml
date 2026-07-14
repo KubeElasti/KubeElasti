@@ -16,6 +16,9 @@ on:
       - 'go.mod'
       - 'charts/**'
 
+permissions:
+  contents: read
+
 jobs:
   kuttl-tests:
     name: Run Kuttl E2E Tests
