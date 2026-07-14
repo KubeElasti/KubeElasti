@@ -2,7 +2,7 @@
 # NOTE: golang:1.25.9 matches the project-wide Go toolchain version used in
 # operator/Dockerfile and resolver/Dockerfile. If building outside CI, ensure
 # this image is available in your registry or pin to a released version.
-FROM golang:1.25.9 AS builder
+FROM golang:1.26.5 AS builder
 
 WORKDIR /app
 

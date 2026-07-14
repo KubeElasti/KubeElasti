@@ -10,6 +10,7 @@
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubeelasti)](https://artifacthub.io/packages/search?repo=kubeelasti)
 [![CNCF Landscape](https://img.shields.io/badge/CNCF%20Landscape-5699C6)](https://landscape.cncf.io/?item=serverless--framework--kubeelasti)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12491/badge)](https://www.bestpractices.dev/projects/12491)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FKubeElasti%2FKubeElasti.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FKubeElasti%2FKubeElasti?ref=badge_shield&issueType=license)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 [![Docs](https://img.shields.io/badge/Docs-kubeelasti.dev-blue)](https://kubeelasti.dev)
 </div>
@@ -92,7 +93,6 @@ Project governance details, including roles, decision-making, and maintainer res
 # Adopters
 
 See the list of organizations who are using KubeElasti in Production or in Staging in the [Adopters](./docs/src/about/adopters.md) guide.
-
 
 # Getting Help
 

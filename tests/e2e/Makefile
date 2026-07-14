@@ -38,6 +38,14 @@ build-images: ## Build and push images
 	$(MAKE) -C ../../resolver docker-build IMG=local/elasti-resolver:v1alpha1
 	$(MAKE) build-grpc-test-image
 
+.PHONY: build-resolver
+build-resolver: ## Build and push resolver image
+	$(MAKE) -C ../../resolver docker-build IMG=local/elasti-resolver:v1alpha1
+
+.PHONY: build-operator
+build-operator: ## Build and push resolver image
+	$(MAKE) -C ../../operator docker-build IMG=local/elasti-operator:v1alpha1
+
 .PHONY: build-grpc-test-image
 build-grpc-test-image: ## Build gRPC test service image
 	docker build -t local/grpc-test-service:v1alpha1 ./grpc-test-service/
