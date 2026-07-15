@@ -87,44 +87,97 @@ jobs:
       artifactory_username: ${{ secrets.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_USERNAME }}
       artifactory_password: ${{ secrets.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_PASSWORD }}
 
-  # Release the Helm chart
+  # Release the Helm chart, sign it, and publish SBOM + signed checksums
   release:
     runs-on: ubuntu-latest
     needs: [build-operator, build-resolver, read-chart-values]
     permissions:
       contents: write
+      id-token: write # required for cosign keyless (Fulcio/Rekor) signing
+    env:
+      CHART_NAME: ${{ needs.read-chart-values.outputs.chart_name }}
+      CHART_VERSION: ${{ needs.read-chart-values.outputs.chart_version }}
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           fetch-depth: "0"
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Install Syft
+        uses: anchore/sbom-action/download-syft@v0
+
       - name: Helm registry login
         run: |
-          helm registry login -u ${{ env.HELM_REGISTRY_USERNAME}} -p ${{ env.HELM_REGISTRY_PASSWORD }} ${{ env.HELM_REGISTRY_URL }}
+          helm registry login -u "${{ env.HELM_REGISTRY_USERNAME }}" -p "${{ env.HELM_REGISTRY_PASSWORD }}" "${{ env.HELM_REGISTRY_URL }}"
 
-      - name: Helm push
+      - name: Cosign registry login
+        run: |
+          cosign login "${{ env.HELM_REGISTRY_URL }}" -u "${{ env.HELM_REGISTRY_USERNAME }}" -p "${{ env.HELM_REGISTRY_PASSWORD }}"
+
+      - name: Package and push Helm chart
+        id: helm_push
         run: |
           cd charts
           CHART_DIR=elasti
-          CHART_NAME=${{ needs.read-chart-values.outputs.chart_name }}
-          CHART_VERSION=${{ needs.read-chart-values.outputs.chart_version }}
-              
-          # packaging chart
-          helm dependency update $CHART_DIR
-          helm package $CHART_DIR
 
-          # pushing the helm charts
-          echo "Pushing Chart: $CHART_NAME"
-          echo "Version: $CHART_NAME-$CHART_VERSION.tgz"
-          helm push $CHART_NAME-$CHART_VERSION.tgz oci://${{ env.HELM_CHART_REPOSITORY}}
+          # packaging chart
+          helm dependency update "$CHART_DIR"
+          helm package "$CHART_DIR"
+
+          CHART_PKG="${CHART_NAME}-${CHART_VERSION}.tgz"
+
+          # pushing the helm chart to the OCI registry and capturing the digest
+          echo "Pushing Chart: $CHART_NAME ($CHART_PKG)"
+          helm push "$CHART_PKG" "oci://${{ env.HELM_CHART_REPOSITORY }}" 2>&1 | tee push.log
+          DIGEST=$(grep -oE 'sha256:[a-f0-9]{64}' push.log | head -n1)
+          echo "Chart digest: $DIGEST"
+          echo "chart_digest=$DIGEST" >> "$GITHUB_OUTPUT"
           echo "Successfully pushed chart: $CHART_NAME"
 
-      - name: Upload Helm chart to release
+      - name: Sign Helm chart in registry (keyless)
+        env:
+          COSIGN_YES: "true"
+        run: |
+          cosign sign "${{ env.HELM_CHART_REPOSITORY }}/${CHART_NAME}@${{ steps.helm_push.outputs.chart_digest }}"
+
+      - name: Generate SBOM (SPDX)
+        run: |
+          syft scan dir:. \
+            --exclude './venv/**' \
+            --exclude './.cache/**' \
+            --exclude './.gomodcache/**' \
+            --exclude './site/**' \
+            --exclude './.git/**' \
+            -o spdx-json="charts/${CHART_NAME}-${CHART_VERSION}.sbom.spdx.json"
+
+      - name: Generate and sign checksums manifest (keyless)
+        env:
+          COSIGN_YES: "true"
+        run: |
+          cd charts
+          sha256sum \
+            "${CHART_NAME}-${CHART_VERSION}.tgz" \
+            "${CHART_NAME}-${CHART_VERSION}.sbom.spdx.json" > checksums.txt
+          cat checksums.txt
+
+          cosign sign-blob \
+            --output-signature checksums.txt.sig \
+            --output-certificate checksums.txt.pem \
+            checksums.txt
+
+      - name: Upload release artifacts
         uses: softprops/action-gh-release@v2
         with:
-            files: "charts/${{ needs.read-chart-values.outputs.chart_name }}-${{ needs.read-chart-values.outputs.chart_version }}.tgz"
-            tag_name: "${{ github.ref_name }}"
-            fail_on_unmatched_files: true
+          files: |
+            charts/${{ env.CHART_NAME }}-${{ env.CHART_VERSION }}.tgz
+            charts/${{ env.CHART_NAME }}-${{ env.CHART_VERSION }}.sbom.spdx.json
+            charts/checksums.txt
+            charts/checksums.txt.sig
+            charts/checksums.txt.pem
+          tag_name: "${{ github.ref_name }}"
+          fail_on_unmatched_files: true
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
