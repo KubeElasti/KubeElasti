@@ -3,8 +3,6 @@ package controller
 import (
 	"context"
 	"fmt"
-	"strings"
-	"sync"
 	"truefoundry/elasti/operator/api/v1alpha1"
 	"truefoundry/elasti/operator/internal/crddirectory"
 	"truefoundry/elasti/operator/internal/informer"
@@ -13,7 +11,6 @@ import (
 	"github.com/truefoundry/elasti/pkg/k8shelper"
 	"github.com/truefoundry/elasti/pkg/values"
 	"go.uber.org/zap"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
@@ -77,65 +74,44 @@ func (r *ElastiServiceReconciler) addCRDFinalizer(ctx context.Context, es *v1alp
 // finalizeCRD reset changes made for the CRD
 func (r *ElastiServiceReconciler) finalizeCRD(ctx context.Context, es *v1alpha1.ElastiService, req ctrl.Request) error {
 	r.Logger.Info("ElastiService is being deleted", zap.String("name", es.Name), zap.Any("deletionTimestamp", es.DeletionTimestamp))
-	var wg sync.WaitGroup
-	wg.Add(4)
-	// Stop all active informers related to this CRD in background
-	go func() {
-		defer wg.Done()
-		r.InformerManager.StopForCRD(req.Name, req.Namespace)
-		r.Logger.Info("[Done] Informer stopped for CRD", zap.String("es", req.String()))
-		// Reset the informer start mutex, so if the ElastiService is recreated, we will need to reset the informer
-		r.resetMutexForInformer(r.getMutexKeyForTargetRef(req))
-		r.resetMutexForInformer(r.getMutexKeyForPublicSVC(req))
-		r.Logger.Info("[Done] Informer mutex reset for ScaleTargetRef and PublicSVC", zap.String("es", req.String()))
-	}()
+
+	// transitionToServe requires the caller to hold the switch-mode lock for this
+	// ElastiService. switchMode acquires this itself, but finalizeCRD is invoked
+	// directly from Reconcile, so we acquire it explicitly here -- same
+	// lock-for-the-whole-function pattern switchMode uses above.
+	{
+		mutex := r.getMutexForSwitchMode(req.String())
+		mutex.Lock()
+		defer mutex.Unlock()
+	}
+
 	targetNamespacedName := types.NamespacedName{
 		Name:      es.Spec.Service,
 		Namespace: es.Namespace,
 	}
-	var err1, err2, err3 error
-	go func() {
-		defer wg.Done()
-		// Delete EndpointSlice to resolver
-		err1 = r.deleteEndpointsliceToResolver(ctx, targetNamespacedName)
-		if err1 == nil {
-			r.Logger.Info("[Done] EndpointSlice to resolver deleted", zap.String("service", targetNamespacedName.String()))
-		}
-	}()
-	go func() {
-		defer wg.Done()
-		// Delete private service
-		err2 = r.deletePrivateService(ctx, targetNamespacedName)
-		if err2 == nil {
-			r.Logger.Info("[Done] Private service deleted", zap.String("service", targetNamespacedName.String()))
-		}
-	}()
-	go func() {
-		defer wg.Done()
-		// Unpause the KEDA ScaledObject if elasti had paused it for scale-to-zero.
-		// Why: handleScaleToZero stamps autoscaling.keda.sh/paused=true and paused-replicas=0
-		// on the ScaledObject. If the ES is deleted while the target is at zero, those
-		// annotations would otherwise linger and KEDA would never resume scaling.
-		if es.Spec.Autoscaler == nil || !strings.EqualFold(es.Spec.Autoscaler.Type, "keda") {
-			return
-		}
-		err3 = r.ScaleHandler.UpdateKedaScaledObjectPausedState(ctx, es.Spec.Autoscaler.Name, es.Namespace, false)
-		if apierrors.IsNotFound(err3) {
-			// ScaledObject already gone — nothing to unpause.
-			err3 = nil
-		}
-		if err3 == nil {
-			r.Logger.Info("[Done] KEDA ScaledObject unpaused", zap.String("scaledObject", es.Spec.Autoscaler.Name), zap.String("namespace", es.Namespace))
-		}
-	}()
-	wg.Wait()
+
+	// This replaces the old three-way parallel cleanup (delete resolver EndpointSlice,
+	// delete private service, unpause KEDA) with the same sequential, readiness-aware
+	// sequence used everywhere else a service leaves proxy mode. We lose the previous
+	// parallelism, but that's noise (~tens of ms) next to the time transitionToServe
+	// now spends waiting for the target to become ready.
+	if err := r.transitionToServe(ctx, es); err != nil {
+		return fmt.Errorf("failed to finalize CRD: %w", err)
+	}
+	r.Logger.Info("[Done] Transitioned target to serve mode", zap.String("es", req.String()))
+
+	// Stop all active informers related to this CRD
+	r.InformerManager.StopForCRD(req.Name, req.Namespace)
+	r.Logger.Info("[Done] Informer stopped for CRD", zap.String("es", req.String()))
+	// Reset the informer start mutex, so if the ElastiService is recreated, we will need to reset the informer
+	r.resetMutexForInformer(r.getMutexKeyForTargetRef(req))
+	r.resetMutexForInformer(r.getMutexKeyForPublicSVC(req))
+	r.Logger.Info("[Done] Informer mutex reset for ScaleTargetRef and PublicSVC", zap.String("es", req.String()))
+
 	// Remove CRD details from service directory
 	crddirectory.RemoveCRD(targetNamespacedName.String())
 	r.Logger.Info("[Done] CRD removed from service directory", zap.String("es", req.String()))
 
-	if err1 != nil || err2 != nil || err3 != nil {
-		return fmt.Errorf("failed to finalize CRD. \n delete endpointslice: %w \n delete private service: %w \n unpause keda scaledobject: %w", err1, err2, err3)
-	}
 	r.Logger.Info("[SERVE MODE ENABLED]")
 	return nil
 }

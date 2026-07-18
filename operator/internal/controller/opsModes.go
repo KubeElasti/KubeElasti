@@ -85,14 +85,9 @@ func (r *ElastiServiceReconciler) enableProxyMode(ctx context.Context, req ctrl.
 	return nil
 }
 
+// enableServeMode moves the service out of proxy mode. switchMode already holds
+// SwitchModeLocks for this ElastiService before calling in here, satisfying
+// transitionToServe's locking precondition.
 func (r *ElastiServiceReconciler) enableServeMode(ctx context.Context, es *v1alpha1.ElastiService) error {
-	targetNamespacedName := types.NamespacedName{
-		Name:      es.Spec.Service,
-		Namespace: es.Namespace,
-	}
-	if err := r.deleteEndpointsliceToResolver(ctx, targetNamespacedName); err != nil {
-		return fmt.Errorf("failed to delete endpointslice to resolver: %w", err)
-	}
-	r.Logger.Info("1. Deleted endpointslice to resolver", zap.String("service", targetNamespacedName.String()))
-	return nil
+	return r.transitionToServe(ctx, es)
 }

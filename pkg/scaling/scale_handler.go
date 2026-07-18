@@ -19,6 +19,7 @@ import (
 	"go.uber.org/zap"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	v1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -158,7 +159,7 @@ func (h *ScaleHandler) checkAndScale(ctx context.Context) error {
 				continue
 			}
 		case ScaleUp:
-			err := h.handleScaleFromZero(ctx, es)
+			err := h.HandleScaleFromZero(ctx, es)
 			if err != nil {
 				h.logger.Error("failed to scale target from zero", zap.String("service", es.Spec.Service), zap.String("namespace", es.Namespace), zap.Error(err))
 				continue
@@ -284,17 +285,23 @@ func resolveCooldownPeriod(es *v1alpha1.ElastiService) time.Duration {
 	return cooldownPeriod
 }
 
-func (h *ScaleHandler) handleScaleFromZero(ctx context.Context, es *v1alpha1.ElastiService) error {
+// HandleScaleFromZero unpauses the KEDA ScaledObject (if applicable) and scales the
+// real target back up to MinTargetReplicas. It's exported so it can be reused as the
+// first step of the controller package's transitionToServe sequence (CRD deletion,
+// resolver deletion), not just from the internal scale-down watcher.
+func (h *ScaleHandler) HandleScaleFromZero(ctx context.Context, es *v1alpha1.ElastiService) error {
 	spec := es.GetSpec()
 	// We update the last scaled up time every time we evaluate that the trigger evaluates to scale-up. This means even if the scale-up is not successful, we update the last scaled up time to avoid the cooldown period increment
 	if err := h.UpdateLastScaledUpTime(ctx, es.Name, es.Namespace); err != nil {
 		h.logger.Error("Failed to update LastScaledUpTime", zap.Error(err), zap.String("service", spec.Service), zap.String("namespace", es.Namespace))
 	}
 
-	// Unpause the KEDA ScaledObject if it's paused
+	// Unpause the KEDA ScaledObject if it's paused. If the ScaledObject is already
+	// gone (e.g. a helm uninstall tearing everything down together), there's nothing
+	// to unpause -- treat that as success rather than failing the whole transition.
 	if spec.Autoscaler != nil && strings.ToLower(spec.Autoscaler.Type) == "keda" {
 		err := h.UpdateKedaScaledObjectPausedState(ctx, spec.Autoscaler.Name, es.Namespace, false)
-		if err != nil {
+		if err != nil && !apierrors.IsNotFound(err) {
 			return fmt.Errorf("failed to update Keda ScaledObject for service %s in namespace %s: %w", spec.Service, es.Namespace, err)
 		}
 	}
