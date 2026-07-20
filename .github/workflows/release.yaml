@@ -6,7 +6,7 @@ on:
       - v*
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   HELM_REGISTRY_URL: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_REGISTRY_URL }}

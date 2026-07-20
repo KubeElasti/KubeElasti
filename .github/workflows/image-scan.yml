@@ -5,11 +5,13 @@ on:
     - cron: '0 9 * * *'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   image-scan-build-resolver:
     name: Image Vulnerability Scan for Build Resolver
+    permissions:
+      contents: write
     uses: truefoundry/github-workflows-public/.github/workflows/update-grype-report.yml@main
     with:
       grype_config_file: resolver-grype-config.yaml
@@ -18,6 +20,8 @@ jobs:
       artifactory_repository_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_REPOSITORY }}
   image-scan-build-operator:
     name: Image Vulnerability Scan for Build Operator
+    permissions:
+      contents: write
     uses: truefoundry/github-workflows-public/.github/workflows/update-grype-report.yml@main
     with:
       grype_config_file: operator-grype-config.yaml
