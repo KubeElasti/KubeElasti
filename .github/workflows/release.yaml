@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - v*
+    # TODO: temporary — for testing SBOM generation on branch pushes. Remove before merge.
+    branches:
+      - rt/sbom
 
 permissions:
   contents: write
