@@ -14,7 +14,6 @@ import (
 	"github.com/truefoundry/elasti/pkg/config"
 	"github.com/truefoundry/elasti/pkg/values"
 	"go.uber.org/zap"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	kRuntime "k8s.io/apimachinery/pkg/runtime"
@@ -33,47 +32,26 @@ import (
 const (
 	// defaultSyncTimeout bounds how long we block waiting for an informer's initial sync.
 	defaultSyncTimeout = 30 * time.Second
-	// defaultSyncGracePeriod is how long a freshly (re)started informer gets to finish
-	// its initial sync before the health monitor considers restarting it.
-	defaultSyncGracePeriod = 2 * time.Minute
-	// Backoff bounds for restarting informers that repeatedly fail to sync.
-	defaultBaseRestartBackoff = 5 * time.Second
-	defaultMaxRestartBackoff  = 5 * time.Minute
-	// verifyTargetTimeout bounds the API call checking that a watch target still exists.
-	verifyTargetTimeout = 10 * time.Second
 )
 
 type (
 	// Manager helps manage lifecycle of informer
 	Manager struct {
-		client        *kubernetes.Clientset
-		dynamicClient dynamic.Interface
-		logger        *zap.Logger
-		informers     sync.Map
-		// keyLocks serializes lifecycle operations (start/stop/restart) per informer key,
-		// so e.g. Add and the health monitor can't both start an informer for the same key
-		// and orphan one of the stop channels.
-		keyLocks            sync.Map
+		client              *kubernetes.Clientset
+		dynamicClient       dynamic.Interface
+		logger              *zap.Logger
+		informers           sync.Map
 		resolver            info
 		resyncPeriod        time.Duration
 		healthCheckDuration time.Duration
 		healthCheckStopChan chan struct{}
 		syncTimeout         time.Duration
-		syncGracePeriod     time.Duration
-		baseRestartBackoff  time.Duration
-		maxRestartBackoff   time.Duration
 	}
 
 	info struct {
 		Informer cache.SharedInformer
 		StopCh   chan struct{}
 		Req      *RequestWatch
-		// StartedAt is when this informer was (re)started.
-		StartedAt time.Time
-		// RestartCount is how many times the health monitor has restarted this informer.
-		RestartCount int
-		// NextRestartAt is the earliest time the health monitor may restart this informer.
-		NextRestartAt time.Time
 	}
 
 	// RequestWatch is the request body sent to the informer
@@ -106,9 +84,6 @@ func NewInformerManager(logger *zap.Logger, kConfig *rest.Config) *Manager {
 		healthCheckDuration: 5 * time.Second,
 		healthCheckStopChan: make(chan struct{}),
 		syncTimeout:         defaultSyncTimeout,
-		syncGracePeriod:     defaultSyncGracePeriod,
-		baseRestartBackoff:  defaultBaseRestartBackoff,
-		maxRestartBackoff:   defaultMaxRestartBackoff,
 	}
 }
 
@@ -156,7 +131,7 @@ func (m *Manager) InitializeResolverInformer(handlers cache.ResourceEventHandler
 	return nil
 }
 
-// waitForSync waits for the informer cache to sync, bounded by the sync timeout.
+// waitForSync waits for the informer cache to sync, bounded by syncTimeout.
 // It returns false if the stop channel is closed or the timeout expires first.
 func (m *Manager) waitForSync(stopCh <-chan struct{}, hasSynced cache.InformerSynced) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), m.syncTimeout)
@@ -171,8 +146,9 @@ func (m *Manager) waitForSync(stopCh <-chan struct{}, hasSynced cache.InformerSy
 	return cache.WaitForCacheSync(ctx.Done(), hasSynced)
 }
 
-// Start is to initiate a health check on all the running informers
-// It uses HasSynced if a informer is not synced, if not, it restarts it
+// Start is to initiate a health check on all the running informers.
+// It only logs when an informer has not finished its initial sync; it does not
+// restart. client-go's Reflector already retries LIST/WATCH failures.
 func (m *Manager) Start() {
 	m.logger.Info("Starting InformerManager")
 	go wait.Until(m.monitorInformers, m.healthCheckDuration, m.healthCheckStopChan)
@@ -221,14 +197,6 @@ func (m *Manager) StopForCRD(crdName string, namespace string) {
 	wg.Wait()
 }
 
-// lockForKey returns the mutex serializing informer lifecycle operations for the given key.
-// Lock entries are intentionally never deleted: they are tiny, and deleting them would
-// race with concurrent LoadOrStore calls handing out a different mutex for the same key.
-func (m *Manager) lockForKey(key string) *sync.Mutex {
-	l, _ := m.keyLocks.LoadOrStore(key, &sync.Mutex{})
-	return l.(*sync.Mutex)
-}
-
 // StopInformer is to stop a informer for a resource
 // It closes the shared informer for it and deletes it from the map
 func (m *Manager) StopInformer(key string) (err error) {
@@ -239,15 +207,6 @@ func (m *Manager) StopInformer(key string) (err error) {
 		}
 		prom.InformerCounter.WithLabelValues(key, "stop", errStr).Inc()
 	}()
-	lock := m.lockForKey(key)
-	lock.Lock()
-	defer lock.Unlock()
-	return m.stopInformerLocked(key)
-}
-
-// stopInformerLocked stops the informer for the given key and removes it from the map.
-// The caller must hold the key lock.
-func (m *Manager) stopInformerLocked(key string) error {
 	value, ok := m.informers.Load(key)
 	if !ok {
 		return fmt.Errorf("informer not found, already stopped for key: %s", key)
@@ -259,11 +218,8 @@ func (m *Manager) stopInformerLocked(key string) error {
 		return fmt.Errorf("failed to cast WatchInfo for key: %s", key)
 	}
 
-	// Close the informer, delete it from the map.
-	// A nil StopCh means this is a pending-restart placeholder with no running informer.
-	if informerInfo.StopCh != nil {
-		close(informerInfo.StopCh)
-	}
+	// Close the informer, delete it from the map
+	close(informerInfo.StopCh)
 	m.informers.Delete(key)
 	prom.InformerGauge.WithLabelValues(key).Dec()
 	return nil
@@ -271,130 +227,17 @@ func (m *Manager) stopInformerLocked(key string) error {
 
 func (m *Manager) monitorInformers() {
 	m.informers.Range(func(key, value interface{}) bool {
-		keyStr, keyOk := key.(string)
-		informerInfo, ok := value.(info)
-		if !keyOk || !ok {
-			return true
-		}
-		if informerInfo.Informer != nil && informerInfo.Informer.HasSynced() {
-			if informerInfo.RestartCount != 0 {
-				m.resetRestartCount(keyStr)
+		info, ok := value.(info)
+		if ok {
+			if !info.Informer.HasSynced() {
+				// Do not restart. Initial sync can take longer than the health-check
+				// interval; killing the informer here caused a permanent restart storm.
+				// Leave it running and let WaitForCacheSync / Reflector finish.
+				m.logger.Info("Informer not synced yet, waiting", zap.String("key", key.(string)))
 			}
-			return true
 		}
-		m.checkAndRestartInformer(keyStr)
 		return true
 	})
-}
-
-// resetRestartCount clears the restart backoff state of a now-synced informer,
-// so a much later sync problem starts again from the base backoff.
-func (m *Manager) resetRestartCount(key string) {
-	lock := m.lockForKey(key)
-	lock.Lock()
-	defer lock.Unlock()
-
-	value, ok := m.informers.Load(key)
-	if !ok {
-		return
-	}
-	informerInfo, ok := value.(info)
-	if !ok || informerInfo.Informer == nil || !informerInfo.Informer.HasSynced() {
-		return
-	}
-	informerInfo.RestartCount = 0
-	informerInfo.NextRestartAt = time.Time{}
-	m.informers.Store(key, informerInfo)
-}
-
-// checkAndRestartInformer restarts the informer for the given key if it is still
-// unsynced, past its sync grace period, past its restart backoff, and its target
-// still exists. If the target is gone, the informer is stopped permanently.
-func (m *Manager) checkAndRestartInformer(key string) {
-	lock := m.lockForKey(key)
-	lock.Lock()
-	defer lock.Unlock()
-
-	// Re-check under the lock: the informer may have been stopped, restarted or
-	// synced since the health check observed it.
-	value, ok := m.informers.Load(key)
-	if !ok {
-		return
-	}
-	informerInfo, ok := value.(info)
-	if !ok {
-		return
-	}
-	if informerInfo.Informer != nil && informerInfo.Informer.HasSynced() {
-		return
-	}
-
-	now := time.Now()
-	// Give a freshly (re)started informer time to complete its initial sync
-	// before considering it unhealthy.
-	if informerInfo.StopCh != nil && now.Sub(informerInfo.StartedAt) < m.syncGracePeriod {
-		return
-	}
-	// Respect the exponential restart backoff.
-	if now.Before(informerInfo.NextRestartAt) {
-		return
-	}
-
-	// If the watched target (or its namespace) is gone, e.g. a torn-down environment,
-	// stop the informer permanently instead of restarting it forever.
-	if err := m.verifyTargetExist(informerInfo.Req); err != nil {
-		if apierrors.IsNotFound(err) {
-			m.logger.Warn("Informer target no longer exists, stopping informer permanently",
-				zap.String("key", key), zap.Error(err))
-			if stopErr := m.stopInformerLocked(key); stopErr != nil {
-				m.logger.Error("Failed to stop informer for missing target", zap.String("key", key), zap.Error(stopErr))
-			}
-			return
-		}
-		// Transient error talking to the API server, retry on a later health check.
-		m.logger.Error("Failed to verify informer target, skipping restart for now",
-			zap.String("key", key), zap.Error(err))
-		return
-	}
-
-	m.logger.Info("Informer not synced, restarting",
-		zap.String("key", key), zap.Int("restartCount", informerInfo.RestartCount+1))
-	if err := m.stopInformerLocked(key); err != nil {
-		m.logger.Error("Error in stopping informer", zap.String("key", key), zap.Error(err))
-	}
-	if err := m.enableInformerLocked(informerInfo.Req, informerInfo.RestartCount+1); err != nil {
-		m.logger.Error("Error in restarting informer", zap.String("key", key), zap.Error(err))
-		// enableInformerLocked cleaned up after itself, so nothing is running for this
-		// key anymore. Store a placeholder so later health checks keep retrying with
-		// backoff; otherwise the watch would be lost until the operator restarts.
-		m.storePlaceholderLocked(key, informerInfo.Req, informerInfo.RestartCount+1)
-	}
-}
-
-// storePlaceholderLocked records a pending-restart entry (no running informer) so the
-// health monitor keeps retrying with backoff. The caller must hold the key lock.
-func (m *Manager) storePlaceholderLocked(key string, req *RequestWatch, restartCount int) {
-	now := time.Now()
-	m.informers.Store(key, info{
-		Req:           req,
-		StartedAt:     now,
-		RestartCount:  restartCount,
-		NextRestartAt: now.Add(m.restartBackoff(restartCount)),
-	})
-	prom.InformerGauge.WithLabelValues(key).Inc()
-}
-
-// restartBackoff returns the exponential backoff delay before restart attempt
-// number restartCount, capped at maxRestartBackoff.
-func (m *Manager) restartBackoff(restartCount int) time.Duration {
-	backoff := m.baseRestartBackoff
-	for i := 1; i < restartCount; i++ {
-		backoff *= 2
-		if backoff >= m.maxRestartBackoff {
-			return m.maxRestartBackoff
-		}
-	}
-	return backoff
 }
 
 // Add is to add a watch on a resource
@@ -416,32 +259,26 @@ func (m *Manager) Add(req *RequestWatch) (err error) {
 		zap.String("crd", req.Req.String()),
 	)
 
-	// Serialize with the health monitor and other Add/Stop calls for the same key,
-	// so two informers can never run concurrently for one key.
-	lock := m.lockForKey(key)
-	lock.Lock()
-	defer lock.Unlock()
-
 	// Proceed only if the informer is not already running, we verify by checking the map
 	if _, ok := m.informers.Load(key); ok {
 		m.logger.Info("Informer already running", zap.String("key", key))
 		return nil
 	}
 
+	//TODO: Check if the resource exists
 	if err = m.verifyTargetExist(req); err != nil {
 		return fmt.Errorf("target not found: %w", err)
 	}
 
-	if err = m.enableInformerLocked(req, 0); err != nil {
-		return fmt.Errorf("failed to enable informer: %w", err)
+	if err = m.enableInformer(req); err != nil {
+		return fmt.Errorf("failed to enable to informer: %w", err)
 	}
+	prom.InformerGauge.WithLabelValues(key).Inc()
 	return nil
 }
 
-// enableInformerLocked starts an informer for a resource and stores it in the map.
-// It waits up to informerSyncTimeout for the initial sync; on failure the informer
-// is stopped and removed again. The caller must hold the key lock.
-func (m *Manager) enableInformerLocked(req *RequestWatch, restartCount int) error {
+// enableInformer is to enable the informer for a resource
+func (m *Manager) enableInformer(req *RequestWatch) error {
 	ctx := context.Background()
 	// Create an informer for the resource
 	informer := cache.NewSharedInformer(
@@ -475,24 +312,18 @@ func (m *Manager) enableInformerLocked(req *RequestWatch, restartCount int) erro
 	// Recover it in case it's not syncing, this is why we also store the handlers
 	// Stop it when the CRD or the operator is deleted
 	key := m.getKeyFromRequestWatch(req)
-	now := time.Now()
 	m.informers.Store(key, info{
-		Informer:      informer,
-		StopCh:        informerStop,
-		Req:           req,
-		StartedAt:     now,
-		RestartCount:  restartCount,
-		NextRestartAt: now.Add(m.restartBackoff(restartCount + 1)),
+		Informer: informer,
+		StopCh:   informerStop,
+		Req:      req,
 	})
-	prom.InformerGauge.WithLabelValues(key).Inc()
 
-	// Wait for the cache to sync, bounded by informerSyncTimeout. On failure, stop the
-	// informer and remove it from the map so we don't leak its goroutines.
+	// Wait for the cache to sync, bounded by syncTimeout. On failure, stop the
+	// informer and remove it from the map so we don't leak its goroutine.
 	if !m.waitForSync(informerStop, informer.HasSynced) {
 		m.logger.Error("Failed to sync informer within timeout", zap.String("key", key))
-		if stopErr := m.stopInformerLocked(key); stopErr != nil {
-			m.logger.Error("Failed to clean up unsynced informer", zap.String("key", key), zap.Error(stopErr))
-		}
+		close(informerStop)
+		m.informers.Delete(key)
 		return errors.New("failed to sync informer within timeout")
 	}
 	m.logger.Info("Informer started", zap.String("key", key))
@@ -527,9 +358,7 @@ func (m *Manager) GetKey(param KeyParams) string {
 
 // verifyTargetExist is to verify if the target resource exists
 func (m *Manager) verifyTargetExist(req *RequestWatch) error {
-	ctx, cancel := context.WithTimeout(context.Background(), verifyTargetTimeout)
-	defer cancel()
-	if _, err := m.dynamicClient.Resource(*req.GroupVersionResource).Namespace(req.ResourceNamespace).Get(ctx, req.ResourceName, metav1.GetOptions{}); err != nil {
+	if _, err := m.dynamicClient.Resource(*req.GroupVersionResource).Namespace(req.ResourceNamespace).Get(context.Background(), req.ResourceName, metav1.GetOptions{}); err != nil {
 		return fmt.Errorf("resource doesn't exist: %w | resource name: %v | resource type: %v | resource namespace: %v", err, req.ResourceName, req.GroupVersionResource.Resource, req.ResourceNamespace)
 	}
 	return nil
