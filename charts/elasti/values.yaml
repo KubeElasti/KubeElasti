@@ -18,7 +18,7 @@ global:
   ## @param global.image.registry registry to use for the deployment
   ##
   image:
-    registry: "tfy.jfrog.io"
+    registry: "ghcr.io"
   ## @param global.imagePullSecrets [array] image pull secrets to use for the deployment
   ##
   imagePullSecrets: []
@@ -84,10 +84,10 @@ elastiController:
       registry: ""
       ## @param elastiController.manager.image.repository repository to use for the deployment
       ##
-      repository: tfy-images/elasti-operator
+      repository: kubeelasti/elasti-operator
       ## @param elastiController.manager.image.tag tag to use for the deployment
       ##
-      tag: e86b28ebd85c68686bc198e39004731488a97c6b
+      tag: 95e83f658c057f8c843dfd5577d199b6fdcb4288
     ## @param elastiController.manager.imagePullPolicy image pull policy
     ##
     imagePullPolicy: IfNotPresent
@@ -206,10 +206,10 @@ elastiResolver:
       registry: ""
       ## @param elastiResolver.proxy.image.repository repository to use for the deployment
       ##
-      repository: tfy-images/elasti-resolver
+      repository: kubeelasti/elasti-resolver
       ## @param elastiResolver.proxy.image.tag tag to use for the deployment
       ##
-      tag: e86b28ebd85c68686bc198e39004731488a97c6b
+      tag: 95e83f658c057f8c843dfd5577d199b6fdcb4288
     ## @param elastiResolver.proxy.imagePullPolicy image pull policy
     ##
     imagePullPolicy: IfNotPresent
