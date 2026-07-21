@@ -1,4 +1,4 @@
-name: Push image to JFROG Public
+name: Push image to GHCR
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   build-operator:
@@ -14,32 +15,30 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      packages: write
     uses: truefoundry/github-workflows-public/.github/workflows/build.yml@main
     with:
       image_tag: ${{ github.sha }}
       image_artifact_name: 'elasti-operator'
       dockerfile_path: 'operator/Dockerfile'
-      artifactory_registry_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_REGISTRY_URL }}
-      artifactory_repository_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_REPOSITORY }}
-    secrets:
-      artifactory_username: ${{ secrets.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_USERNAME }}
-      artifactory_password: ${{ secrets.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_PASSWORD }}
+      enable_jfrog: false
+      enable_ghcr: true
+      ghcr_repository_url: ghcr.io/${{ github.repository_owner }}
 
   build-resolver:
     name: Build and Push Resolver Docker Images
     permissions:
       id-token: write
       contents: read
+      packages: write
     uses: truefoundry/github-workflows-public/.github/workflows/build.yml@main
     with:
       image_tag: ${{ github.sha }}
       image_artifact_name: 'elasti-resolver'
       dockerfile_path: 'resolver/Dockerfile'
-      artifactory_registry_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_REGISTRY_URL }}
-      artifactory_repository_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_REPOSITORY }}
-    secrets:
-      artifactory_username: ${{ secrets.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_USERNAME }}
-      artifactory_password: ${{ secrets.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_PASSWORD }}
+      enable_jfrog: false
+      enable_ghcr: true
+      ghcr_repository_url: ghcr.io/${{ github.repository_owner }}
 
   # We are updating the sha in the helm chart values.yaml file on the helm-main branch
   update-helm-chart:

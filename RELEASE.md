@@ -115,7 +115,7 @@ Stable releases require manual preparation and are triggered by creating a GitHu
 
 2. The `.github/workflows/release.yaml` workflow is triggered:
    - Helm chart is packaged
-   - Chart is pushed to the JFrog Artifactory Helm repository
+   - Chart is pushed to GitHub Container Registry (`oci://ghcr.io/kubeelasti/charts`)
 
 
 ## 2. Beta Release
@@ -133,7 +133,7 @@ Beta(Legacy) releases are automatically generated when code is merged to the `ma
 2. The `.github/workflows/build-n-publish.yml` workflow is triggered:
    - Docker images are built for both operator and resolver components
    - Images are tagged with the commit SHA
-   - Images are pushed to JFrog Artifactory
+   - Images are pushed to GitHub Container Registry (`ghcr.io/kubeelasti`)
    - The `helm-main` branch is updated with the latest SHA in `values.yaml`
 
 ### Using Beta Releases
