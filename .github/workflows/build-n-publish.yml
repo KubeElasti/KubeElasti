@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'sd/ghcr-release' # TEMP: remove before merge — enables a test GHCR push from this branch
 
 permissions:
   contents: read
@@ -44,6 +45,7 @@ jobs:
   update-helm-chart:
     name: Update Helm values.yaml
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' # TEMP-safe: don't mutate helm-main from test-branch runs
     permissions:
       contents: write
     needs: [build-operator, build-resolver]
