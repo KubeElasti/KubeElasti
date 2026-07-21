@@ -26,6 +26,9 @@ spec:
       containers:
       - args:
         {{- toYaml .Values.elastiController.manager.args | nindent 8 }}
+        {{- if eq .Values.rbac.scope "Namespaced" }}
+        - --watch-namespaces={{ include "elasti.rbacNamespaces" . | fromYamlArray | join "," }}
+        {{- end }}
         command:
         - /manager
         env:

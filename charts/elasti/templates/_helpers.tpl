@@ -465,6 +465,80 @@ Selector Labels - merges app labels with base selector labels
 
 {{/*
 ===========================================
+RBAC Helpers
+===========================================
+*/}}
+
+{{/*
+Effective set of namespaces the operator/resolver are granted access to when
+rbac.scope=Namespaced. Always includes the release namespace (resolver
+deployment, leader election, operator-managed private services) in addition to
+the configured workload namespaces. Returns a de-duplicated list.
+*/}}
+{{- define "elasti.rbacNamespaces" -}}
+{{- $namespaces := concat (.Values.rbac.namespaces | default (list)) (list .Release.Namespace) | uniq }}
+{{- toYaml $namespaces }}
+{{- end }}
+
+{{/*
+Operator manager rules - access to the ElastiService CRD.
+*/}}
+{{- define "elasti.operatorManagerRules" -}}
+- apiGroups: ["elasti.truefoundry.com"]
+  resources: ["elastiservices"]
+  verbs: ["get", "list", "watch", "update"]
+- apiGroups: ["elasti.truefoundry.com"]
+  resources: ["elastiservices/finalizers"]
+  verbs: ["update"]
+- apiGroups: ["elasti.truefoundry.com"]
+  resources: ["elastiservices/status"]
+  verbs: ["get", "patch", "update"]
+{{- end }}
+
+{{/*
+Operator additional access rules - workload discovery, scaling and endpoint management.
+The scale subresource wildcard rule is valid inside a namespaced Role (it applies within the namespace).
+*/}}
+{{- define "elasti.operatorAdditionalRules" -}}
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets"]
+  verbs: ["get", "list", "watch"]
+# Required to scale any resource
+- apiGroups: ["*"]
+  resources: ["*/scale"]
+  verbs: ["get", "update", "patch"]
+- apiGroups: ["discovery.k8s.io"]
+  resources: ["endpointslices"]
+  verbs: ["get", "list", "watch", "update", "patch", "delete", "create"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "watch", "update", "patch", "delete", "create"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch", "update"]
+- apiGroups: ["argoproj.io"]
+  resources: ["rollouts"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+- apiGroups: ["keda.sh"]
+  resources: ["scaledobjects"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+# Required to get pod details in informer
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+{{- end }}
+
+{{/*
+Resolver additional access rules.
+*/}}
+{{- define "elasti.resolverAdditionalRules" -}}
+- apiGroups: ["discovery.k8s.io"]
+  resources: ["endpointslices"]
+  verbs: ["list"]
+{{- end }}
+
+{{/*
+===========================================
 Common Helpers
 ===========================================
 */}}

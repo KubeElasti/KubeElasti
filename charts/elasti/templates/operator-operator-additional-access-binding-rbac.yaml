@@ -1,3 +1,25 @@
+{{- if eq .Values.rbac.scope "Namespaced" }}
+{{- range $ns := include "elasti.rbacNamespaces" . | fromYamlArray }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "elasti.fullname" $ }}-operator-operator-additional-access-binding
+  namespace: {{ $ns }}
+  labels:
+    {{- include "elasti-operator.commonLabels" $ | nindent 4 }}
+  annotations:
+    {{- include "elasti-operator.commonAnnotations" $ | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: {{ if $.Values.rbac.useClusterRole }}ClusterRole{{ else }}Role{{ end }}
+  name: {{ include "elasti.fullname" $ }}-operator-additional-access
+subjects:
+- kind: ServiceAccount
+  name: {{ include "elasti.fullname" $ }}-operator-controller-manager
+  namespace: '{{ $.Release.Namespace }}'
+{{- end }}
+{{- else }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -14,3 +36,4 @@ subjects:
 - kind: ServiceAccount
   name: {{ include "elasti.fullname" . }}-operator-controller-manager
   namespace: '{{ .Release.Namespace }}'
+{{- end }}

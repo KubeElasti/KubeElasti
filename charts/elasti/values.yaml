@@ -53,6 +53,17 @@ global:
     annotations: {}
     ## @param global.serviceAccount.labels [object] labels to apply to all service accounts
     labels: {}
+## @section RBAC parameters
+rbac:
+  ## @param rbac.scope RBAC scope for elasti. `Cluster` (default) creates ClusterRole/ClusterRoleBinding and watches all namespaces. `Namespaced` creates namespace-scoped Role/RoleBinding and restricts the operator to `rbac.namespaces`.
+  ##
+  scope: Cluster
+  ## @param rbac.namespaces [array] Workload namespaces the operator manages when `rbac.scope=Namespaced`. The release namespace is always included automatically.
+  ##
+  namespaces: []
+  ## @param rbac.useClusterRole When `rbac.scope=Namespaced`: if `false` (default) a Role is created per namespace (zero cluster-scoped objects); if `true` a single ClusterRole holds the rules and is granted per-namespace via RoleBinding (one cluster-scoped object, no cluster-wide binding).
+  ##
+  useClusterRole: false
 ## @section Elasti controller parameters
 elastiController:
   manager:

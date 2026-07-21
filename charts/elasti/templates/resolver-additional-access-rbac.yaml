@@ -1,3 +1,5 @@
+{{- if eq .Values.rbac.scope "Namespaced" }}
+{{- if .Values.rbac.useClusterRole }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -7,6 +9,32 @@ metadata:
   annotations:
     {{- include "elasti-resolver.commonAnnotations" . | nindent 4 }}
 rules:
-- apiGroups: ["discovery.k8s.io"]
-  resources: ["endpointslices"]
-  verbs: ["list"]
+{{- include "elasti.resolverAdditionalRules" . | nindent 0 }}
+{{- else }}
+{{- range $ns := include "elasti.rbacNamespaces" . | fromYamlArray }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "elasti.fullname" $ }}-resolver-additional-access
+  namespace: {{ $ns }}
+  labels:
+    {{- include "elasti-resolver.commonLabels" $ | nindent 4 }}
+  annotations:
+    {{- include "elasti-resolver.commonAnnotations" $ | nindent 4 }}
+rules:
+{{- include "elasti.resolverAdditionalRules" $ | nindent 0 }}
+{{- end }}
+{{- end }}
+{{- else }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "elasti.fullname" . }}-resolver-additional-access
+  labels:
+    {{- include "elasti-resolver.commonLabels" . | nindent 4 }}
+  annotations:
+    {{- include "elasti-resolver.commonAnnotations" . | nindent 4 }}
+rules:
+{{- include "elasti.resolverAdditionalRules" . | nindent 0 }}
+{{- end }}

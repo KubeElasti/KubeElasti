@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/getsentry/sentry-go"
@@ -40,11 +41,11 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -92,8 +93,9 @@ func mainWithError() error {
 		defer sentry.Flush(2 * time.Second)
 	}
 
-	var watchNamespace string
-	flag.StringVar(&watchNamespace, "watch-namespace", metav1.NamespaceAll, "Namespace to watch for resources")
+	var watchNamespacesRaw string
+	flag.StringVar(&watchNamespacesRaw, "watch-namespaces", "",
+		"Comma-separated list of namespaces to watch for resources. Empty (the default) watches all namespaces (cluster scope).")
 
 	zapLogger, err := tfLogger.NewLogger("dev", sentryEnabled)
 	if err != nil {
@@ -122,6 +124,15 @@ func mainWithError() error {
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
+	// Parse the comma-separated watch-namespaces flag into a slice, dropping
+	// empty entries. An empty slice means cluster scope (watch all namespaces).
+	var watchNamespaces []string
+	for _, ns := range strings.Split(watchNamespacesRaw, ",") {
+		if ns = strings.TrimSpace(ns); ns != "" {
+			watchNamespaces = append(watchNamespaces, ns)
+		}
+	}
+
 	// if the enable-http2 flag is false (the default), http/2 should be disabled
 	// due to its vulnerabilities. More specifically, disabling http/2 will
 	// prevent from being vulnerable to the HTTP/2 Stream Cancellation and
@@ -142,7 +153,7 @@ func mainWithError() error {
 		TLSOpts: tlsOpts,
 	})
 
-	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+	ctrlOptions := ctrl.Options{
 		Scheme: scheme,
 		Metrics: metricsserver.Options{
 			BindAddress:   metricsAddr,
@@ -154,7 +165,21 @@ func mainWithError() error {
 		LeaderElection:                enableLeaderElection,
 		LeaderElectionID:              "acf50383.truefoundry.io",
 		LeaderElectionReleaseOnCancel: true,
-	})
+	}
+
+	// When specific namespaces are configured, restrict the manager cache to
+	// them so the operator can run with namespace-scoped RBAC (Role/RoleBinding)
+	// instead of cluster-wide permissions.
+	if len(watchNamespaces) > 0 {
+		defaultNamespaces := make(map[string]cache.Config, len(watchNamespaces))
+		for _, ns := range watchNamespaces {
+			defaultNamespaces[ns] = cache.Config{}
+		}
+		ctrlOptions.Cache = cache.Options{DefaultNamespaces: defaultNamespaces}
+		setupLog.Info("restricting manager to namespaces", "namespaces", watchNamespaces)
+	}
+
+	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrlOptions)
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		sentry.CaptureException(err)
@@ -169,7 +194,7 @@ func mainWithError() error {
 	defer informerManager.Stop()
 
 	// Initiate and start the shared scaleHandler
-	scaleHandler := scaling.NewScaleHandler(zapLogger, mgr.GetConfig(), watchNamespace, mgr.GetEventRecorderFor("elasti-operator"))
+	scaleHandler := scaling.NewScaleHandler(zapLogger, mgr.GetConfig(), watchNamespaces, mgr.GetEventRecorderFor("elasti-operator"))
 
 	// Set up the ElastiService controller
 	reconciler := &controller.ElastiServiceReconciler{
@@ -180,7 +205,7 @@ func mainWithError() error {
 		ScaleHandler:    scaleHandler,
 	}
 
-	if err = reconciler.SetupWithManager(mgr, watchNamespace); err != nil {
+	if err = reconciler.SetupWithManager(mgr, watchNamespaces); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ElastiService")
 		sentry.CaptureException(err)
 		return fmt.Errorf("main: %w", err)
@@ -237,7 +262,7 @@ func mainWithError() error {
 		return fmt.Errorf("failed to sync cache")
 	}
 
-	if err = reconciler.Initialize(context.Background(), watchNamespace); err != nil {
+	if err = reconciler.Initialize(context.Background(), watchNamespaces); err != nil {
 		setupLog.Error(err, "unable to initialize controller")
 		return fmt.Errorf("main: %w", err)
 	}

@@ -116,7 +116,14 @@ func (r *ElastiServiceReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	return res, nil
 }
 
-func (r *ElastiServiceReconciler) SetupWithManager(mgr ctrl.Manager, watchNamespace string) error {
+func (r *ElastiServiceReconciler) SetupWithManager(mgr ctrl.Manager, watchNamespaces []string) error {
+	// Build a set for O(1) membership checks. An empty set means cluster scope
+	// (watch every namespace).
+	watchedSet := make(map[string]struct{}, len(watchNamespaces))
+	for _, ns := range watchNamespaces {
+		watchedSet[ns] = struct{}{}
+	}
+
 	err := ctrl.NewControllerManagedBy(mgr).
 		For(&v1alpha1.ElastiService{}).
 		WithEventFilter(predicate.NewPredicateFuncs(func(obj client.Object) bool {
@@ -124,10 +131,11 @@ func (r *ElastiServiceReconciler) SetupWithManager(mgr ctrl.Manager, watchNamesp
 			if !ok {
 				return false
 			}
-			if watchNamespace == metav1.NamespaceAll || es.Namespace == watchNamespace {
+			if len(watchedSet) == 0 {
 				return true
 			}
-			return false
+			_, watched := watchedSet[es.Namespace]
+			return watched
 		})).
 		Complete(r)
 	if err != nil {
@@ -141,8 +149,8 @@ func (r *ElastiServiceReconciler) getMutexForReconcile(key string) *sync.Mutex {
 	return l.(*sync.Mutex)
 }
 
-func (r *ElastiServiceReconciler) Initialize(ctx context.Context, watchNamespace string) error {
-	if err := r.reconcileExistingCRDs(ctx, watchNamespace); err != nil {
+func (r *ElastiServiceReconciler) Initialize(ctx context.Context, watchNamespaces []string) error {
+	if err := r.reconcileExistingCRDs(ctx, watchNamespaces); err != nil {
 		return fmt.Errorf("failed to reconcile existing CRDs: %w", err)
 	}
 	if err := r.InformerManager.InitializeResolverInformer(r.getResolverChangeHandler(ctx)); err != nil {
@@ -152,42 +160,50 @@ func (r *ElastiServiceReconciler) Initialize(ctx context.Context, watchNamespace
 	return nil
 }
 
-func (r *ElastiServiceReconciler) reconcileExistingCRDs(ctx context.Context, watchNamespace string) error {
-	crdList := &v1alpha1.ElastiServiceList{}
-	if err := r.List(ctx, crdList, client.InNamespace(watchNamespace)); err != nil {
-		return fmt.Errorf("failed to list ElastiServices: %w", err)
+func (r *ElastiServiceReconciler) reconcileExistingCRDs(ctx context.Context, watchNamespaces []string) error {
+	// An empty watch list means cluster scope: list ElastiServices across all namespaces.
+	namespaces := watchNamespaces
+	if len(namespaces) == 0 {
+		namespaces = []string{metav1.NamespaceAll}
 	}
+
 	count := 0
-
-	for _, es := range crdList.Items {
-		// Skip if being deleted
-		if !es.DeletionTimestamp.IsZero() {
-			r.Logger.Debug("Skipping ElastiService because it is being deleted", zap.String("name", es.Name), zap.String("namespace", es.Namespace))
-			continue
+	for _, ns := range namespaces {
+		crdList := &v1alpha1.ElastiServiceList{}
+		if err := r.List(ctx, crdList, client.InNamespace(ns)); err != nil {
+			return fmt.Errorf("failed to list ElastiServices in namespace %q: %w", ns, err)
 		}
 
-		req := ctrl.Request{
-			NamespacedName: types.NamespacedName{
-				Name:      es.Name,
-				Namespace: es.Namespace,
-			},
-		}
+		for _, es := range crdList.Items {
+			// Skip if being deleted
+			if !es.DeletionTimestamp.IsZero() {
+				r.Logger.Debug("Skipping ElastiService because it is being deleted", zap.String("name", es.Name), zap.String("namespace", es.Namespace))
+				continue
+			}
 
-		if _, err := r.Reconcile(ctx, req); err != nil {
-			r.Logger.Error(
-				"Failed to reconcile existing ElastiService",
+			req := ctrl.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      es.Name,
+					Namespace: es.Namespace,
+				},
+			}
+
+			if _, err := r.Reconcile(ctx, req); err != nil {
+				r.Logger.Error(
+					"Failed to reconcile existing ElastiService",
+					zap.String("name", es.Name),
+					zap.String("namespace", es.Namespace),
+					zap.Error(err),
+				)
+				continue
+			}
+			count++
+			r.Logger.Info(
+				"Reconciled existing ElastiService",
 				zap.String("name", es.Name),
 				zap.String("namespace", es.Namespace),
-				zap.Error(err),
 			)
-			continue
 		}
-		count++
-		r.Logger.Info(
-			"Reconciled existing ElastiService",
-			zap.String("name", es.Name),
-			zap.String("namespace", es.Namespace),
-		)
 	}
 
 	r.Logger.Info("Successfully reconciled all existing ElastiServices", zap.Int("count", count))
