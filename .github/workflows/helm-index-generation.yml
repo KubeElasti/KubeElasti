@@ -6,6 +6,10 @@ on:
       - 'main'
     paths:
       - 'charts/elasti/Chart.yaml'
+
+permissions:
+  contents: read
+
 jobs:
   generate-helm-index:
     runs-on: ubuntu-latest
