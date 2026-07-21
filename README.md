@@ -44,7 +44,7 @@ Kubernetes clusters can become costly, especially when running multiple services
 - [Adopters](#adopters)
 - [Getting Help](#getting-help)
 - [Roadmap](#roadmap)
-  - [Star History](#star-history)
+- [Contributors](#contributors)
 
 # Introduction
 
@@ -104,6 +104,12 @@ We have a dedicated [Discussions](https://github.com/KubeElasti/KubeElasti/discu
 
 We are maintaining the future roadmap using the [issues](https://github.com/KubeElasti/KubeElasti/issues) and [milestones](https://github.com/KubeElasti/KubeElasti/milestones). You can also suggest ideas and vote for them by adding a 👍 reaction to the issue.
 
-## Star History
+# Contributors
 
-[![Star History Chart](https://api.star-history.com/svg?repos=KubeElasti/KubeElasti&type=Date)](https://www.star-history.com/#KubeElasti/KubeElasti&Date)
+KubeElasti is built by a growing community of contributors. Thank you to everyone who has helped shape the project!
+
+<a href="https://github.com/KubeElasti/KubeElasti/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=KubeElasti/KubeElasti" alt="KubeElasti contributors" />
+</a>
+
+We are actively looking for additional maintainers to help grow and steer the project. If you are interested in taking on a larger role, please reach out on [Slack](https://cloud-native.slack.com/archives/C0AMUFC5Y3D), start a thread in our [Discussions](https://github.com/KubeElasti/KubeElasti/discussions), or open an [issue](https://github.com/KubeElasti/KubeElasti/issues/new). See the [Contribution](#contribution) and [Governance](#governance) guides to get started.
