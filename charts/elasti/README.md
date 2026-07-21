@@ -13,7 +13,7 @@ KubeElasti is a Kubernetes-native solution that offers scale-to-zero functionali
 | `global.fullnameOverride`           | full name of the deployment                  | `""`            |
 | `global.enableMonitoring`           | whether to enable monitoring                 | `false`         |
 | `global.secretName`                 | name of the secret to use for the deployment | `elasti-secret` |
-| `global.image.registry`             | registry to use for the deployment           | `tfy.jfrog.io`  |
+| `global.image.registry`             | registry to use for the deployment           | `ghcr.io`       |
 | `global.imagePullSecrets`           | image pull secrets to use for the deployment | `[]`            |
 | `global.labels`                     | labels to apply to all resources             | `{}`            |
 | `global.annotations`                | annotations to apply to all resources        | `{}`            |
@@ -35,7 +35,7 @@ KubeElasti is a Kubernetes-native solution that offers scale-to-zero functionali
 | `elastiController.manager.containerSecurityContext` | container security context                             | `{}`                         |
 | `elastiController.manager.podSecurityContext`       | pod security context                                   | `{}`                         |
 | `elastiController.manager.image.registry`           | registry to use for the deployment                     | `""`                         |
-| `elastiController.manager.image.repository`         | repository to use for the deployment                   | `tfy-images/elasti-operator` |
+| `elastiController.manager.image.repository`         | repository to use for the deployment                   | `kubeelasti/elasti-operator` |
 | `elastiController.manager.image.tag`                | tag to use for the deployment                          | `0.1.25`                     |
 | `elastiController.manager.imagePullPolicy`          | image pull policy                                      | `IfNotPresent`               |
 | `elastiController.manager.resources`                | resources to use for the deployment                    | `{}`                         |
@@ -70,7 +70,7 @@ KubeElasti is a Kubernetes-native solution that offers scale-to-zero functionali
 | ----------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------- |
 | `elastiResolver.proxy.env`                                  | environment to use for the deployment                       | `{}`                         |
 | `elastiResolver.proxy.image.registry`                       | registry to use for the deployment                          | `""`                         |
-| `elastiResolver.proxy.image.repository`                     | repository to use for the deployment                        | `tfy-images/elasti-resolver` |
+| `elastiResolver.proxy.image.repository`                     | repository to use for the deployment                        | `kubeelasti/elasti-resolver` |
 | `elastiResolver.proxy.image.tag`                            | tag to use for the deployment                               | `0.1.25`                     |
 | `elastiResolver.proxy.imagePullPolicy`                      | image pull policy                                           | `IfNotPresent`               |
 | `elastiResolver.proxy.resources`                            | resources to use for the deployment                         | `{}`                         |
