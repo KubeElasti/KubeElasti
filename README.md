@@ -1,11 +1,14 @@
-> KubeElasti is looking for additional maintainers to help grow and steer the project. If you are interested, please reach out on [Slack](https://cloud-native.slack.com/archives/C0AMUFC5Y3D) or start a thread in our [Discussions](https://github.com/KubeElasti/KubeElasti/discussions).
+
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/cncf/artwork/refs/heads/main/projects/kubeelasti/stacked/color/kubeelasti-stacked-color.svg" alt="KubeElasti Logo" width="300px">
+<img src="./docs/assets/images/logo/rounded_black_white_bg.png" alt="KubeElasti Logo" width="200px">
+<h1> KubeElasti</h1>
 <h3> Confidently Scale-to-zero with no downtime</h3>
 </div>
 
 <div align="center">
+
+
 
 ![Lint and Test](https://github.com/KubeElasti/KubeElasti/actions/workflows/lint-and-test.yaml/badge.svg)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubeelasti)](https://artifacthub.io/packages/search?repo=kubeelasti)
