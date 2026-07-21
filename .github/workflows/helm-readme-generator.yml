@@ -6,6 +6,10 @@ on:
       - 'main'
     paths:
       - 'charts/**'
+
+permissions:
+  contents: read
+
 jobs:
   update-readme-metadata:
     runs-on: ubuntu-latest

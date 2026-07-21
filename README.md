@@ -10,9 +10,11 @@
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubeelasti)](https://artifacthub.io/packages/search?repo=kubeelasti)
 [![CNCF Landscape](https://img.shields.io/badge/CNCF%20Landscape-5699C6)](https://landscape.cncf.io/?item=serverless--framework--kubeelasti)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12491/badge)](https://www.bestpractices.dev/projects/12491)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/KubeElasti/KubeElasti/badge)](https://scorecard.dev/viewer/?uri=github.com/KubeElasti/KubeElasti)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FKubeElasti%2FKubeElasti.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FKubeElasti%2FKubeElasti?ref=badge_shield&issueType=license)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 [![Docs](https://img.shields.io/badge/Docs-kubeelasti.dev-blue)](https://kubeelasti.dev)
+[![Static Badge](https://img.shields.io/badge/slack-@cloud_native/kubeelasti-blue.svg?logo=slack )](https://cloud-native.slack.com/archives/C0AMUFC5Y3D)
 </div>
 
 # Why use KubeElasti?
@@ -42,7 +44,7 @@ Kubernetes clusters can become costly, especially when running multiple services
 - [Adopters](#adopters)
 - [Getting Help](#getting-help)
 - [Roadmap](#roadmap)
-  - [Star History](#star-history)
+- [Contributors](#contributors)
 
 # Introduction
 
@@ -102,6 +104,12 @@ We have a dedicated [Discussions](https://github.com/KubeElasti/KubeElasti/discu
 
 We are maintaining the future roadmap using the [issues](https://github.com/KubeElasti/KubeElasti/issues) and [milestones](https://github.com/KubeElasti/KubeElasti/milestones). You can also suggest ideas and vote for them by adding a 👍 reaction to the issue.
 
-## Star History
+# Contributors
 
-[![Star History Chart](https://api.star-history.com/svg?repos=KubeElasti/KubeElasti&type=Date)](https://www.star-history.com/#KubeElasti/KubeElasti&Date)
+KubeElasti is built by a growing community of contributors. Thank you to everyone who has helped shape the project!
+
+<a href="https://github.com/KubeElasti/KubeElasti/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=KubeElasti/KubeElasti" alt="KubeElasti contributors" />
+</a>
+
+We are actively looking for additional maintainers to help grow and steer the project. If you are interested in taking on a larger role, please reach out on [Slack](https://cloud-native.slack.com/archives/C0AMUFC5Y3D), start a thread in our [Discussions](https://github.com/KubeElasti/KubeElasti/discussions), or open an [issue](https://github.com/KubeElasti/KubeElasti/issues/new). See the [Contribution](#contribution) and [Governance](#governance) guides to get started.

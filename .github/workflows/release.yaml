@@ -6,7 +6,7 @@ on:
       - v*
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   HELM_REGISTRY_URL: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_REGISTRY_URL }}
@@ -68,6 +68,8 @@ jobs:
       dockerfile_path: "operator/Dockerfile"
       artifactory_registry_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_REGISTRY_URL }}
       artifactory_repository_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_REPOSITORY }}
+      enable_sbom: true
+      sbom_artifact_name: "sbom-elasti-operator"
     secrets:
       artifactory_username: ${{ secrets.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_USERNAME }}
       artifactory_password: ${{ secrets.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_PASSWORD }}
@@ -83,6 +85,8 @@ jobs:
       dockerfile_path: "resolver/Dockerfile"
       artifactory_registry_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_REGISTRY_URL }}
       artifactory_repository_url: ${{ vars.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_REPOSITORY }}
+      enable_sbom: true
+      sbom_artifact_name: "sbom-elasti-resolver"
     secrets:
       artifactory_username: ${{ secrets.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_USERNAME }}
       artifactory_password: ${{ secrets.TRUEFOUNDRY_ARTIFACTORY_PUBLIC_PASSWORD }}
@@ -120,10 +124,42 @@ jobs:
           helm push $CHART_NAME-$CHART_VERSION.tgz oci://${{ env.HELM_CHART_REPOSITORY}}
           echo "Successfully pushed chart: $CHART_NAME"
 
-      - name: Upload Helm chart to release
+      - name: Install Syft
+        uses: anchore/sbom-action/download-syft@v0
+        id: syft
+
+      - name: Generate Helm chart SBOM
+        env:
+          SYFT: ${{ steps.syft.outputs.cmd }}
+          CHART_NAME: ${{ needs.read-chart-values.outputs.chart_name }}
+          CHART_VERSION: ${{ needs.read-chart-values.outputs.chart_version }}
+        run: |
+          set -euo pipefail
+          SBOM_FILE="charts/${CHART_NAME}-${CHART_VERSION}.sbom.spdx.json"
+          echo "Generating SBOM for chart ${CHART_NAME}-${CHART_VERSION}"
+          "$SYFT" scan "dir:charts/elasti" -o spdx-json="${SBOM_FILE}"
+          echo "Generated SBOM: ${SBOM_FILE}"
+
+      - name: Download operator image SBOM
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build-operator.outputs.sbom_artifact_name }}
+          path: image-sboms
+
+      - name: Download resolver image SBOM
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build-resolver.outputs.sbom_artifact_name }}
+          path: image-sboms
+
+      - name: Upload Helm chart and SBOMs to release
         uses: softprops/action-gh-release@v2
         with:
-            files: "charts/${{ needs.read-chart-values.outputs.chart_name }}-${{ needs.read-chart-values.outputs.chart_version }}.tgz"
+            files: |
+              charts/${{ needs.read-chart-values.outputs.chart_name }}-${{ needs.read-chart-values.outputs.chart_version }}.tgz
+              charts/${{ needs.read-chart-values.outputs.chart_name }}-${{ needs.read-chart-values.outputs.chart_version }}.sbom.spdx.json
+              image-sboms/${{ needs.build-operator.outputs.sbom_file_name }}
+              image-sboms/${{ needs.build-resolver.outputs.sbom_file_name }}
             tag_name: "${{ github.ref_name }}"
             fail_on_unmatched_files: true
         env:

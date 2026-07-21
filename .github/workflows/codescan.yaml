@@ -30,6 +30,9 @@ on:
   schedule:
     - cron: "18 19 * * 5"
 
+permissions:
+  contents: read
+
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
@@ -46,9 +49,11 @@ jobs:
       # required to fetch internal or private CodeQL packs
       packages: read
 
+      # required to checkout the repository and build with Go
+      contents: read
+
       # only required for workflows in private repositories
       #   actions: read
-      #   contents: read
 
     strategy:
       fail-fast: false
