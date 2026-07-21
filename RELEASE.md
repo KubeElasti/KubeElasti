@@ -114,8 +114,85 @@ Stable releases require manual preparation and are triggered by creating a GitHu
 
 
 2. The `.github/workflows/release.yaml` workflow is triggered:
+   - Operator and resolver images are built, pushed, and **keyless-signed** with cosign
+   - An SPDX SBOM is generated and signed for each image
    - Helm chart is packaged
-   - Chart is pushed to GitHub Container Registry (`oci://ghcr.io/kubeelasti/charts`)
+   - Chart is pushed to GitHub Container Registry (`oci://ghcr.io/kubeelasti/charts`) and **keyless-signed** with cosign
+   - An SPDX SBOM is generated and signed for the chart
+   - The chart, all SBOMs, and all cosign signature files are attached to the GitHub release
+
+## Supply-chain signing
+
+Releases are signed with [cosign](https://github.com/sigstore/cosign) using keyless
+[Sigstore](https://www.sigstore.dev/) signing — no long-lived keys, trust is anchored to the
+GitHub Actions OIDC identity that produced the release (via Fulcio and the Rekor transparency log).
+
+What gets signed and where the signature lives:
+
+| Artifact | Registry signature (`cosign verify`) | Release asset (offline `cosign verify-blob`) | Signing identity |
+| -------- | ------------------------------------ | -------------------------------------------- | ---------------- |
+| Operator image | `ghcr.io/kubeelasti/elasti-operator` | `elasti-operator-<tag>.sig` / `.pem` / `.payload` | `build.yml` in `truefoundry/github-workflows-public` |
+| Resolver image | `ghcr.io/kubeelasti/elasti-resolver` | `elasti-resolver-<tag>.sig` / `.pem` / `.payload` | `build.yml` in `truefoundry/github-workflows-public` |
+| Image SBOMs | — | `elasti-*-<tag>.spdx.json` + `.spdx.json.sigstore.json` | `build.yml` in `truefoundry/github-workflows-public` |
+| Helm chart | `ghcr.io/kubeelasti/charts/elasti` | `elasti-<version>.tgz` + `.tgz.sigstore.json` | `release.yaml` in this repo |
+| Chart SBOM | — | `elasti-<version>.sbom.spdx.json` + `.sigstore.json` | `release.yaml` in this repo |
+
+The `.sig`/`.pem`/`.payload` and `*.sigstore.json` release assets are what the
+[OpenSSF Signed-Releases](https://github.com/ossf/scorecard/blob/main/docs/checks.md#signed-releases)
+check looks for.
+
+## Verifying a release
+
+Install [cosign](https://docs.sigstore.dev/cosign/system_config/installation/), then set:
+
+```bash
+ISSUER='https://token.actions.githubusercontent.com'
+# Chart + chart SBOM are signed by this repo's release workflow (on the tag):
+CHART_ID_RE='^https://github.com/KubeElasti/KubeElasti/\.github/workflows/release\.yaml@refs/tags/.*'
+# Images + image SBOMs are signed by the shared build workflow:
+IMAGE_ID_RE='^https://github.com/truefoundry/github-workflows-public/\.github/workflows/build\.yml@.*'
+```
+
+**Helm chart (from the registry — recommended):**
+
+```bash
+cosign verify --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$CHART_ID_RE" \
+  ghcr.io/kubeelasti/charts/elasti:<version>
+```
+
+**Container images (from the registry — recommended):**
+
+```bash
+for img in elasti-operator elasti-resolver; do
+  cosign verify --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$IMAGE_ID_RE" \
+    ghcr.io/kubeelasti/${img}:<version>
+done
+```
+
+**Release assets (offline, from the GitHub release):** download the assets, then verify the
+self-contained Sigstore bundles:
+
+```bash
+# Chart tarball
+cosign verify-blob --bundle elasti-<version>.tgz.sigstore.json \
+  --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$CHART_ID_RE" \
+  elasti-<version>.tgz
+
+# Chart SBOM
+cosign verify-blob --bundle elasti-<version>.sbom.spdx.json.sigstore.json \
+  --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$CHART_ID_RE" \
+  elasti-<version>.sbom.spdx.json
+
+# Image SBOM (repeat for elasti-resolver)
+cosign verify-blob --bundle elasti-operator-<tag>.spdx.json.sigstore.json \
+  --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$IMAGE_ID_RE" \
+  elasti-operator-<tag>.spdx.json
+
+# Raw image signature (repeat for elasti-resolver)
+cosign verify-blob --signature elasti-operator-<tag>.sig --certificate elasti-operator-<tag>.pem \
+  --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$IMAGE_ID_RE" \
+  elasti-operator-<tag>.payload
+```
 
 
 ## 2. Beta Release
