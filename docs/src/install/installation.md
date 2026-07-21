@@ -19,7 +19,7 @@ hide:
 Use Helm to install KubeElasti into your Kubernetes cluster. Check out [values.yaml](https://github.com/KubeElasti/KubeElasti/blob/main/charts/elasti/values.yaml) to see configuration options in the helm value file.
 
 ```bash
-helm install elasti oci://tfy.jfrog.io/tfy-helm/elasti --namespace elasti --create-namespace
+helm install elasti oci://ghcr.io/kubeelasti/charts/elasti --namespace elasti --create-namespace
 ```
 
 

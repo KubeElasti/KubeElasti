@@ -22,7 +22,7 @@ The following components are **in‑scope** for security reporting:
 * `elasti-controller`
 * `elasti-resolver`
 * Helm charts and Kubernetes manifests distributed in the official repository
-* All container images published under `tfy.jfrog.io/tfy-images/elasti*`
+* All container images published under `ghcr.io/kubeelasti/elasti*`
 
 Out‑of‑scope issues include but are not limited to:
 
