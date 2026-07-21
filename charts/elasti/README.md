@@ -27,6 +27,14 @@ KubeElasti is a Kubernetes-native solution that offers scale-to-zero functionali
 | `global.serviceAccount.annotations` | annotations to apply to all service accounts | `{}`            |
 | `global.serviceAccount.labels`      | labels to apply to all service accounts      | `{}`            |
 
+### RBAC parameters
+
+| Name                  | Description                                                                                                                                                                                                                                                         | Value     |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| `rbac.scope`          | RBAC scope for elasti. `Cluster` (default) creates ClusterRole/ClusterRoleBinding and watches all namespaces. `Namespaced` creates namespace-scoped Role/RoleBinding and restricts the operator to `rbac.namespaces`.                                               | `Cluster` |
+| `rbac.namespaces`     | Workload namespaces the operator manages when `rbac.scope=Namespaced`. The release namespace is always included automatically.                                                                                                                                      | `[]`      |
+| `rbac.useClusterRole` | When `rbac.scope=Namespaced`: if `false` (default) a Role is created per namespace (zero cluster-scoped objects); if `true` a single ClusterRole holds the rules and is granted per-namespace via RoleBinding (one cluster-scoped object, no cluster-wide binding). | `false`   |
+
 ### Elasti controller parameters
 
 | Name                                                | Description                                            | Value                        |
