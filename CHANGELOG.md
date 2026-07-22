@@ -8,13 +8,35 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+## v0.1.30-rc1 (2026-07-22)
+
+### Breaking Changes
+
+* Images and the Helm chart move to GHCR (`ghcr.io/kubeelasti`) instead of JFrog. Update image pull and Helm repository references accordingly; this may be a breaking change for users still pointing at the old JFrog URLs. by `@ramantehlan` in [#308](https://github.com/KubeElasti/KubeElasti/pull/308)
+
 ### Fixes
 
 * fix: add grace period for CNI to converge before disabling resolver proxy during scale-from-zero events by `@chaserhkj` in [#293](https://github.com/KubeElasti/KubeElasti/pull/293). Fixes [#280](https://github.com/KubeElasti/KubeElasti/issues/280)
+* fix: bound generated private service and EndpointSlice names to Kubernetes length limits by `@ramantehlan` in [#295](https://github.com/KubeElasti/KubeElasti/pull/295). Fixes [#294](https://github.com/KubeElasti/KubeElasti/issues/294)
 
 ### Improvements
 
-* helm: support nodeSelector, tolerations, and affinity on elastiController and elastiResolver by @mcastellini in [#292](https://github.com/KubeElasti/KubeElasti/pull/292)
+* helm: support nodeSelector, tolerations, and affinity on elastiController and elastiResolver by `@mcastellini` in [#292](https://github.com/KubeElasti/KubeElasti/pull/292)
+* feat: update Go modules to v1.26.5 and clear Grype-reported vulnerabilities by `@ramantehlan` in [#300](https://github.com/KubeElasti/KubeElasti/pull/300)
+* feat: generate and publish SBOMs for images and chart on release by `@ramantehlan` in [#304](https://github.com/KubeElasti/KubeElasti/pull/304)
+* feat: add signed releases with Cosign by `@ramantehlan` in [#311](https://github.com/KubeElasti/KubeElasti/pull/311)
+* feat: OpenSSF Phase 1 hardening, including Gitleaks and read-only workflow defaults by `@ramantehlan` in [#301](https://github.com/KubeElasti/KubeElasti/pull/301) and [#306](https://github.com/KubeElasti/KubeElasti/pull/306)
+* feat: update OpenSSF Scorecard configuration by `@ramantehlan` in [#305](https://github.com/KubeElasti/KubeElasti/pull/305)
+
+### Other
+
+* feat: update KubeElasti logo and maintainers by `@ramantehlan` in [#310](https://github.com/KubeElasti/KubeElasti/pull/310)
+* docs: replace GitHub stars callout with project contributors by `@ramantehlan` in [#307](https://github.com/KubeElasti/KubeElasti/pull/307)
+* chore(deps): bump google.golang.org/grpc in e2e gRPC test service by `@dependabot` in [#312](https://github.com/KubeElasti/KubeElasti/pull/312)
+
+### New Contributors
+
+* `@mcastellini` made their first contribution in [#292](https://github.com/KubeElasti/KubeElasti/pull/292)
 
 ## v0.1.25 (2026-06-05)
 
