@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/truefoundry/elasti/pkg/config"
@@ -10,11 +11,13 @@ import (
 	"go.uber.org/zap"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/cache"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"truefoundry/elasti/operator/api/v1alpha1"
+	"truefoundry/elasti/operator/internal/crddirectory"
 	"truefoundry/elasti/operator/internal/informer"
 	"truefoundry/elasti/operator/internal/prom"
 
@@ -59,17 +62,65 @@ func (r *ElastiServiceReconciler) getResolverChangeHandler(ctx context.Context) 
 			}
 		},
 		DeleteFunc: func(_ interface{}) {
-			// TODO: Handle deletion of resolver deployment
-			// We can do two things here
-			// 1. We can move to the serve mode
-			// 2. We can add a finalizer to the deployent to avoid deletion
-			//
-			//
-			// Another situation is, if the resolver has some issues, and is restarting.
-			// In that case, we can wait for the resolver to come back up, and in the meanwhile, we can move to the serve mode
-			r.Logger.Warn("Resolver deployment deleted", zap.String("deployment_name", config.GetResolverConfig().DeploymentName))
+			r.handleResolverDeletion(ctx)
 		},
 	}
+}
+
+// handleResolverDeletion switches all proxy-mode services to serve mode when the
+// resolver deployment is deleted. This prevents silent traffic loss caused by
+// hijacked EndpointSlices pointing at now-dead resolver pod IPs.
+func (r *ElastiServiceReconciler) handleResolverDeletion(ctx context.Context) {
+	r.Logger.Warn("Resolver deployment deleted, switching proxy-mode services to serve mode",
+		zap.String("deployment_name", config.GetResolverConfig().DeploymentName),
+	)
+
+	var switchedCount int
+	crddirectory.CRDDirectory.Services.Range(func(key, value interface{}) bool {
+		crdDetails, ok := value.(*crddirectory.CRDDetails)
+		if !ok {
+			r.Logger.Error("Unexpected value type in CRDDirectory", zap.Any("key", key))
+			return true
+		}
+		if crdDetails == nil {
+			return true
+		}
+		if crdDetails.Status.Mode != values.ProxyMode {
+			return true
+		}
+
+		keyStr, ok := key.(string)
+		if !ok {
+			r.Logger.Error("Non-string key in CRDDirectory", zap.Any("key", key))
+			return true
+		}
+		parts := strings.Split(keyStr, "/")
+		if len(parts) != 2 {
+			r.Logger.Error("Invalid key format in CRDDirectory", zap.String("key", keyStr))
+			return true
+		}
+
+		req := ctrl.Request{
+			NamespacedName: types.NamespacedName{
+				Namespace: parts[0],
+				Name:      crdDetails.CRDName,
+			},
+		}
+
+		if err := r.switchMode(ctx, req, values.ServeMode); err != nil {
+			r.Logger.Error("Failed to switch service to serve mode after resolver deletion",
+				zap.String("es", req.String()),
+				zap.Error(err))
+		} else {
+			switchedCount++
+			r.Logger.Info("Switched service to serve mode after resolver deletion", zap.String("es", req.String()))
+		}
+		return true
+	})
+
+	r.Logger.Info("Finished switching proxy-mode services to serve mode after resolver deletion",
+		zap.Int("count", switchedCount),
+	)
 }
 
 func (r *ElastiServiceReconciler) getPublicServiceChangeHandler(ctx context.Context, es *v1alpha1.ElastiService, req ctrl.Request) cache.ResourceEventHandlerFuncs {
