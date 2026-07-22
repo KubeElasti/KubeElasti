@@ -38,10 +38,7 @@ Namespace
 {{- end }}
 
 {{/*
-The de-duplicated set of namespaces KubeElasti is confined to in namespace-scoped mode, returned as
-a comma-separated string. Always includes the release namespace so the leader-election lease and the
-resolver's own EndpointSlices stay reachable. Only meaningful when .Values.global.allowedNamespaces
-is non-empty (the caller gates on that); in cluster-scoped mode this helper is never rendered.
+Comma-separated allowedNamespaces plus the release namespace, de-duplicated.
 */}}
 {{- define "elasti.watchNamespaces" -}}
 {{- append .Values.global.allowedNamespaces .Release.Namespace | uniq | join "," -}}
