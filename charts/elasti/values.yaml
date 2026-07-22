@@ -3,6 +3,9 @@ global:
   ## @param global.kubernetesClusterDomain domain of the Kubernetes cluster
   ##
   kubernetesClusterDomain: cluster.local
+  ## @param global.allowedNamespaces [array] namespaces KubeElasti is confined to. Empty (default) installs cluster-scoped RBAC and watches all namespaces. When set, installs namespace-scoped Role/RoleBinding in each listed namespace (the release namespace is always included) and confines the operator and resolver to those namespaces.
+  ##
+  allowedNamespaces: []
   ## @param global.nameOverride name of the deployment
   ##
   nameOverride: ""
