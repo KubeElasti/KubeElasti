@@ -37,10 +37,20 @@ jobs:
             echo "Updating README.md for ${chart}"
             readme-generator --values "${chart}/values.yaml" --readme "${chart}/README.md" --schema "/tmp/schema.json"
           done
-      - name: Configure Git and push changes
+      - name: Commit verified README changes
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_BRANCH: ${{ github.event.pull_request.head.ref }}
+          COMMIT_MESSAGE_BODY: "Signed-off-by: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
         run: |
-          if git status -s | grep charts; then
-              git config user.name "$GITHUB_ACTOR"
-              git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-              git add . && git commit -am "Update README.md with readme-generator-for-helm" --signoff && git push
+          mapfile -t changed_files < <(git diff --name-only -- charts)
+          if [[ ${#changed_files[@]} -eq 0 ]]; then
+            echo "No README changes to commit"
+            exit 0
           fi
+          # Use the GraphQL createCommitOnBranch API so GitHub signs the commit
+          # (shows as Verified). Plain git commit + push is always unsigned.
+          .github/scripts/verified-commit.sh \
+            "Update README.md with readme-generator-for-helm" \
+            "${changed_files[@]}"

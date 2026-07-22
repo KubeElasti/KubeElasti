@@ -61,12 +61,14 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write # required for keyless cosign signing
     uses: truefoundry/github-workflows-public/.github/workflows/build.yml@main
     with:
       image_tag: ${{ needs.read-chart-values.outputs.operator_tag }}
       image_artifact_name: "elasti-operator"
       dockerfile_path: "operator/Dockerfile"
       enable_sbom: true
+      enable_sign: true
       sbom_artifact_name: "sbom-elasti-operator"
       enable_jfrog: false
       enable_ghcr: true
@@ -79,12 +81,14 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write # required for keyless cosign signing
     uses: truefoundry/github-workflows-public/.github/workflows/build.yml@main
     with:
       image_tag: ${{ needs.read-chart-values.outputs.resolver_tag }}
       image_artifact_name: "elasti-resolver"
       dockerfile_path: "resolver/Dockerfile"
       enable_sbom: true
+      enable_sign: true
       sbom_artifact_name: "sbom-elasti-resolver"
       enable_jfrog: false
       enable_ghcr: true
@@ -97,32 +101,64 @@ jobs:
     permissions:
       contents: write
       packages: write
+      id-token: write # required for keyless cosign signing of the chart
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           fetch-depth: "0"
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      # cosign reads Docker's credential store (~/.docker/config.json), which
+      # `helm registry login` does not populate. Log in with Docker so cosign can
+      # pull the pushed chart to sign it.
+      - name: Log in to GHCR (for cosign)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Helm registry login
         run: |
           helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
 
       - name: Helm push
+        id: helm_push
         run: |
+          set -euo pipefail
           cd charts
           CHART_DIR=elasti
           CHART_NAME=${{ needs.read-chart-values.outputs.chart_name }}
           CHART_VERSION=${{ needs.read-chart-values.outputs.chart_version }}
-              
+
           # packaging chart
           helm dependency update $CHART_DIR
           helm package $CHART_DIR
 
-          # pushing the helm charts
+          # pushing the helm charts, capturing the pushed digest for signing
           echo "Pushing Chart: $CHART_NAME"
           echo "Version: $CHART_NAME-$CHART_VERSION.tgz"
-          helm push $CHART_NAME-$CHART_VERSION.tgz oci://${{ env.HELM_CHART_REPOSITORY}}
-          echo "Successfully pushed chart: $CHART_NAME"
+          helm push "$CHART_NAME-$CHART_VERSION.tgz" oci://${{ env.HELM_CHART_REPOSITORY }} 2>&1 | tee push-output.txt
+
+          DIGEST=$(grep -oE 'sha256:[a-f0-9]{64}' push-output.txt | head -n1)
+          if [ -z "$DIGEST" ]; then
+            echo "Error: could not determine pushed chart digest" >&2
+            exit 1
+          fi
+          echo "Successfully pushed chart: $CHART_NAME ($DIGEST)"
+          echo "chart_digest=${DIGEST}" >> "$GITHUB_OUTPUT"
+
+      - name: Sign Helm chart in registry (keyless)
+        env:
+          COSIGN_YES: 'true'
+          CHART_REF: ${{ env.HELM_CHART_REPOSITORY }}/${{ needs.read-chart-values.outputs.chart_name }}@${{ steps.helm_push.outputs.chart_digest }}
+        run: |
+          set -euo pipefail
+          echo "Signing Helm chart ${CHART_REF}"
+          cosign sign --yes "${CHART_REF}"
 
       - name: Install Syft
         uses: anchore/sbom-action/download-syft@v0
@@ -140,26 +176,47 @@ jobs:
           "$SYFT" scan "dir:charts/elasti" -o spdx-json="${SBOM_FILE}"
           echo "Generated SBOM: ${SBOM_FILE}"
 
-      - name: Download operator image SBOM
+      - name: Sign Helm chart release assets (keyless)
+        env:
+          COSIGN_YES: 'true'
+          CHART_NAME: ${{ needs.read-chart-values.outputs.chart_name }}
+          CHART_VERSION: ${{ needs.read-chart-values.outputs.chart_version }}
+        run: |
+          set -euo pipefail
+          CHART_TGZ="charts/${CHART_NAME}-${CHART_VERSION}.tgz"
+          CHART_SBOM="charts/${CHART_NAME}-${CHART_VERSION}.sbom.spdx.json"
+
+          # cosign sign-blob --bundle emits a self-contained Sigstore bundle
+          # (signature + Fulcio cert + Rekor proof). Named *.sigstore.json so they
+          # are recognised by the OpenSSF Signed-Releases check as release assets.
+          for f in "${CHART_TGZ}" "${CHART_SBOM}"; do
+            echo "Signing ${f} -> ${f}.sigstore.json"
+            cosign sign-blob --yes --bundle "${f}.sigstore.json" "${f}"
+          done
+
+      - name: Download operator image SBOM and signatures
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build-operator.outputs.sbom_artifact_name }}
           path: image-sboms
 
-      - name: Download resolver image SBOM
+      - name: Download resolver image SBOM and signatures
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build-resolver.outputs.sbom_artifact_name }}
           path: image-sboms
 
-      - name: Upload Helm chart and SBOMs to release
+      - name: Upload Helm chart, SBOMs and signatures to release
         uses: softprops/action-gh-release@v2
         with:
+            # Chart .tgz + chart SBOM + their .sigstore.json bundles, plus the
+            # per-image SBOMs and cosign signature files (.sig/.pem/.payload/.sigstore.json).
             files: |
               charts/${{ needs.read-chart-values.outputs.chart_name }}-${{ needs.read-chart-values.outputs.chart_version }}.tgz
+              charts/${{ needs.read-chart-values.outputs.chart_name }}-${{ needs.read-chart-values.outputs.chart_version }}.tgz.sigstore.json
               charts/${{ needs.read-chart-values.outputs.chart_name }}-${{ needs.read-chart-values.outputs.chart_version }}.sbom.spdx.json
-              image-sboms/${{ needs.build-operator.outputs.sbom_file_name }}
-              image-sboms/${{ needs.build-resolver.outputs.sbom_file_name }}
+              charts/${{ needs.read-chart-values.outputs.chart_name }}-${{ needs.read-chart-values.outputs.chart_version }}.sbom.spdx.json.sigstore.json
+              image-sboms/*
             tag_name: "${{ github.ref_name }}"
             fail_on_unmatched_files: true
         env:
