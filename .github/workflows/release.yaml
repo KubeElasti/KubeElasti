@@ -114,6 +114,16 @@ jobs:
       - name: Install cosign
         uses: sigstore/cosign-installer@v3
 
+      # cosign reads Docker's credential store (~/.docker/config.json), which
+      # `helm registry login` does not populate. Log in with Docker so cosign can
+      # pull the pushed chart to sign it.
+      - name: Log in to GHCR (for cosign)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Helm registry login
         run: |
           helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
