@@ -2,8 +2,6 @@ name: Release Elasti Helm Chart
 
 on:
   push:
-    branches:
-      - sd/cosign
     tags:
       - v*
 

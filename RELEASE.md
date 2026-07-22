@@ -124,24 +124,35 @@ Stable releases require manual preparation and are triggered by creating a GitHu
 ## Supply-chain signing
 
 Releases are signed with [cosign](https://github.com/sigstore/cosign) using keyless
-[Sigstore](https://www.sigstore.dev/) signing — no long-lived keys, trust is anchored to the
+[Sigstore](https://www.sigstore.dev/) signing. There are no long-lived keys; trust is anchored to the
 GitHub Actions OIDC identity that produced the release (via Fulcio and the Rekor transparency log).
 
 What gets signed and where the signature lives:
 
+> `<version>` below is the chart/app version **without** the leading `v` (e.g. `0.1.25`). That is
+> what appears in the asset filenames and the image tags. The GitHub release/git tag keeps the `v`
+> (e.g. `v0.1.25`).
+
 | Artifact | Registry signature (`cosign verify`) | Release asset (offline `cosign verify-blob`) | Signing identity |
 | -------- | ------------------------------------ | -------------------------------------------- | ---------------- |
-| Operator image | `ghcr.io/kubeelasti/elasti-operator` | `elasti-operator-<tag>.sig` / `.pem` / `.payload` | `build.yml` in `truefoundry/github-workflows-public` |
-| Resolver image | `ghcr.io/kubeelasti/elasti-resolver` | `elasti-resolver-<tag>.sig` / `.pem` / `.payload` | `build.yml` in `truefoundry/github-workflows-public` |
-| Image SBOMs | — | `elasti-*-<tag>.spdx.json` + `.spdx.json.sigstore.json` | `build.yml` in `truefoundry/github-workflows-public` |
+| Operator image | `ghcr.io/kubeelasti/elasti-operator` | `elasti-operator-<version>.sig` / `.pem` / `.payload` | `build.yml` in `truefoundry/github-workflows-public` |
+| Resolver image | `ghcr.io/kubeelasti/elasti-resolver` | `elasti-resolver-<version>.sig` / `.pem` / `.payload` | `build.yml` in `truefoundry/github-workflows-public` |
+| Image SBOMs | n/a | `elasti-*-<version>.spdx.json` + `.spdx.json.sigstore.json` | `build.yml` in `truefoundry/github-workflows-public` |
 | Helm chart | `ghcr.io/kubeelasti/charts/elasti` | `elasti-<version>.tgz` + `.tgz.sigstore.json` | `release.yaml` in this repo |
-| Chart SBOM | — | `elasti-<version>.sbom.spdx.json` + `.sigstore.json` | `release.yaml` in this repo |
-
-The `.sig`/`.pem`/`.payload` and `*.sigstore.json` release assets are what the
-[OpenSSF Signed-Releases](https://github.com/ossf/scorecard/blob/main/docs/checks.md#signed-releases)
-check looks for.
+| Chart SBOM | n/a | `elasti-<version>.sbom.spdx.json` + `.sigstore.json` | `release.yaml` in this repo |
 
 ## Verifying a release
+
+Verifying proves a release artifact was genuinely built by KubeElasti's CI and hasn't been
+tampered with. Most **end users only need to verify the chart and images from the registry**.
+Those steps, with a plain-English explanation, live in the
+[installation guide](https://kubeelasti.dev/src/install/installation/#verify-the-release-optional-but-recommended).
+This section additionally covers verifying the **files attached to the GitHub release** (SBOMs and
+offline signature bundles), which is what a supply-chain audit or the OpenSSF check would do.
+
+A successful `cosign verify` / `verify-blob` prints `Verified OK` (blobs) or a
+`The following checks were performed ...` block (registry). Anything else, especially
+`no matching signatures`, means **do not trust the artifact**.
 
 Install [cosign](https://docs.sigstore.dev/cosign/system_config/installation/), then set:
 
@@ -153,14 +164,14 @@ CHART_ID_RE='^https://github.com/KubeElasti/KubeElasti/\.github/workflows/releas
 IMAGE_ID_RE='^https://github.com/truefoundry/github-workflows-public/\.github/workflows/build\.yml@.*'
 ```
 
-**Helm chart (from the registry — recommended):**
+**Helm chart (from the registry, recommended):**
 
 ```bash
 cosign verify --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$CHART_ID_RE" \
   ghcr.io/kubeelasti/charts/elasti:<version>
 ```
 
-**Container images (from the registry — recommended):**
+**Container images (from the registry, recommended):**
 
 ```bash
 for img in elasti-operator elasti-resolver; do
@@ -184,15 +195,45 @@ cosign verify-blob --bundle elasti-<version>.sbom.spdx.json.sigstore.json \
   elasti-<version>.sbom.spdx.json
 
 # Image SBOM (repeat for elasti-resolver)
-cosign verify-blob --bundle elasti-operator-<tag>.spdx.json.sigstore.json \
+cosign verify-blob --bundle elasti-operator-<version>.spdx.json.sigstore.json \
   --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$IMAGE_ID_RE" \
-  elasti-operator-<tag>.spdx.json
+  elasti-operator-<version>.spdx.json
 
 # Raw image signature (repeat for elasti-resolver)
-cosign verify-blob --signature elasti-operator-<tag>.sig --certificate elasti-operator-<tag>.pem \
+cosign verify-blob --signature elasti-operator-<version>.sig --certificate elasti-operator-<version>.pem \
   --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$IMAGE_ID_RE" \
-  elasti-operator-<tag>.payload
+  elasti-operator-<version>.payload
 ```
+
+**Verifying an image with the `.sig` file (offline, two steps).** The `.sig`/`.pem`/`.payload`
+trio lets you verify an image *without pulling the signature from the registry*. But be aware:
+the command above proves the **payload** is authentic, but it does **not**, on its own, tie the
+signature to the image you're about to run. The payload is a small JSON document that records the
+image **digest** it vouches for, so you must also confirm that digest matches your image:
+
+```bash
+# Step 1: verify the signature over the payload (as above) -> "Verified OK"
+cosign verify-blob --signature elasti-operator-<version>.sig --certificate elasti-operator-<version>.pem \
+  --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$IMAGE_ID_RE" \
+  elasti-operator-<version>.payload
+
+# Step 2: read the digest the payload vouches for ...
+SIGNED_DIGEST=$(jq -r '.critical.image."docker-manifest-digest"' elasti-operator-<version>.payload)
+echo "$SIGNED_DIGEST"
+
+# ... and confirm it matches the actual image (needs crane, or `docker buildx imagetools inspect`)
+crane digest ghcr.io/kubeelasti/elasti-operator:<version>   # must equal $SIGNED_DIGEST
+```
+
+If both steps pass and the two digests are identical, the `.sig` proves that exact image was
+signed by the expected workflow. (Verifying straight from the registry with `cosign verify`, see
+above, does both steps for you in one command, which is why it's the recommended path.)
+
+> Newer cosign prints a deprecation note for `--signature`/`--certificate` on `verify-blob`; the
+> command still succeeds. The `.sigstore.json` bundles above are the preferred, future-proof form.
+
+All of the commands in this section were confirmed against a real signed release
+(`elasti-*-0.1.25` assets), and every check returns `Verified OK`.
 
 
 ## 2. Beta Release

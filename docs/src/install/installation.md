@@ -23,49 +23,38 @@ helm install elasti oci://ghcr.io/kubeelasti/charts/elasti --namespace elasti --
 ```
 
 
-## Verify the release (optional)
+??? note "Verify the release (optional)"
 
-Every KubeElasti release is signed with [cosign](https://github.com/sigstore/cosign) using
-keyless [Sigstore](https://www.sigstore.dev/) signing — there are no long-lived keys, trust is
-anchored to the GitHub Actions OIDC identity that built the release (verified through Fulcio and
-the Rekor transparency log). The Helm chart, both container images, and their SBOMs are all signed.
+    **New to this?** Every KubeElasti release is keyless-signed with
+    [cosign](https://github.com/sigstore/cosign)/[Sigstore](https://www.sigstore.dev/). Verifying
+    proves an artifact genuinely came from KubeElasti's CI and wasn't tampered with. No keys
+    needed, just [install cosign](https://docs.sigstore.dev/cosign/system_config/installation/).
 
-Install cosign (`brew install cosign`, or see the [install docs](https://docs.sigstore.dev/cosign/system_config/installation/)), then:
+    Replace `<version>` (e.g. `0.1.25`) and run:
 
-### Verify the Helm chart
+    ```bash
+    ISSUER='https://token.actions.githubusercontent.com'
+    CHART_ID='^https://github.com/KubeElasti/KubeElasti/\.github/workflows/release\.yaml@refs/tags/.*'
+    IMAGE_ID='^https://github.com/truefoundry/github-workflows-public/\.github/workflows/build\.yml@.*'
 
-The chart is signed in this repository's release workflow, so the signing identity is
-`release.yaml` on the release tag:
+    # Helm chart
+    cosign verify --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$CHART_ID" \
+      ghcr.io/kubeelasti/charts/elasti:<version>
 
-```bash
-CHART_ID_RE='^https://github.com/KubeElasti/KubeElasti/\.github/workflows/release\.yaml@refs/tags/.*'
-ISSUER='https://token.actions.githubusercontent.com'
+    # Resolver image
+    cosign verify --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$IMAGE_ID" \
+      ghcr.io/kubeelasti/elasti-resolver:<version>
 
-cosign verify \
-  --certificate-oidc-issuer "$ISSUER" \
-  --certificate-identity-regexp "$CHART_ID_RE" \
-  ghcr.io/kubeelasti/charts/elasti:<version>
-```
+    # Controller image
+    cosign verify --certificate-oidc-issuer "$ISSUER" --certificate-identity-regexp "$IMAGE_ID" \
+      ghcr.io/kubeelasti/elasti-operator:<version>
+    ```
 
-### Verify the container images
-
-The images and their SBOMs are signed by the shared build workflow, so the signing identity is
-`build.yml` in `truefoundry/github-workflows-public`:
-
-```bash
-IMAGE_ID_RE='^https://github.com/truefoundry/github-workflows-public/\.github/workflows/build\.yml@.*'
-ISSUER='https://token.actions.githubusercontent.com'
-
-for img in elasti-operator elasti-resolver; do
-  cosign verify \
-    --certificate-oidc-issuer "$ISSUER" \
-    --certificate-identity-regexp "$IMAGE_ID_RE" \
-    ghcr.io/kubeelasti/${img}:<version>
-done
-```
-
-For verifying the SBOMs and offline signature bundles attached to the GitHub release, see
-[the release process doc](https://github.com/KubeElasti/KubeElasti/blob/main/RELEASE.md#verifying-a-release).
+    A pass prints a `The following checks were performed ...` block. If you see
+    **`Error: no matching signatures`**, the artifact is unsigned, altered, or from an unexpected
+    source. **Do not install it** ([report it](https://github.com/KubeElasti/KubeElasti/blob/main/SECURITY.md)).
+    Verifying the files attached to a release (SBOMs, offline `.sig` bundles) is covered in the
+    [release doc](https://github.com/KubeElasti/KubeElasti/blob/main/RELEASE.md#verifying-a-release).
 
 
 ## Uninstall
