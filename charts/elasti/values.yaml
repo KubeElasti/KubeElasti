@@ -87,7 +87,7 @@ elastiController:
       repository: kubeelasti/elasti-operator
       ## @param elastiController.manager.image.tag tag to use for the deployment
       ##
-      tag: 0f50ce2e0f88b2ea5fd3a076417d2c8a300f2d89
+      tag: a0a09a12a379f91f63b1c1cb1f3778490c86a591
     ## @param elastiController.manager.imagePullPolicy image pull policy
     ##
     imagePullPolicy: IfNotPresent
@@ -209,7 +209,7 @@ elastiResolver:
       repository: kubeelasti/elasti-resolver
       ## @param elastiResolver.proxy.image.tag tag to use for the deployment
       ##
-      tag: 0f50ce2e0f88b2ea5fd3a076417d2c8a300f2d89
+      tag: a0a09a12a379f91f63b1c1cb1f3778490c86a591
     ## @param elastiResolver.proxy.imagePullPolicy image pull policy
     ##
     imagePullPolicy: IfNotPresent
