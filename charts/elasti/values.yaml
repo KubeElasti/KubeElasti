@@ -3,10 +3,10 @@ global:
   ## @param global.kubernetesClusterDomain domain of the Kubernetes cluster
   ##
   kubernetesClusterDomain: cluster.local
-  ## @param global.allowedNamespaces [array] namespaces KubeElasti is confined to. Empty (default) installs cluster-scoped RBAC and watches all namespaces. When set, installs namespace-scoped Role/RoleBinding in each listed namespace (the release namespace is always included) and confines the operator and resolver to those namespaces.
+  ## @param global.allowedNamespaces [array] namespaces to confine KubeElasti to; empty installs cluster-scoped RBAC and watches all namespaces
   ##
   allowedNamespaces: []
-  ## @param global.installCRD whether the chart installs the ElastiService CRD. Set to false for a namespace-scoped install where a cluster admin has already applied the CRD, since creating a CRD needs cluster-scoped permission.
+  ## @param global.installCRD whether the chart installs the ElastiService CRD; set false if an admin already applied it
   ##
   installCRD: true
   ## @param global.nameOverride name of the deployment
