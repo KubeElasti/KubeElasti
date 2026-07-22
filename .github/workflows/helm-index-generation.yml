@@ -41,8 +41,12 @@ jobs:
       - name: Configure Git and push changes
         if: github.event.pull_request.head.repo.full_name == github.repository
         run: |
-          if git diff --quiet docs/index.yaml; then
-            echo "No changes to index.yaml"
+          # `helm repo index` rewrites the created:/generated: timestamps and the
+          # resulting package digest on every run, so a naive diff is never empty and
+          # would push a fresh (unsigned) commit on every PR push. Ignore those
+          # non-deterministic fields and only commit when there is a real change.
+          if git diff -I '^ *created:' -I '^ *generated:' -I '^ *digest:' --quiet -- docs/index.yaml; then
+            echo "No meaningful changes to index.yaml (only timestamps/digest)"
           else
             git config user.name "$GITHUB_ACTOR"
             git config user.email "$GITHUB_ACTOR@users.noreply.github.com"

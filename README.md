@@ -1,10 +1,14 @@
-> If you are using KubeElasti, please help us by giving us 30 seconds to add yourself to the [Adopters List](https://github.com/KubeElasti/KubeElasti/issues/new?template=adopter.yml). This will encourage us to continue working on it. ❤️
+
 
 <div align="center">
-<img src="./docs/assets/images/logo/banner.png" alt="KubeElasti Banner">
+<img src="./docs/assets/images/logo/rounded_black_white_bg.png" alt="KubeElasti Logo" width="200px">
+<h1> KubeElasti</h1>
+<h3> Confidently Scale-to-zero with no downtime</h3>
 </div>
 
 <div align="center">
+
+
 
 ![Lint and Test](https://github.com/KubeElasti/KubeElasti/actions/workflows/lint-and-test.yaml/badge.svg)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubeelasti)](https://artifacthub.io/packages/search?repo=kubeelasti)
@@ -45,6 +49,7 @@ Kubernetes clusters can become costly, especially when running multiple services
 - [Getting Help](#getting-help)
 - [Roadmap](#roadmap)
 - [Contributors](#contributors)
+- [Project Supporters](#project-supporters)
 
 # Introduction
 
@@ -113,3 +118,7 @@ KubeElasti is built by a growing community of contributors. Thank you to everyon
 </a>
 
 We are actively looking for additional maintainers to help grow and steer the project. If you are interested in taking on a larger role, please reach out on [Slack](https://cloud-native.slack.com/archives/C0AMUFC5Y3D), start a thread in our [Discussions](https://github.com/KubeElasti/KubeElasti/discussions), or open an [issue](https://github.com/KubeElasti/KubeElasti/issues/new). See the [Contribution](#contribution) and [Governance](#governance) guides to get started.
+
+# Project Supporters
+
+KubeElasti is supported by [TrueFoundry](https://www.truefoundry.com/), which contributed the project to the [Cloud Native Computing Foundation (CNCF)](https://www.cncf.io/).
