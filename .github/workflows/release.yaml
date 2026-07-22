@@ -2,17 +2,10 @@ name: Release Elasti Helm Chart
 
 on:
   push:
+    branches:
+      - sd/cosign
     tags:
       - v*
-  # TEMP: allow cutting a throwaway release manually to validate the signing flow.
-  # Remove this workflow_dispatch block once verified.
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Temp release version to cut (e.g. v0.0.0-cosign-test). Images/chart use this without the leading v; the GitHub release/tag keeps it.'
-        required: true
-        type: string
-        default: v0.0.0-cosign-test
 
 permissions:
   contents: write
@@ -31,7 +24,6 @@ jobs:
       chart_name: ${{ steps.read_chart.outputs.CHART_NAME }}
       resolver_tag: ${{ steps.read_chart.outputs.RESOLVER_TAG }}
       operator_tag: ${{ steps.read_chart.outputs.OPERATOR_TAG }}
-      release_tag: ${{ steps.read_chart.outputs.RELEASE_TAG }}
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -45,40 +37,23 @@ jobs:
 
       - name: Read chart values
         id: read_chart
-        env:
-          # Set only on manual (TEMP) runs; empty on real tag-triggered releases.
-          OVERRIDE_VERSION: ${{ github.event.inputs.version }}
         run: |
-          set -euo pipefail
-          CHART_NAME=$(yq -r '.name' charts/elasti/Chart.yaml)
-
-          if [ -n "$OVERRIDE_VERSION" ]; then
-            # TEMP release: derive everything from the dispatch input so we don't
-            # clobber real image tags / chart versions. The GitHub release/tag
-            # keeps the leading v; images and chart version drop it.
-            RELEASE_TAG="$OVERRIDE_VERSION"
-            CHART_VERSION="${OVERRIDE_VERSION#v}"
-            APP_VERSION="${OVERRIDE_VERSION#v}"
-            RESOLVER_TAG="$CHART_VERSION"
-            OPERATOR_TAG="$CHART_VERSION"
-            echo "TEMP release requested: $RELEASE_TAG"
-          else
-            RELEASE_TAG="${GITHUB_REF_NAME}"
-            CHART_VERSION=$(yq -r '.version' charts/elasti/Chart.yaml)
-            APP_VERSION=$(yq -r '.appVersion' charts/elasti/Chart.yaml)
-            RESOLVER_TAG=$(yq -r '.elastiResolver.proxy.image.tag' charts/elasti/values.yaml)
-            OPERATOR_TAG=$(yq -r '.elastiController.manager.image.tag' charts/elasti/values.yaml)
-          fi
-
+          CHART_VERSION=$(yq -r '.version' charts/elasti/Chart.yaml)
           echo "CHART_VERSION=$CHART_VERSION" >> $GITHUB_OUTPUT
+
+          APP_VERSION=$(yq -r '.appVersion' charts/elasti/Chart.yaml)
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_OUTPUT
+
+          CHART_NAME=$(yq -r '.name' charts/elasti/Chart.yaml)
           echo "CHART_NAME=$CHART_NAME" >> $GITHUB_OUTPUT
+
+          RESOLVER_TAG=$(yq -r '.elastiResolver.proxy.image.tag' charts/elasti/values.yaml)
           echo "RESOLVER_TAG=$RESOLVER_TAG" >> $GITHUB_OUTPUT
+
+          OPERATOR_TAG=$(yq -r '.elastiController.manager.image.tag' charts/elasti/values.yaml)
           echo "OPERATOR_TAG=$OPERATOR_TAG" >> $GITHUB_OUTPUT
-          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_OUTPUT
 
           echo "Chart values read: $CHART_NAME v$CHART_VERSION (app v$APP_VERSION)"
-          echo "Release tag: $RELEASE_TAG"
           echo "Resolver tag: $RESOLVER_TAG"
           echo "Operator tag: $OPERATOR_TAG"
 
@@ -139,38 +114,22 @@ jobs:
       - name: Install cosign
         uses: sigstore/cosign-installer@v3
 
-      - name: Install yq
-        run: |
-          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
-          sudo chmod +x /usr/bin/yq
-
       - name: Helm registry login
         run: |
           helm registry login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
 
       - name: Helm push
         id: helm_push
-        env:
-          # Set only on manual (TEMP) runs; empty on real tag-triggered releases.
-          OVERRIDE_VERSION: ${{ github.event.inputs.version }}
-          CHART_VERSION: ${{ needs.read-chart-values.outputs.chart_version }}
         run: |
           set -euo pipefail
           cd charts
           CHART_DIR=elasti
           CHART_NAME=${{ needs.read-chart-values.outputs.chart_name }}
+          CHART_VERSION=${{ needs.read-chart-values.outputs.chart_version }}
 
-          if [ -n "$OVERRIDE_VERSION" ]; then
-            # TEMP release: point the chart's image tags at the temp images we
-            # just built so the packaged chart is coherent/installable.
-            yq -i ".elastiController.manager.image.tag=\"${CHART_VERSION}\"" "$CHART_DIR/values.yaml"
-            yq -i ".elastiResolver.proxy.image.tag=\"${CHART_VERSION}\"" "$CHART_DIR/values.yaml"
-          fi
-
-          # packaging chart (--version/--app-version keep the tgz + Chart metadata
-          # aligned with the release version, including TEMP overrides)
+          # packaging chart
           helm dependency update $CHART_DIR
-          helm package $CHART_DIR --version "$CHART_VERSION" --app-version "$CHART_VERSION"
+          helm package $CHART_DIR
 
           # pushing the helm charts, capturing the pushed digest for signing
           echo "Pushing Chart: $CHART_NAME"
@@ -251,9 +210,7 @@ jobs:
               charts/${{ needs.read-chart-values.outputs.chart_name }}-${{ needs.read-chart-values.outputs.chart_version }}.sbom.spdx.json
               charts/${{ needs.read-chart-values.outputs.chart_name }}-${{ needs.read-chart-values.outputs.chart_version }}.sbom.spdx.json.sigstore.json
               image-sboms/*
-            tag_name: "${{ needs.read-chart-values.outputs.release_tag }}"
-            # TEMP dispatch runs are cut as prereleases so they don't show as latest.
-            prerelease: ${{ github.event_name == 'workflow_dispatch' }}
+            tag_name: "${{ github.ref_name }}"
             fail_on_unmatched_files: true
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
