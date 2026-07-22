@@ -6,8 +6,7 @@ on:
       - v*
 
 permissions:
-  contents: write
-  packages: write
+  contents: read
 
 env:
   HELM_CHART_REPOSITORY: ghcr.io/kubeelasti/charts
