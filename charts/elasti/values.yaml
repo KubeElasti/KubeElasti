@@ -6,6 +6,9 @@ global:
   ## @param global.allowedNamespaces [array] namespaces KubeElasti is confined to. Empty (default) installs cluster-scoped RBAC and watches all namespaces. When set, installs namespace-scoped Role/RoleBinding in each listed namespace (the release namespace is always included) and confines the operator and resolver to those namespaces.
   ##
   allowedNamespaces: []
+  ## @param global.installCRD whether the chart installs the ElastiService CRD. Set to false for a namespace-scoped install where a cluster admin has already applied the CRD, since creating a CRD needs cluster-scoped permission.
+  ##
+  installCRD: true
   ## @param global.nameOverride name of the deployment
   ##
   nameOverride: ""
