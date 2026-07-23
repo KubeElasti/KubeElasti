@@ -6,9 +6,6 @@ global:
   ## @param global.allowedNamespaces [array] namespaces to confine KubeElasti to; empty installs cluster-scoped RBAC and watches all namespaces
   ##
   allowedNamespaces: []
-  ## @param global.installCRD whether the chart installs the ElastiService CRD; set false if an admin already applied it
-  ##
-  installCRD: true
   ## @param global.nameOverride name of the deployment
   ##
   nameOverride: ""
