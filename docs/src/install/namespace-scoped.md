@@ -4,7 +4,7 @@ description: "Install KubeElasti confined to an explicit list of namespaces usin
 keywords:
   - KubeElasti namespace scoped
   - namespace scoped RBAC
-  - install without cluster admin
+  - namespaced operator RBAC
   - allowedNamespaces
   - WATCH_NAMESPACES
   - multi-tenant Kubernetes
@@ -27,34 +27,24 @@ Namespace-scoped mode is opt-in. You give KubeElasti an explicit list of namespa
 
 Use the default cluster-scoped install if none of these apply.
 
-## Prerequisite: install the CRD
+## The CRD is still cluster-scoped
 
-Creating a CRD is always a cluster-scoped operation. By default the chart installs the `ElastiService` CRD as part of the release, so a namespace-only install would fail on that step.
+Namespace-scoped mode makes the operator and resolver run with namespaced `Role`/`RoleBinding` only, with no `ClusterRole` at runtime. The one cluster-scoped object that remains is the `ElastiService` CRD. CRDs are always cluster-scoped in Kubernetes.
 
-A cluster admin installs the CRD once, out of band. Render it from the chart so it matches the release version:
-
-```bash
-helm template elasti oci://ghcr.io/kubeelasti/charts/elasti \
-  --show-only templates/elastiservice-crd.yaml | kubectl apply -f -
-```
-
-After the CRD exists, a tenant with permission only in its own namespaces installs the chart with `global.installCRD=false` (below).
+The chart installs the CRD as part of the release, so installing or upgrading the chart needs permission to manage that CRD. This is a one-time registration, not a standing grant to the operator or resolver.
 
 !!! warning "Operator image version"
     Namespace-scoped mode needs an operator image that supports the `WATCH_NAMESPACES` env var. Use a release that ships this feature. On an older image the chart still renders scoped RBAC, but the operator falls back to cluster-scoped watching and its reads fail under the namespaced `Role`.
 
 ## Enable it
 
-Set `global.allowedNamespaces` to the namespaces you want KubeElasti to manage, and turn off CRD install (the admin already applied it):
+Set `global.allowedNamespaces` to the namespaces you want KubeElasti to manage:
 
 ```bash
 helm install elasti oci://ghcr.io/kubeelasti/charts/elasti \
   --namespace elasti --create-namespace \
-  --set global.installCRD=false \
   --set 'global.allowedNamespaces={team-a,team-b}'
 ```
-
-If your credentials can manage CRDs, leave `global.installCRD` at its default (`true`) and skip the admin step above.
 
 The release namespace is always added to the list automatically. The operator needs it for the leader-election lease and to read the resolver's `EndpointSlices`.
 
@@ -112,8 +102,4 @@ kubectl delete elastiservices --all
 helm uninstall elasti -n elasti
 ```
 
-The CRD, installed separately by an admin, is removed separately:
-
-```bash
-kubectl delete crd elastiservices.elasti.truefoundry.com
-```
+The CRD is part of the release, so `helm uninstall` removes it too.
