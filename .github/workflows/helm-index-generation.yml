@@ -21,36 +21,40 @@ jobs:
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
-      
+
       - name: Install Helm
         uses: azure/setup-helm@v4
         with:
           version: 'v4.0.4'
-      
+
       - name: Extract chart version
         id: chart-version
         run: |
           VERSION=$(grep '^version:' charts/elasti/Chart.yaml | awk '{print $2}')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
-      
+
       - name: Generate Helm index
         run: |
           make index-helm RELEASE-NAME=v${{ steps.chart-version.outputs.version }}
-      
-      - name: Configure Git and push changes
+
+      - name: Commit verified index.yaml changes
         if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_BRANCH: ${{ github.event.pull_request.head.ref }}
+          COMMIT_MESSAGE_BODY: "Signed-off-by: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
         run: |
           # `helm repo index` rewrites the created:/generated: timestamps and the
           # resulting package digest on every run, so a naive diff is never empty and
-          # would push a fresh (unsigned) commit on every PR push. Ignore those
+          # would push a fresh commit on every PR push. Ignore those
           # non-deterministic fields and only commit when there is a real change.
           if git diff -I '^ *created:' -I '^ *generated:' -I '^ *digest:' --quiet -- docs/index.yaml; then
             echo "No meaningful changes to index.yaml (only timestamps/digest)"
           else
-            git config user.name "$GITHUB_ACTOR"
-            git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-            git add docs/index.yaml
-            git commit -m "chore: update helm index.yaml" --signoff
-            git push
+            # Use the GraphQL createCommitOnBranch API so GitHub signs the commit
+            # (shows as Verified). Plain git commit + push is always unsigned.
+            .github/scripts/verified-commit.sh \
+              "chore: update helm index.yaml" \
+              docs/index.yaml
           fi
