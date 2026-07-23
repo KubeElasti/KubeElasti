@@ -3,6 +3,9 @@ global:
   ## @param global.kubernetesClusterDomain domain of the Kubernetes cluster
   ##
   kubernetesClusterDomain: cluster.local
+  ## @param global.allowedNamespaces [array] namespaces to confine KubeElasti to; empty installs cluster-scoped RBAC and watches all namespaces
+  ##
+  allowedNamespaces: []
   ## @param global.nameOverride name of the deployment
   ##
   nameOverride: ""
