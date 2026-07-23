@@ -6,42 +6,42 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Understand KubeElasti resolver architecture for traffic proxying, request queueing, and service discovery in Kubernetes serverless environments.">
+        <meta name="description" content="Install KubeElasti confined to an explicit list of namespaces using namespace-scoped Role/RoleBinding, with no cluster-wide list/watch. Opt-in via global.allowedNamespaces.">
       
       
         <meta name="author" content="KubeElasti Authors">
       
       
-        <link rel="canonical" href="https://kubeelasti.dev/src/documentation/architecture/resolver/">
+        <link rel="canonical" href="https://kubeelasti.dev/src/install/namespace-scoped/">
       
       
-        <link rel="prev" href="../state/">
+        <link rel="prev" href="../installation/">
       
       
-        <link rel="next" href="../operator/">
+        <link rel="next" href="../demo-setup/">
       
       
         
       
       
-      <link rel="icon" href="../../../../assets/images/logo/favicon.ico">
+      <link rel="icon" href="../../../assets/images/logo/favicon.ico">
       <meta name="generator" content="zensical-0.0.51">
     
     
       
-        <title>KubeElasti Resolver Architecture - Proxy and Traffic Management - KubeElasti</title>
+        <title>Namespace-scoped install - run KubeElasti without cluster-wide RBAC - KubeElasti</title>
       
     
     
       
         
       
-      <link rel="stylesheet" href="../../../../assets/stylesheets/modern/main.62c9b9cc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/modern/main.62c9b9cc.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../../../assets/stylesheets/modern/palette.dfe2e883.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/modern/palette.dfe2e883.min.css">
       
       
   
@@ -136,7 +136,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/extra.css">
     
     <script>__md_scope=new URL("/",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
@@ -152,7 +152,7 @@
   
   <!-- Dynamic Keywords from Page Meta -->
   
-    <meta name="keywords" content="KubeElasti resolver, traffic proxy, request queueing, service discovery, proxy architecture, Kubernetes proxy">
+    <meta name="keywords" content="KubeElasti namespace scoped, namespace scoped RBAC, namespaced operator RBAC, allowedNamespaces, WATCH_NAMESPACES, multi-tenant Kubernetes">
   
   
   <!-- Open Graph Meta Tags -->
@@ -160,21 +160,21 @@
   <meta property="og:site_name" content="KubeElasti Documentation">
   <meta property="og:locale" content="en_US">
   
-  <meta property="og:url" content="https://kubeelasti.dev/src/documentation/architecture/resolver/">
+  <meta property="og:url" content="https://kubeelasti.dev/src/install/namespace-scoped/">
   
-  <meta property="og:title" content="KubeElasti Resolver Architecture - Proxy and Traffic Management">
-  <meta property="og:description" content="Understand KubeElasti resolver architecture for traffic proxying, request queueing, and service discovery in Kubernetes serverless environments.">
+  <meta property="og:title" content="Namespace-scoped install - run KubeElasti without cluster-wide RBAC">
+  <meta property="og:description" content="Install KubeElasti confined to an explicit list of namespaces using namespace-scoped Role/RoleBinding, with no cluster-wide list/watch. Opt-in via global.allowedNamespaces.">
   <meta property="og:image" content="https://kubeelasti.dev/assets/images/logo/logo_white_full.png">
   
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="KubeElasti Resolver Architecture - Proxy and Traffic Management">
-  <meta name="twitter:description" content="Understand KubeElasti resolver architecture for traffic proxying, request queueing, and service discovery in Kubernetes serverless environments.">
+  <meta name="twitter:title" content="Namespace-scoped install - run KubeElasti without cluster-wide RBAC">
+  <meta name="twitter:description" content="Install KubeElasti confined to an explicit list of namespaces using namespace-scoped Role/RoleBinding, with no cluster-wide list/watch. Opt-in via global.allowedNamespaces.">
   <meta name="twitter:image" content="https://kubeelasti.dev/assets/images/logo/logo_white_full.png">
   
   <!-- Canonical URL -->
   
-  <link rel="canonical" href="https://kubeelasti.dev/src/documentation/architecture/resolver/">
+  <link rel="canonical" href="https://kubeelasti.dev/src/install/namespace-scoped/">
   
   
   <!-- PWA / browser chrome (hex from mkdocs extra.theme_color; matches documented primary) -->
@@ -243,7 +243,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#resolver-architecture" class="md-skip">
+        <a href="#namespace-scoped-install" class="md-skip">
           Skip to content
         </a>
       
@@ -271,9 +271,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../.." title="KubeElasti" class="md-header__button md-logo" aria-label="KubeElasti" data-md-component="logo">
+    <a href="../../.." title="KubeElasti" class="md-header__button md-logo" aria-label="KubeElasti" data-md-component="logo">
       
-  <img src="../../../../assets/images/logo/logo.svg" alt="KubeElasti">
+  <img src="../../../assets/images/logo/logo.svg" alt="KubeElasti">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
@@ -290,7 +290,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              KubeElasti Resolver Architecture - Proxy and Traffic Management
+              Namespace-scoped install - run KubeElasti without cluster-wide RBAC
             
           </span>
         </div>
@@ -374,7 +374,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../.." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   Home
@@ -403,7 +403,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../about/introduction/" class="md-tabs__link">
+        <a href="../../about/introduction/" class="md-tabs__link">
           
   
   About
@@ -415,62 +415,6 @@
 
       
         
-  
-  
-  
-  
-    
-      
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../../install/installation/" class="md-tabs__link">
-          
-  
-  Install
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-    
-  
-  
-    
-      
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-    
-      
   
   
   
@@ -495,7 +439,61 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../architecture/" class="md-tabs__link">
+        <a href="../installation/" class="md-tabs__link">
+          
+  
+  Install
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+      
+  
+  
+  
+  
+    
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../documentation/architecture/architecture/" class="md-tabs__link">
           
   
   Documentation
@@ -528,7 +526,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../blog/posts/probe-response/" class="md-tabs__link">
+        <a href="../../../blog/posts/probe-response/" class="md-tabs__link">
           
   
   Blog
@@ -561,9 +559,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../.." title="KubeElasti" class="md-nav__button md-logo" aria-label="KubeElasti" data-md-component="logo">
+    <a href="../../.." title="KubeElasti" class="md-nav__button md-logo" aria-label="KubeElasti" data-md-component="logo">
       
-  <img src="../../../../assets/images/logo/logo.svg" alt="KubeElasti">
+  <img src="../../../assets/images/logo/logo.svg" alt="KubeElasti">
 
     </a>
     KubeElasti
@@ -590,7 +588,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -646,7 +644,7 @@
   
   
   
-    <a href="../../../about/introduction/" class="md-nav__link">
+    <a href="../../about/introduction/" class="md-nav__link">
       
   
   
@@ -675,43 +673,46 @@
       
   
   
-  
-  
     
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-      
-        
-        
-      
-    
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
-      
-        
   
   
   
-    <a href="../../../install/installation/" class="md-nav__link">
+    
+    
       
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
   
   
   <span class="md-ellipsis">
@@ -724,149 +725,15 @@
   
   
 
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
-  
-
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Documentation
-
-    
-  </span>
-  
-  
-
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
   
-  Documentation
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Architecture
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_1">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-  Architecture
+  Install
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
@@ -878,45 +745,16 @@
   
   
     <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         
   
   
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-layers" viewBox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-rocket" viewBox="0 0 24 24"><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"/><path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"/></svg>
   
   <span class="md-ellipsis">
     
   
-  Overview
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../state/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-git-branch" viewBox="0 0 24 24"><path d="M15 6a9 9 0 0 0-9 9V3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  State
+  Installation
 
     
   </span>
@@ -949,12 +787,12 @@
           
   
   
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-network" viewBox="0 0 24 24"><rect width="6" height="6" x="16" y="16" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="9" y="2" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
   
   <span class="md-ellipsis">
     
   
-  Resolver
+  Namespace-scoped install
 
     
   </span>
@@ -968,12 +806,12 @@
         
   
   
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-network" viewBox="0 0 24 24"><rect width="6" height="6" x="16" y="16" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="9" y="2" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
   
   <span class="md-ellipsis">
     
   
-  Resolver
+  Namespace-scoped install
 
     
   </span>
@@ -999,10 +837,76 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#request-routing" class="md-nav__link">
+  <a href="#what-it-is" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Request Routing
+        What it is
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        When to use it
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-crd-is-still-cluster-scoped" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        The CRD is still cluster-scoped
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enable-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Enable it
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        What changes
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Verify
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uninstall" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Uninstall
       </span>
     </span>
   </a>
@@ -1025,16 +929,16 @@
   
   
     <li class="md-nav__item">
-      <a href="../operator/" class="md-nav__link">
+      <a href="../demo-setup/" class="md-nav__link">
         
   
   
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-flask-conical" viewBox="0 0 24 24"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2M6.453 15h11.094M8.5 2h7"/></svg>
   
   <span class="md-ellipsis">
     
   
-  Operator
+  Demo setup
 
     
   </span>
@@ -1054,514 +958,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../faq/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-circle-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Architecture FAQ
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Components
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-  Components
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../get-started/triggers/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-activity" viewBox="0 0 24 24"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Triggers
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../get-started/scalers/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-trending-up" viewBox="0 0 24 24"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Scalers
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../get-started/monitoring/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-line-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Monitoring
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Integrations
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-  Integrations
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../integrations/nginx/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-network" viewBox="0 0 24 24"><rect width="6" height="6" x="16" y="16" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="9" y="2" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  NGINX Ingress
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../integrations/istio/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-network" viewBox="0 0 24 24"><rect width="6" height="6" x="16" y="16" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="9" y="2" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Istio
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../integrations/envoy-gateway/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-network" viewBox="0 0 24 24"><rect width="6" height="6" x="16" y="16" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="9" y="2" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Envoy Gateway
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Development
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-  Development
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/env/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-terminal" viewBox="0 0 24 24"><path d="M12 19h8M4 17l6-6-6-6"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Dev Environment
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/playground/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-test-tube" viewBox="0 0 24 24"><path d="M14.5 2v17.5c0 1.4-1.1 2.5-2.5 2.5s-2.5-1.1-2.5-2.5V2M8.5 2h7M14.5 16h-5"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Playground
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/test-load/" class="md-nav__link">
-        
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-gauge" viewBox="0 0 24 24"><path d="m12 14 4-4M3.34 19a10 10 0 1 1 17.32 0"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-  Load Testing
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../development/test-e2e/" class="md-nav__link">
+      <a href="../pre-requisites/" class="md-nav__link">
         
   
   
@@ -1570,7 +967,7 @@
   <span class="md-ellipsis">
     
   
-  E2E Testing
+  Pre-Requisites
 
     
   </span>
@@ -1590,16 +987,16 @@
   
   
     <li class="md-nav__item">
-      <a href="../../development/contributors/" class="md-nav__link">
+      <a href="../configure-elastiservice/" class="md-nav__link">
         
   
   
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3.128a4 4 0 0 1 0 7.744M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sliders-horizontal" viewBox="0 0 24 24"><path d="M10 5H3M12 19H3M14 3v4M16 17v4M21 12h-9M21 19h-5M21 5h-7M8 10v4M8 12H3"/></svg>
   
   <span class="md-ellipsis">
     
   
-  Contributors
+  Configuration
 
     
   </span>
@@ -1618,10 +1015,70 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    
+  
+  
+  
+    <a href="../../documentation/architecture/architecture/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Documentation
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+  
+
       
     </li>
   
@@ -1662,7 +1119,7 @@
   
   
   
-    <a href="../../../../blog/posts/probe-response/" class="md-nav__link">
+    <a href="../../../blog/posts/probe-response/" class="md-nav__link">
       
   
   
@@ -1728,10 +1185,76 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#request-routing" class="md-nav__link">
+  <a href="#what-it-is" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Request Routing
+        What it is
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        When to use it
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-crd-is-still-cluster-scoped" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        The CRD is still cluster-scoped
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enable-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Enable it
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        What changes
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Verify
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uninstall" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Uninstall
       </span>
     </span>
   </a>
@@ -1763,7 +1286,7 @@
   
   
     <li class="md-path__item">
-      <a href="../../../.." class="md-path__link">
+      <a href="../../.." class="md-path__link">
         
   
   <span class="md-ellipsis">
@@ -1790,24 +1313,6 @@
       
         
       
-    
-    
-    
-    
-      
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
         
       
     
@@ -1815,48 +1320,11 @@
     
     
       <li class="md-path__item">
-        <a href="../architecture/" class="md-path__link">
+        <a href="../installation/" class="md-path__link">
           
   
   <span class="md-ellipsis">
-    Documentation
-  </span>
-
-        </a>
-      </li>
-    
-  
-
-    
-  
-
-      
-        
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-    
-      <li class="md-path__item">
-        <a href="../architecture/" class="md-path__link">
-          
-  
-  <span class="md-ellipsis">
-    Architecture
+    Install
   </span>
 
         </a>
@@ -1876,67 +1344,90 @@
   
 
 
-<h1 id="resolver-architecture">Resolver Architecture<a class="headerlink" href="#resolver-architecture" title="Permanent link">&para;</a></h1>
-<pre class="mermaid"><code>flowchart LR
-  %% ── USER &amp; ENTRY ─────────────────────
-  User(("Client")) --&gt; RP["Proxy&lt;br/&gt;:8012"] --&gt; Main["Main&lt;br/&gt;cmd/main.go"] --&gt; IS["Metrics&lt;br/&gt;:8013"]
-
-  %% ── CORE MODULES ─────────────────────
-  subgraph Mods["Core Modules"]
-    Handler["Handler"]:::core
-    Hosts["Hosts"]:::core
-    Thr["Throttle"]:::core
-    Oper["Operator Comm"]:::core
-    Obs["Observability"]:::core
-  end
-  Main -- uses --&gt; Handler &amp; Hosts &amp; Thr &amp; Oper &amp; Obs
-
-  %% Request flow (compact arrows)
-  Handler --&gt; Hosts
-  Handler --&gt; Thr
-  Thr --&gt; Handler
-  Handler --&gt; Obs
-  Handler -.-&gt; Sentry["Sentry"]
-
-  %% Operator comm
-  Handler -.-&gt; Oper
-  Oper -.-&gt; OpSvc["Operator Svc"]
-
-  %% External deps
-  Thr -.-&gt; K8sAPI["K8s API"]
-  Obs -.-&gt; Prom["Prometheus"]
-</code></pre>
-<h2 id="request-routing">Request Routing<a class="headerlink" href="#request-routing" title="Permanent link">&para;</a></h2>
-<p>The resolver identifies the target service by reading a single header on each
-incoming request. Two things decide which header is read:</p>
+<h1 id="namespace-scoped-install">Namespace-scoped install<a class="headerlink" href="#namespace-scoped-install" title="Permanent link">&para;</a></h1>
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>By default KubeElasti installs cluster-scoped: a <code>ClusterRole</code> and <code>ClusterRoleBinding</code> let the operator and resolver watch every namespace.</p>
+<p>Namespace-scoped mode is opt-in. You give KubeElasti an explicit list of namespaces. It then installs a <code>Role</code> and <code>RoleBinding</code> in each one instead of a <code>ClusterRole</code>, and the operator only watches those namespaces. There is no cluster-wide list/watch.</p>
+<h2 id="when-to-use-it">When to use it<a class="headerlink" href="#when-to-use-it" title="Permanent link">&para;</a></h2>
 <ul>
-<li>By default, the resolver binary reads the standard HTTP <code>Host</code> header
-  (<code>resolver/cmd/main.go:51</code>, <code>HeaderForHost string ... default:"Host"</code>).</li>
-<li>The shipped Helm chart overrides that default to <code>X-Envoy-Decorator-Operation</code>
-  (<code>charts/elasti/values.yaml</code>, <code>elastiResolver.proxy.env.headerForHost</code>) so
-  that deployments fronted by Envoy, Istio, or similar proxies that rewrite the
-  Host header keep working.</li>
+<li>Multi-tenant clusters where a team may only touch its own namespaces.</li>
+<li>Regulated or restricted environments that forbid cluster-wide RBAC.</li>
+<li>You want KubeElasti's blast radius limited to a known set of namespaces.</li>
 </ul>
-<p>Whichever header is selected, its value is parsed into <code>namespace</code> and
-<code>service</code> by <code>GetHost</code> in <code>hostmanager.go</code> and used to look up the target
-service to forward the request to.</p>
-<p>This has a practical consequence. Whatever routes traffic to the resolver,
-whether an Ingress controller, a service mesh, a <code>Service</code> selector, or a
-direct client, must arrive at the resolver with a header value that matches
-the target service's in-cluster FQDN format (for example,
-<code>target-deployment.target.svc.cluster.local</code>). If the header does not match,
-the resolver cannot tell which service the request was meant for and will not
-forward the request.</p>
-<p>Integration-specific setup lives under <a href="../../integrations/">Gateway and ingress integrations</a>:</p>
-<ul>
-<li><a href="../../integrations/nginx/">NGINX Ingress</a> — <code>nginx.ingress.kubernetes.io/upstream-vhost</code></li>
-<li><a href="../../integrations/istio/">Istio</a> — <code>X-Envoy-Decorator-Operation</code> (Helm default)</li>
-<li><a href="../../integrations/envoy-gateway/">Envoy Gateway</a> — <code>HTTPRoute</code> <code>URLRewrite</code> (<code>urlRewrite.hostname</code>); use <code>headerForHost: Host</code></li>
-</ul>
-<p>To use a different header (for example, a custom one set by your edge proxy),
-override the Helm value at install time:</p>
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>--set<span class="w"> </span>elastiResolver.proxy.env.headerForHost<span class="o">=</span>X-My-Custom-Host
+<p>Use the default cluster-scoped install if none of these apply.</p>
+<h2 id="the-crd-is-still-cluster-scoped">The CRD is still cluster-scoped<a class="headerlink" href="#the-crd-is-still-cluster-scoped" title="Permanent link">&para;</a></h2>
+<p>Namespace-scoped mode makes the operator and resolver run with namespaced <code>Role</code>/<code>RoleBinding</code> only, with no <code>ClusterRole</code> at runtime. The one cluster-scoped object that remains is the <code>ElastiService</code> CRD. CRDs are always cluster-scoped in Kubernetes.</p>
+<p>The chart installs the CRD as part of the release, so installing or upgrading the chart needs permission to manage that CRD. This is a one-time registration, not a standing grant to the operator or resolver.</p>
+<div class="admonition warning">
+<p class="admonition-title">Operator image version</p>
+<p>Namespace-scoped mode needs an operator image that supports the <code>WATCH_NAMESPACES</code> env var. Use a release that ships this feature. On an older image the chart still renders scoped RBAC, but the operator falls back to cluster-scoped watching and its reads fail under the namespaced <code>Role</code>.</p>
+</div>
+<h2 id="enable-it">Enable it<a class="headerlink" href="#enable-it" title="Permanent link">&para;</a></h2>
+<p>Set <code>global.allowedNamespaces</code> to the namespaces you want KubeElasti to manage:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>helm<span class="w"> </span>install<span class="w"> </span>elasti<span class="w"> </span>oci://ghcr.io/kubeelasti/charts/elasti<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span>--namespace<span class="w"> </span>elasti<span class="w"> </span>--create-namespace<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span>--set<span class="w"> </span><span class="s1">&#39;global.allowedNamespaces={team-a,team-b}&#39;</span>
 </span></code></pre></div>
+<p>The release namespace is always added to the list automatically. The operator needs it for the leader-election lease and to read the resolver's <code>EndpointSlices</code>.</p>
+<p>Leaving <code>global.allowedNamespaces</code> empty (the default) keeps the cluster-scoped install unchanged.</p>
+<h2 id="what-changes">What changes<a class="headerlink" href="#what-changes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Default (<code>[]</code>)</th>
+<th>Scoped (list set)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operator/resolver RBAC</td>
+<td><code>ClusterRole</code> + <code>ClusterRoleBinding</code></td>
+<td><code>Role</code> + <code>RoleBinding</code> per namespace (+ release namespace)</td>
+</tr>
+<tr>
+<td>Watched scope</td>
+<td>all namespaces</td>
+<td>only the listed namespaces</td>
+</tr>
+<tr>
+<td>Operator env</td>
+<td>none</td>
+<td><code>WATCH_NAMESPACES</code></td>
+</tr>
+<tr>
+<td>ClusterRoles created</td>
+<td>yes</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>flowchart TD
+    A[helm install] --&gt; B{global.allowedNamespaces}
+    B --&gt;|empty, default| C[ClusterRole + ClusterRoleBinding]
+    C --&gt; C2[Operator watches ALL namespaces]
+    B --&gt;|"team-a, team-b"| D[Role + RoleBinding in team-a, team-b, release-ns]
+    D --&gt; D2[WATCH_NAMESPACES env set on operator]
+    D2 --&gt; D3[Operator watches ONLY listed namespaces, no ClusterRoles]</code></pre>
+<h2 id="verify">Verify<a class="headerlink" href="#verify" title="Permanent link">&para;</a></h2>
+<p>No <code>ClusterRole</code> or <code>ClusterRoleBinding</code> is created in scoped mode:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>clusterrole,clusterrolebinding<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/instance<span class="o">=</span>elasti
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># expect: no resources found</span>
+</span></code></pre></div>
+<p>A <code>Role</code> and <code>RoleBinding</code> exist in each listed namespace:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>role,rolebinding<span class="w"> </span>-n<span class="w"> </span>team-a<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/instance<span class="o">=</span>elasti
+</span></code></pre></div>
+<p>The operator has the namespace list:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>elasti<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/component<span class="o">=</span>operator<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].spec.template.spec.containers[0].env}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>WATCH_NAMESPACES
+</span></code></pre></div>
+<p>An <code>ElastiService</code> created in a namespace outside the list is ignored by the operator.</p>
+<h2 id="uninstall">Uninstall<a class="headerlink" href="#uninstall" title="Permanent link">&para;</a></h2>
+<p>Same as the default install. Remove ElastiServices first, then the release:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>elastiservices<span class="w"> </span>--all
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>helm<span class="w"> </span>uninstall<span class="w"> </span>elasti<span class="w"> </span>-n<span class="w"> </span>elasti
+</span></code></pre></div>
+<p>The CRD is part of the release, so <code>helm uninstall</code> removes it too.</p>
 
 
 
@@ -1980,7 +1471,7 @@ override the Helm value at install time:</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../state/" class="md-footer__link md-footer__link--prev" aria-label="Previous: State">
+          <a href="../installation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Installation">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!--! Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l137.3-137.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
@@ -1990,20 +1481,20 @@ override the Helm value at install time:</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                State
+                Installation
               </div>
             </div>
           </a>
         
         
           
-          <a href="../operator/" class="md-footer__link md-footer__link--next" aria-label="Next: Operator">
+          <a href="../demo-setup/" class="md-footer__link md-footer__link--next" aria-label="Next: Demo setup">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Operator
+                Demo setup
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2080,10 +1571,10 @@ override the Helm value at install time:</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate":{"json":[".s2"]},"base":"../../../..","features":["content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.instant.progress","navigation.path","navigation.prune","navigation.sections","navigation.tabs","navigation.top","navigation.tracking","search.highlight","search.share","search.suggest","toc.follow"],"search":"../../../../assets/javascripts/workers/search.b6b7e04f.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":{"json":[".s2"]},"base":"../../..","features":["content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.instant.progress","navigation.path","navigation.prune","navigation.sections","navigation.tabs","navigation.top","navigation.tracking","search.highlight","search.share","search.suggest","toc.follow"],"search":"../../../assets/javascripts/workers/search.b6b7e04f.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.d7f30b55.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.d7f30b55.min.js"></script>
       
     
   </body>
