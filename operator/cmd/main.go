@@ -237,31 +237,38 @@ func mainWithError() error {
 	}
 
 	setupLog.Info("starting manager")
+	// The manager runs until SIGTERM/SIGINT. Its result is always delivered,
+	// including nil on a clean shutdown, and main returns once it arrives:
+	// otherwise the process outlives the manager until the kubelet's SIGKILL.
+	// managerRunning ends when the manager returns, so the startup waits below
+	// can't outlive a manager that failed to start or has shut down.
+	ctx := ctrl.SetupSignalHandler()
+	managerRunning, managerStopped := context.WithCancel(ctx)
 	mgrErrChan := make(chan error, 1)
 	// we are using a goroutine to start the manager because we don't want to block the main thread
 	go func() {
-		if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-			setupLog.Error(err, "problem running manager")
-			mgrErrChan <- fmt.Errorf("manager: %w", err)
-		}
+		defer managerStopped()
+		mgrErrChan <- mgr.Start(ctx)
 	}()
-
-	// Wait for cache to sync
-	if !mgr.GetCache().WaitForCacheSync(context.Background()) {
-		return fmt.Errorf("failed to sync cache")
+	managerResult := func() error {
+		if err := <-mgrErrChan; err != nil {
+			setupLog.Error(err, "problem running manager")
+			return fmt.Errorf("main: manager: %w", err)
+		}
+		return nil
 	}
 
-	if err = reconciler.Initialize(context.Background(), watchNamespaces); err != nil {
+	if !mgr.GetCache().WaitForCacheSync(managerRunning) {
+		return managerResult()
+	}
+
+	if err = reconciler.Initialize(managerRunning, watchNamespaces); err != nil {
 		setupLog.Error(err, "unable to initialize controller")
 		return fmt.Errorf("main: %w", err)
 	}
 	setupLog.Info("initialized controller")
 
-	if err := <-mgrErrChan; err != nil {
-		return fmt.Errorf("main: %w", err)
-	}
-
-	return nil
+	return managerResult()
 }
 
 // effectiveWatchNamespaces returns the de-duplicated set of namespaces to confine the manager

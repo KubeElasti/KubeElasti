@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Fixes
+
+* fix: the operator exits on SIGTERM (it waited for SIGKILL after every clean shutdown) and exits with an error when the manager fails to start (it hung waiting for the cache) by `@nuwang` in [#377](https://github.com/KubeElasti/KubeElasti/pull/377)
+
 ## v0.1.31-rc2 (2026-08-06)
 
 ### Improvements
