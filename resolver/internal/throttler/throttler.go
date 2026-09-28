@@ -72,15 +72,20 @@ func (t *Throttler) Try(ctx context.Context, host *messages.Host, resolve func(i
 				reenqueue = false
 			}
 
+			if !reenqueue {
+				// The request was proxied (or failed to be). ctx only bounds
+				// the wait for readiness, so however long the proxied
+				// response took, it is not a timeout.
+				return
+			}
+			// Wait for the next readiness check, but no longer than the
+			// context allows.
 			select {
 			case <-ctx.Done():
 				tryErr = fmt.Errorf("context done error: %w", ctx.Err())
 				reenqueue = false
-			default:
-				if reenqueue {
-					tryCount++
-					time.Sleep(t.retryDuration)
-				}
+			case <-time.After(t.retryDuration):
+				tryCount++
 			}
 		})
 		if breakErr != nil {

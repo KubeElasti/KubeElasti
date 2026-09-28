@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Fixes
+
+* fix: the resolver no longer reports a proxied request that outlasted its timeout as timed out (which wrote a second response), and answers when the timeout ends instead of at the next readiness check by `@nuwang` in [#376](https://github.com/KubeElasti/KubeElasti/pull/376)
+
 ## v0.1.31-rc2 (2026-08-06)
 
 ### Improvements
