@@ -52,19 +52,23 @@ func NewOperatorClientWithURL(logger *zap.Logger, retryDuration time.Duration, b
 		retryDuration:           retryDuration,
 		operatorURL:             baseURL,
 		incomingRequestEndpoint: "/informer/incoming-request",
-		client:                  http.Client{},
+		// A hung operator must not hold a service's dedup slot past its
+		// retry window.
+		client: http.Client{Timeout: retryDuration},
 	}
 }
 
-// SendIncomingRequestInfo send request details like service name to the operator
+// SendIncomingRequestInfo send request details like service name to the operator.
+// It notifies the operator at most once per namespace/service per retryDuration.
 func (o *Client) SendIncomingRequestInfo(ns, svc string) {
-	lock, taken := o.getMutexForServiceRPC(svc)
+	key := ns + "/" + svc
+	lock, taken := o.getMutexForServiceRPC(key)
 	if taken {
 		return
 	}
 	lock.Lock()
 	defer time.AfterFunc(o.retryDuration, func() {
-		o.releaseMutexForServiceRPC(svc)
+		o.releaseMutexForServiceRPC(key)
 	})
 
 	requestBody := messages.RequestCount{

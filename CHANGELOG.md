@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Fixes
+
+* fix: dedup resolver wake notifications per namespace/service and bound the operator call; the operator answers a wake before scaling by `@nuwang` in [#372](https://github.com/KubeElasti/KubeElasti/pull/372)
+
 ## v0.1.31-rc2 (2026-08-06)
 
 ### Improvements

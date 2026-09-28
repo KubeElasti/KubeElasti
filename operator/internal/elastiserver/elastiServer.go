@@ -37,17 +37,22 @@ type (
 		scaleHandler *scaling.ScaleHandler
 		// rescaleDuration is the duration to wait before checking to rescaling the target
 		rescaleDuration time.Duration
+		// scaleTarget scales the target behind a service; scaleTargetForService
+		// outside tests.
+		scaleTarget func(ctx context.Context, serviceName, namespace string) error
 	}
 )
 
 func NewServer(logger *zap.Logger, scaleHandler *scaling.ScaleHandler, rescaleDuration time.Duration) *Server {
 	// Get Ops client
-	return &Server{
+	s := &Server{
 		logger:       logger.Named("elastiServer"),
 		scaleHandler: scaleHandler,
 		// rescaleDuration is the duration to wait before checking to rescaling the target
 		rescaleDuration: rescaleDuration,
 	}
+	s.scaleTarget = s.scaleTargetForService
+	return s
 }
 
 // Start starts the ElastiServer and declares the endpoint and handlers for it
@@ -133,17 +138,22 @@ func (s *Server) resolverReqHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if err = s.scaleTargetForService(req.Context(), body.Svc, body.Namespace); err != nil {
-		s.logger.Error("Failed to scale target",
-			zap.Error(err),
+	// Scale after the handler returns, so the resolver gets its answer now
+	// (the response is only flushed when the handler returns), and on a
+	// context that outlives the request, which is cancelled at that point.
+	ctx := context.WithoutCancel(req.Context())
+	go func() {
+		if err := s.scaleTarget(ctx, body.Svc, body.Namespace); err != nil {
+			s.logger.Error("Failed to scale target",
+				zap.Error(err),
+				zap.String("service", body.Svc),
+				zap.String("namespace", body.Namespace))
+			return
+		}
+		s.logger.Info("Request fulfilled successfully",
 			zap.String("service", body.Svc),
 			zap.String("namespace", body.Namespace))
-		return
-	}
-
-	s.logger.Info("Request fulfilled successfully",
-		zap.String("service", body.Svc),
-		zap.String("namespace", body.Namespace))
+	}()
 }
 
 func (s *Server) crdCacheHandler(w http.ResponseWriter, req *http.Request) {
