@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Improvements
+
+* perf: check scaler health once per Prometheus backend per scale-down cycle instead of once per ElastiService by `@nuwang` in [#378](https://github.com/KubeElasti/KubeElasti/pull/378)
+
 ## v0.1.31-rc2 (2026-08-06)
 
 ### Improvements

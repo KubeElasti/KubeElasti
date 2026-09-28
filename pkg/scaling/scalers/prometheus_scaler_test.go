@@ -483,3 +483,58 @@ func TestClose(t *testing.T) {
 		t.Fatalf("unexpected error with nil client: %v", err)
 	}
 }
+
+// HealthKey groups scalers whose IsHealthy runs the same query against the
+// same backend with the same credentials; anything that can change the
+// answer must change the key.
+func TestPrometheusScalerHealthKey(t *testing.T) {
+	t.Setenv("PROMETHEUS_TRIGGER_SERVER_ADDRESS", "http://prom.monitoring:9090")
+	t.Setenv("PROMETHEUS_TRIGGER_AUTHORIZATION_HEADER", "")
+	key := func(t *testing.T, metadata string, cooldown time.Duration) string {
+		t.Helper()
+		s, err := NewPrometheusScaler(json.RawMessage(metadata), cooldown)
+		if err != nil {
+			t.Fatalf("NewPrometheusScaler: %v", err)
+		}
+		return s.(HealthKeyer).HealthKey()
+	}
+	base := key(t, `{"query":"a","threshold":"1"}`, 5*time.Minute)
+
+	same := []struct{ name, metadata string }{
+		{"different trigger query", `{"query":"b","threshold":"2"}`},
+		{"explicit default server", `{"query":"a","serverAddress":"http://prom.monitoring:9090"}`},
+		{"explicit default uptime filter", `{"query":"a","uptimeFilter":"container=\"prometheus\""}`},
+	}
+	for _, tt := range same {
+		if got := key(t, tt.metadata, 5*time.Minute); got != base {
+			t.Errorf("%s: key %q, want the base key %q", tt.name, got, base)
+		}
+	}
+
+	differs := []struct {
+		name     string
+		metadata string
+		cooldown time.Duration
+	}{
+		{"other server", `{"query":"a","serverAddress":"http://other:9090"}`, 5 * time.Minute},
+		{"other uptime filter", `{"query":"a","uptimeFilter":"job=\"prom\""}`, 5 * time.Minute},
+		{"other cooldown (query window)", `{"query":"a"}`, 10 * time.Minute},
+		{"tenant header", `{"query":"a","headers":{"X-Scope-OrgID":"team-a"}}`, 5 * time.Minute},
+	}
+	for _, tt := range differs {
+		if got := key(t, tt.metadata, tt.cooldown); got == base || got == "" {
+			t.Errorf("%s: key %q must be non-empty and differ from the base key", tt.name, got)
+		}
+	}
+}
+
+func TestPrometheusScalerHealthKeyEmptyWithoutServerAddress(t *testing.T) {
+	t.Setenv("PROMETHEUS_TRIGGER_SERVER_ADDRESS", "")
+	s, err := NewPrometheusScaler(json.RawMessage(`{"query":"a"}`), time.Minute)
+	if err != nil {
+		t.Fatalf("NewPrometheusScaler: %v", err)
+	}
+	if key := s.(HealthKeyer).HealthKey(); key != "" {
+		t.Fatalf("HealthKey() = %q, want empty when no server address is configured", key)
+	}
+}

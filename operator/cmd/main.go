@@ -184,6 +184,9 @@ func mainWithError() error {
 
 	// Initiate and start the shared scaleHandler
 	scaleHandler := scaling.NewScaleHandler(zapLogger, mgr.GetConfig(), watchNamespaces, mgr.GetEventRecorderFor("elasti-operator"))
+	// Each scale-down cycle reads ElastiServices from the manager's cache
+	// (scoped to the watched namespaces) instead of listing the API server.
+	scaleHandler.SetElastiServiceLister(controller.CachedElastiServiceLister(mgr.GetCache()))
 
 	// Set up the ElastiService controller
 	reconciler := &controller.ElastiServiceReconciler{
