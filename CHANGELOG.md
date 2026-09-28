@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Fixes
+
+* fix: decode each Prometheus query response into its own value, removing a data race under concurrent scaler evaluation by `@nuwang` in [#371](https://github.com/KubeElasti/KubeElasti/pull/371)
+
 ## v0.1.31-rc2 (2026-08-06)
 
 ### Improvements

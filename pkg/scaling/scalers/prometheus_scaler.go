@@ -41,7 +41,7 @@ type prometheusMetadata struct {
 	Headers       map[string]string `json:"headers"`
 }
 
-var promQueryResponse struct {
+type prometheusQueryResponse struct {
 	Status string `json:"status"`
 	Data   struct {
 		ResultType string `json:"resultType"`
@@ -208,6 +208,7 @@ func (s *prometheusScaler) executePromQuery(ctx context.Context, query string) (
 		return -1, fmt.Errorf("unexpected HTTP status: %s", resp.Status)
 	}
 
+	var promQueryResponse prometheusQueryResponse
 	if err := json.NewDecoder(resp.Body).Decode(&promQueryResponse); err != nil {
 		return -1, fmt.Errorf("failed to decode Prometheus response: %w", err)
 	}

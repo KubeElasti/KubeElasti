@@ -3,9 +3,11 @@ package scalers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 	"time"
 )
@@ -339,6 +341,39 @@ func TestExecutePromQuery(t *testing.T) {
 				t.Errorf("executePromQuery() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+// Scalers are evaluated concurrently (one per ElastiService trigger), so each
+// query must decode into its own response, never into shared state.
+func TestExecutePromQueryConcurrentCallsIsolated(t *testing.T) {
+	one := plainScaler(promServer(t, 200, okVal("1")).URL)
+	two := plainScaler(promServer(t, 200, okVal("2")).URL)
+
+	var wg sync.WaitGroup
+	errs := make(chan error, 64)
+	for i := 0; i < 64; i++ {
+		s, want := one, 1.0
+		if i%2 == 1 {
+			s, want = two, 2.0
+		}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			got, err := s.executePromQuery(context.Background(), "up")
+			if err != nil {
+				errs <- err
+				return
+			}
+			if got != want {
+				errs <- fmt.Errorf("executePromQuery() = %v, want %v", got, want)
+			}
+		}()
+	}
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		t.Error(err)
 	}
 }
 
