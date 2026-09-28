@@ -184,6 +184,12 @@ func mainWithError() error {
 
 	// Initiate and start the shared scaleHandler
 	scaleHandler := scaling.NewScaleHandler(zapLogger, mgr.GetConfig(), watchNamespaces, mgr.GetEventRecorderFor("elasti-operator"))
+	// Scale-down runs only on the leader, on the manager's context.
+	if err := mgr.Add(scaleHandler.ScaleDownWatcher()); err != nil {
+		setupLog.Error(err, "unable to add the scale-down watcher")
+		sentry.CaptureException(err)
+		return fmt.Errorf("main: %w", err)
+	}
 
 	// Set up the ElastiService controller
 	reconciler := &controller.ElastiServiceReconciler{

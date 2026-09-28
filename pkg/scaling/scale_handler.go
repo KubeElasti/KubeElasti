@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -97,36 +96,6 @@ func NewScaleHandler(logger *zap.Logger, config *rest.Config, watchNamespaces []
 		watchNamespaces: watchNamespaces,
 		EventRecorder:   eventRecorder,
 	}
-}
-
-func (h *ScaleHandler) StartScaleDownWatcher(ctx context.Context) {
-	pollingInterval := 30 * time.Second
-	if envInterval := os.Getenv("POLLING_INTERVAL"); envInterval != "" {
-		duration, err := time.ParseDuration(envInterval)
-		switch {
-		case err != nil:
-			h.logger.Warn("Invalid POLLING_INTERVAL value, using default 30s", zap.Error(err))
-		case duration <= 0:
-			h.logger.Warn("POLLING_INTERVAL must be positive, using default 30s", zap.String("value", envInterval))
-		default:
-			pollingInterval = duration
-		}
-	}
-	ticker := time.NewTicker(pollingInterval)
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				ticker.Stop()
-				return
-			case <-ticker.C:
-				if err := h.checkAndScale(ctx); err != nil {
-					h.logger.Error("failed to run the scale down check", zap.Error(err))
-				}
-			}
-		}
-	}()
 }
 
 // listNamespaces returns the namespaces to query for ElastiServices. An empty watch set means

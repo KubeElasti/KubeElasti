@@ -158,7 +158,6 @@ func (r *ElastiServiceReconciler) Initialize(ctx context.Context, watchNamespace
 	if err := r.InformerManager.InitializeResolverInformer(r.getResolverChangeHandler(ctx)); err != nil {
 		return fmt.Errorf("failed to initialize resolver informer: %w", err)
 	}
-	r.ScaleHandler.StartScaleDownWatcher(ctx)
 	return nil
 }
 

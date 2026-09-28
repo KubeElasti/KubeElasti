@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Fixes
+
+* fix: run the scale-down watcher only on the leader, as a manager Runnable that stops with the manager by `@nuwang` in [#373](https://github.com/KubeElasti/KubeElasti/pull/373)
+
 ## v0.1.31-rc2 (2026-08-06)
 
 ### Improvements

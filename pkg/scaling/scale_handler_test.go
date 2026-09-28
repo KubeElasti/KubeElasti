@@ -16,7 +16,7 @@ func TestScaleHandler(t *testing.T) {
 	RunSpecs(t, "ScaleHandler Suite")
 }
 
-var _ = Describe("StartScaleDownWatcher Polling Interval", func() {
+var _ = Describe("ScaleDownWatcher Polling Interval", func() {
 	var (
 		observedLogs *observer.ObservedLogs
 		logger       *zap.Logger
@@ -34,26 +34,16 @@ var _ = Describe("StartScaleDownWatcher Polling Interval", func() {
 		os.Unsetenv("POLLING_INTERVAL")
 	})
 
-	// Helper function to test polling interval parsing logic
+	// testPollingIntervalParsing runs the watcher's POLLING_INTERVAL parsing
+	// with the variable set to envValue (unset when empty).
 	testPollingIntervalParsing := func(envValue string) (time.Duration, bool) {
-		pollingInterval := 30 * time.Second
-		hasWarning := false
-
-		if envValue != "" {
-			duration, err := time.ParseDuration(envValue)
-			switch {
-			case err != nil:
-				logger.Warn("Invalid POLLING_INTERVAL value, using default 30s", zap.Error(err))
-				hasWarning = true
-			case duration <= 0:
-				logger.Warn("POLLING_INTERVAL must be positive, using default 30s", zap.String("value", envValue))
-				hasWarning = true
-			default:
-				pollingInterval = duration
-			}
+		if envValue == "" {
+			os.Unsetenv("POLLING_INTERVAL")
+		} else {
+			os.Setenv("POLLING_INTERVAL", envValue)
 		}
-
-		return pollingInterval, hasWarning
+		interval := pollingIntervalFromEnv(logger)
+		return interval, observedLogs.Len() > 0
 	}
 
 	Context("When POLLING_INTERVAL is not set", func() {
