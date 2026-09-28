@@ -33,6 +33,7 @@ type (
 		crdCache    *crdcache.Cache
 		operatorRPC Operator
 		hostManager HostManager
+		readiness   Readiness
 	}
 
 	// Params is the configuration for the handler
@@ -44,6 +45,7 @@ type (
 		Throttler   *throttler.Throttler
 		Transport   http.RoundTripper
 		CRDCache    *crdcache.Cache
+		Readiness   Readiness
 	}
 
 	// Operator is to communicate with the operator
@@ -55,6 +57,12 @@ type (
 	HostManager interface {
 		GetHost(req *http.Request) (*messages.Host, error)
 		ScheduleDisableTrafficForHost(service string)
+		EnableTrafficForHost(service string)
+	}
+
+	// Readiness reports whether a Service has ready endpoints.
+	Readiness interface {
+		CheckIfServiceEndpointSliceActive(ns, svc string) (bool, error)
 	}
 )
 
@@ -69,6 +77,7 @@ func NewHandler(hc *Params) *Handler {
 		crdCache:    hc.CRDCache,
 		operatorRPC: hc.OperatorRPC,
 		hostManager: hc.HostManager,
+		readiness:   hc.Readiness,
 	}
 }
 
@@ -121,7 +130,7 @@ func (h *Handler) handleAnyRequest(w http.ResponseWriter, req *http.Request) (*m
 	defer prom.QueuedRequestGauge.WithLabelValues(host.SourceService, host.Namespace).Dec()
 
 	// This closes the connections, in case the host is scaled up by the controller.
-	if !host.TrafficAllowed {
+	if h.trafficSwitchedAway(host) {
 		h.logger.Info("Traffic not allowed", zap.Any("host", logger.MaskMiddle(host.IncomingHost, 4, 4)))
 		w.Header().Set("Connection", "close")
 		w.Header().Set("Content-Type", "application/json")
@@ -333,4 +342,25 @@ func (h *Handler) GetCRDCacheStatus(w http.ResponseWriter, _ *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+}
+
+// trafficSwitchedAway reports whether the request should be turned away
+// with 408 because the host's traffic was switched to the target. That only
+// holds while the target serves: once it is back at zero (the disable was
+// scheduled by a request proxied before the scale-down), the request is the
+// resolver's to handle, so traffic is re-enabled for the host. If readiness
+// can't be read, the request is turned away as before.
+func (h *Handler) trafficSwitchedAway(host *messages.Host) bool {
+	if host.TrafficAllowed {
+		return false
+	}
+	active, err := h.readiness.CheckIfServiceEndpointSliceActive(host.Namespace, host.TargetService)
+	if err != nil || active {
+		return true
+	}
+	h.logger.Info("target scaled back to zero while traffic was switched away; re-enabling",
+		zap.String("namespace", host.Namespace),
+		zap.String("service", host.SourceService))
+	h.hostManager.EnableTrafficForHost(host.IncomingHost)
+	return false
 }

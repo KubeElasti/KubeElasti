@@ -119,6 +119,7 @@ func main() {
 		HostManager: newHostManager,
 		Throttler:   newThrottler,
 		Transport:   newTransport,
+		Readiness:   k8sUtil,
 	})
 
 	// Handle all the incoming requests

@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Fixes
+
+* fix: the resolver no longer answers 408 "traffic is switched" for a target that scaled back to zero during the post-proxy disable window; it wakes the target instead by `@nuwang` in [#375](https://github.com/KubeElasti/KubeElasti/pull/375)
+
 ## v0.1.31-rc2 (2026-08-06)
 
 ### Improvements
