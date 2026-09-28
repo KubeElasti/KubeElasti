@@ -58,6 +58,23 @@ type ScaleHandler struct {
 
 	logger          *zap.Logger
 	watchNamespaces []string
+
+	// listElastiServices returns the ElastiServices each scale-down cycle
+	// evaluates; a fresh API LIST unless SetElastiServiceLister replaced it.
+	listElastiServices ElastiServiceLister
+	// scanner evaluates them and dispatches the resulting scale actions.
+	scanner *scanner
+}
+
+// ElastiServiceLister returns the ElastiServices the scale-down loop
+// evaluates. It may return services together with an error when only some
+// namespaces could be listed.
+type ElastiServiceLister func(ctx context.Context) ([]v1alpha1.ElastiService, error)
+
+// SetElastiServiceLister replaces the per-cycle API LIST, typically with a
+// lister backed by the manager's informer cache.
+func (h *ScaleHandler) SetElastiServiceLister(lister ElastiServiceLister) {
+	h.listElastiServices = lister
 }
 
 // getMutexForScale returns a mutex for scaling based on the input key
@@ -88,7 +105,7 @@ func NewScaleHandler(logger *zap.Logger, config *rest.Config, watchNamespaces []
 		logger.Fatal("Error connecting with kubernetes", zap.Error(err))
 	}
 
-	return &ScaleHandler{
+	h := &ScaleHandler{
 		logger:          logger.Named("ScaleHandler"),
 		kClient:         kClient,
 		kDynamicClient:  kDynamicClient,
@@ -97,6 +114,9 @@ func NewScaleHandler(logger *zap.Logger, config *rest.Config, watchNamespaces []
 		watchNamespaces: watchNamespaces,
 		EventRecorder:   eventRecorder,
 	}
+	h.listElastiServices = h.listElastiServicesFromAPI
+	h.scanner = newScanner(scanConfigFromEnv(h.logger))
+	return h
 }
 
 func (h *ScaleHandler) StartScaleDownWatcher(ctx context.Context) {
@@ -139,8 +159,11 @@ func listNamespaces(watchNamespaces []string) []string {
 	return watchNamespaces
 }
 
-func (h *ScaleHandler) checkAndScale(ctx context.Context) error {
+// listElastiServicesFromAPI lists ElastiServices with a fresh API LIST per
+// watched namespace (one all-namespaces LIST in cluster scope).
+func (h *ScaleHandler) listElastiServicesFromAPI(ctx context.Context) ([]v1alpha1.ElastiService, error) {
 	// This client is not cache-backed, so namespace scoping must be enforced here.
+	var services []v1alpha1.ElastiService
 	var listErrs []error
 	for _, ns := range listNamespaces(h.watchNamespaces) {
 		elastiServiceList, err := h.kDynamicClient.Resource(values.ElastiServiceGVR).Namespace(ns).List(ctx, metav1.ListOptions{})
@@ -149,47 +172,59 @@ func (h *ScaleHandler) checkAndScale(ctx context.Context) error {
 			listErrs = append(listErrs, fmt.Errorf("namespace %q: %w", ns, err))
 			continue
 		}
-
 		for _, item := range elastiServiceList.Items {
-			es := &v1alpha1.ElastiService{}
-			if err := runtime.DefaultUnstructuredConverter.FromUnstructured(item.Object, es); err != nil {
+			es := v1alpha1.ElastiService{}
+			if err := runtime.DefaultUnstructuredConverter.FromUnstructured(item.Object, &es); err != nil {
 				h.logger.Error("failed to convert unstructured to ElastiService", zap.Error(err))
 				continue
 			}
-			cooldownPeriod := resolveCooldownPeriod(es)
-
-			scaleDirection, err := h.calculateScaleDirection(ctx, cooldownPeriod, es)
-			if err != nil {
-				h.logger.Error("failed to calculate scale direction", zap.String("service", es.Spec.Service), zap.String("namespace", es.Namespace), zap.Error(err))
-				continue
-			} else if scaleDirection == NoScale {
-				continue
-			}
-
-			switch scaleDirection {
-			case ScaleDown:
-				err := h.handleScaleToZero(ctx, es)
-				if err != nil {
-					h.logger.Error("failed to scale target to zero", zap.String("service", es.Spec.Service), zap.String("namespace", es.Namespace), zap.Error(err))
-					continue
-				}
-			case ScaleUp:
-				err := h.handleScaleFromZero(ctx, es)
-				if err != nil {
-					h.logger.Error("failed to scale target from zero", zap.String("service", es.Spec.Service), zap.String("namespace", es.Namespace), zap.Error(err))
-					continue
-				}
-			}
+			services = append(services, es)
 		}
 	}
+	return services, errors.Join(listErrs...)
+}
 
-	if len(listErrs) > 0 {
-		return fmt.Errorf("failed to list ElastiServices: %w", errors.Join(listErrs...))
+func (h *ScaleHandler) checkAndScale(ctx context.Context) error {
+	services, listErr := h.listElastiServices(ctx)
+	health := newHealthMemo()
+	evaluate := func(ctx context.Context, es *v1alpha1.ElastiService) (ScaleDirection, error) {
+		direction, err := h.calculateScaleDirection(ctx, resolveCooldownPeriod(es), es, health)
+		if err != nil {
+			h.logger.Error("failed to calculate scale direction", zap.String("service", es.Spec.Service), zap.String("namespace", es.Namespace), zap.Error(err))
+		}
+		return direction, err
+	}
+	h.scanner.run(ctx, services, evaluate, h.applyScaleDirection)
+
+	if listErr != nil {
+		return fmt.Errorf("failed to list ElastiServices: %w", listErr)
 	}
 	return nil
 }
 
-func (h *ScaleHandler) calculateScaleDirection(ctx context.Context, cooldownPeriod time.Duration, es *v1alpha1.ElastiService) (ScaleDirection, error) {
+// applyScaleDirection carries out a scan's decision for es.
+func (h *ScaleHandler) applyScaleDirection(ctx context.Context, es *v1alpha1.ElastiService, direction ScaleDirection) error {
+	switch direction {
+	case ScaleDown:
+		if err := h.handleScaleToZero(ctx, es); err != nil {
+			h.logger.Error("failed to scale target to zero", zap.String("service", es.Spec.Service), zap.String("namespace", es.Namespace), zap.Error(err))
+			return err
+		}
+	case ScaleUp:
+		if err := h.handleScaleFromZero(ctx, es); err != nil {
+			h.logger.Error("failed to scale target from zero", zap.String("service", es.Spec.Service), zap.String("namespace", es.Namespace), zap.Error(err))
+			return err
+		}
+	}
+	return nil
+}
+
+// SetScanObserver receives the scale-down scan's measurements.
+func (h *ScaleHandler) SetScanObserver(observer ScanObserver) {
+	h.scanner.observer = observer
+}
+
+func (h *ScaleHandler) calculateScaleDirection(ctx context.Context, cooldownPeriod time.Duration, es *v1alpha1.ElastiService, health *healthMemo) (ScaleDirection, error) {
 	if len(es.Spec.Triggers) == 0 {
 		h.logger.Info("No triggers found, skipping scale to zero", zap.String("namespace", es.Namespace), zap.String("service", es.Spec.Service))
 		return "", fmt.Errorf("no triggers found")
@@ -227,8 +262,7 @@ func (h *ScaleHandler) calculateScaleDirection(ctx context.Context, cooldownPeri
 		}
 		defer scaler.Close(ctx)
 
-		// TODO: Cache the health of the scaler if the server address has already been checked
-		healthy, err := scaler.IsHealthy(ctx)
+		healthy, err := health.isHealthy(ctx, scaler)
 		if err != nil {
 			h.logger.Warn(
 				"failed to check scaler health",

@@ -145,6 +145,16 @@ elastiController:
       # e.g. prometheusTriggerAllowedServerAddresses: prometheus-operated.monitoring.svc.cluster.local:9090
       ##
       prometheusTriggerAllowedServerAddresses:
+      ## elastiController.manager.env.scanConcurrency: how many ElastiServices the scale-down scan evaluates at once (operator default 8)
+      ##
+      scanConcurrency:
+      ## elastiController.manager.env.scanEvaluationTimeout: time limit for evaluating one ElastiService's triggers, e.g. "20s" (operator default 20s).
+      # It bounds the scaler queries only, never the scale action that follows.
+      ##
+      scanEvaluationTimeout:
+      ## elastiController.manager.env.scaleDownConcurrency: how many scale-downs may run at once (operator default 8)
+      ##
+      scaleDownConcurrency:
 
   ## @param elastiController.replicas number of replicas to use for the deployment
   ##

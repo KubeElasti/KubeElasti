@@ -43,6 +43,18 @@ spec:
         - name: PROMETHEUS_TRIGGER_ALLOWED_SERVER_ADDRESSES
           value: {{ . | quote }}
         {{- end }}
+        {{- with .Values.elastiController.manager.env.scanConcurrency }}
+        - name: SCAN_CONCURRENCY
+          value: {{ . | quote }}
+        {{- end }}
+        {{- with .Values.elastiController.manager.env.scanEvaluationTimeout }}
+        - name: SCAN_EVALUATION_TIMEOUT
+          value: {{ . | quote }}
+        {{- end }}
+        {{- with .Values.elastiController.manager.env.scaleDownConcurrency }}
+        - name: SCALE_DOWN_CONCURRENCY
+          value: {{ . | quote }}
+        {{- end }}
         {{- if .Values.elastiController.manager.sentry.enabled }}
         - name: SENTRY_DSN
           valueFrom:

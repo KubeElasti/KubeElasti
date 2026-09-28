@@ -8,6 +8,10 @@ All the unreleased changes are listed under `Unreleased` section. Add your chang
 
 ## Unreleased
 
+### Improvements
+
+* perf: evaluate ElastiServices in parallel (SCAN_CONCURRENCY) with a per-evaluation timeout, dispatch scale actions asynchronously with a scale-down limit, and export scan metrics by `@nuwang` in [#379](https://github.com/KubeElasti/KubeElasti/pull/379)
+
 ## v0.1.31-rc2 (2026-08-06)
 
 ### Improvements

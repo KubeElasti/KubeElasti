@@ -3,9 +3,11 @@ package scalers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 	"time"
 )
@@ -342,6 +344,39 @@ func TestExecutePromQuery(t *testing.T) {
 	}
 }
 
+// Scalers are evaluated concurrently (one per ElastiService trigger), so each
+// query must decode into its own response, never into shared state.
+func TestExecutePromQueryConcurrentCallsIsolated(t *testing.T) {
+	one := plainScaler(promServer(t, 200, okVal("1")).URL)
+	two := plainScaler(promServer(t, 200, okVal("2")).URL)
+
+	var wg sync.WaitGroup
+	errs := make(chan error, 64)
+	for i := 0; i < 64; i++ {
+		s, want := one, 1.0
+		if i%2 == 1 {
+			s, want = two, 2.0
+		}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			got, err := s.executePromQuery(context.Background(), "up")
+			if err != nil {
+				errs <- err
+				return
+			}
+			if got != want {
+				errs <- fmt.Errorf("executePromQuery() = %v, want %v", got, want)
+			}
+		}()
+	}
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		t.Error(err)
+	}
+}
+
 func TestExecutePromQueryRequestErrors(t *testing.T) {
 	t.Run("no address configured", func(t *testing.T) {
 		s := &prometheusScaler{metadata: &prometheusMetadata{}, httpClient: &http.Client{}}
@@ -481,5 +516,60 @@ func TestClose(t *testing.T) {
 	}
 	if err := (&prometheusScaler{}).Close(context.Background()); err != nil {
 		t.Fatalf("unexpected error with nil client: %v", err)
+	}
+}
+
+// HealthKey groups scalers whose IsHealthy runs the same query against the
+// same backend with the same credentials; anything that can change the
+// answer must change the key.
+func TestPrometheusScalerHealthKey(t *testing.T) {
+	t.Setenv("PROMETHEUS_TRIGGER_SERVER_ADDRESS", "http://prom.monitoring:9090")
+	t.Setenv("PROMETHEUS_TRIGGER_AUTHORIZATION_HEADER", "")
+	key := func(t *testing.T, metadata string, cooldown time.Duration) string {
+		t.Helper()
+		s, err := NewPrometheusScaler(json.RawMessage(metadata), cooldown)
+		if err != nil {
+			t.Fatalf("NewPrometheusScaler: %v", err)
+		}
+		return s.(HealthKeyer).HealthKey()
+	}
+	base := key(t, `{"query":"a","threshold":"1"}`, 5*time.Minute)
+
+	same := []struct{ name, metadata string }{
+		{"different trigger query", `{"query":"b","threshold":"2"}`},
+		{"explicit default server", `{"query":"a","serverAddress":"http://prom.monitoring:9090"}`},
+		{"explicit default uptime filter", `{"query":"a","uptimeFilter":"container=\"prometheus\""}`},
+	}
+	for _, tt := range same {
+		if got := key(t, tt.metadata, 5*time.Minute); got != base {
+			t.Errorf("%s: key %q, want the base key %q", tt.name, got, base)
+		}
+	}
+
+	differs := []struct {
+		name     string
+		metadata string
+		cooldown time.Duration
+	}{
+		{"other server", `{"query":"a","serverAddress":"http://other:9090"}`, 5 * time.Minute},
+		{"other uptime filter", `{"query":"a","uptimeFilter":"job=\"prom\""}`, 5 * time.Minute},
+		{"other cooldown (query window)", `{"query":"a"}`, 10 * time.Minute},
+		{"tenant header", `{"query":"a","headers":{"X-Scope-OrgID":"team-a"}}`, 5 * time.Minute},
+	}
+	for _, tt := range differs {
+		if got := key(t, tt.metadata, tt.cooldown); got == base || got == "" {
+			t.Errorf("%s: key %q must be non-empty and differ from the base key", tt.name, got)
+		}
+	}
+}
+
+func TestPrometheusScalerHealthKeyEmptyWithoutServerAddress(t *testing.T) {
+	t.Setenv("PROMETHEUS_TRIGGER_SERVER_ADDRESS", "")
+	s, err := NewPrometheusScaler(json.RawMessage(`{"query":"a"}`), time.Minute)
+	if err != nil {
+		t.Fatalf("NewPrometheusScaler: %v", err)
+	}
+	if key := s.(HealthKeyer).HealthKey(); key != "" {
+		t.Fatalf("HealthKey() = %q, want empty when no server address is configured", key)
 	}
 }

@@ -2,13 +2,16 @@ package scalers
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"math"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"syscall"
@@ -41,7 +44,7 @@ type prometheusMetadata struct {
 	Headers       map[string]string `json:"headers"`
 }
 
-var promQueryResponse struct {
+type prometheusQueryResponse struct {
 	Status string `json:"status"`
 	Data   struct {
 		ResultType string `json:"resultType"`
@@ -208,6 +211,7 @@ func (s *prometheusScaler) executePromQuery(ctx context.Context, query string) (
 		return -1, fmt.Errorf("unexpected HTTP status: %s", resp.Status)
 	}
 
+	var promQueryResponse prometheusQueryResponse
 	if err := json.NewDecoder(resp.Body).Decode(&promQueryResponse); err != nil {
 		return -1, fmt.Errorf("failed to decode Prometheus response: %w", err)
 	}
@@ -314,6 +318,32 @@ func (s *prometheusScaler) Close(_ context.Context) error {
 		s.httpClient.CloseIdleConnections()
 	}
 	return nil
+}
+
+// HealthKey identifies the check IsHealthy runs: the effective server
+// address, uptime filter, query window (the cooldown) and request headers.
+// Headers are hashed so credentials never sit in the key. Empty when no
+// server address is configured; IsHealthy then fails on its own.
+func (s *prometheusScaler) HealthKey() string {
+	serverAddress, err := s.getServerAddress()
+	if err != nil {
+		return ""
+	}
+	uptimeFilter := s.metadata.UptimeFilter
+	if uptimeFilter == "" {
+		uptimeFilter = defaultUptimeFilter
+	}
+
+	headers := make(map[string]string, len(s.defaultHeaders)+len(s.metadata.Headers))
+	maps.Copy(headers, s.defaultHeaders)
+	maps.Copy(headers, s.metadata.Headers)
+	headerHash := sha256.New()
+	for _, name := range slices.Sorted(maps.Keys(headers)) {
+		fmt.Fprintf(headerHash, "%s\x00%s\x00", name, headers[name])
+	}
+
+	return fmt.Sprintf("%s\x00%s\x00%d\x00%x", serverAddress, uptimeFilter,
+		int(math.Ceil(s.cooldownPeriod.Seconds())), headerHash.Sum(nil))
 }
 
 func (s *prometheusScaler) IsHealthy(ctx context.Context) (bool, error) {
