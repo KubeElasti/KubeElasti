@@ -39,17 +39,23 @@ func NewHostManager(logger *zap.Logger, trafficReEnableDuration, trafficDisableG
 	}
 }
 
+// validLabel replaces invalid UTF-8 sequences, which come straight from the request and make
+// the Prometheus client panic when used as a label value.
+func validLabel(value string) string {
+	return strings.ToValidUTF8(value, "�")
+}
+
 // GetHost returns the host details for incoming and outgoing requests
 func (hm *HostManager) GetHost(req *http.Request) (*messages.Host, error) {
 	incomingHost := req.Host
-	if values, ok := req.Header[hm.headerForHost]; ok {
+	if values, ok := req.Header[hm.headerForHost]; ok && len(values) > 0 {
 		incomingHost = values[0]
 	}
 	host, ok := hm.hosts.Load(incomingHost)
 	if !ok {
 		sourceService, namespace, err := hm.extractNamespaceAndService(incomingHost)
 		if err != nil {
-			prom.HostExtractionCounter.WithLabelValues("error", incomingHost, hm.headerForHost, err.Error()).Inc()
+			prom.HostExtractionCounter.WithLabelValues("error", validLabel(incomingHost), hm.headerForHost, validLabel(err.Error())).Inc()
 			return &messages.Host{}, err
 		}
 		targetService := utils.GetPrivateServiceName(sourceService)
@@ -68,10 +74,10 @@ func (hm *HostManager) GetHost(req *http.Request) (*messages.Host, error) {
 			TrafficAllowed: true,
 		}
 		hm.hosts.Store(incomingHost, newHost)
-		prom.HostExtractionCounter.WithLabelValues("cache-miss", incomingHost, hm.headerForHost, "").Inc()
+		prom.HostExtractionCounter.WithLabelValues("cache-miss", validLabel(incomingHost), hm.headerForHost, "").Inc()
 		return newHost, nil
 	}
-	prom.HostExtractionCounter.WithLabelValues("cache-hit", incomingHost, hm.headerForHost, "").Inc()
+	prom.HostExtractionCounter.WithLabelValues("cache-hit", validLabel(incomingHost), hm.headerForHost, "").Inc()
 	return host.(*messages.Host), nil
 }
 
@@ -86,7 +92,7 @@ func (hm *HostManager) disableTrafficForHost(hostName string) {
 		go time.AfterFunc(hm.trafficReEnableDuration, func() {
 			hm.enableTrafficForHost(hostName)
 		})
-		prom.TrafficSwitchCounter.WithLabelValues(hostName, "disabled").Inc()
+		prom.TrafficSwitchCounter.WithLabelValues(validLabel(hostName), "disabled").Inc()
 	}
 }
 
@@ -125,7 +131,7 @@ func (hm *HostManager) enableTrafficForHost(hostName string) {
 		host.(*messages.Host).TrafficAllowed = true
 		hm.hosts.Store(hostName, host)
 		hm.logger.Debug("Enabled traffic for host", zap.Any("hostName", logger.MaskMiddle(hostName, 4, 4)))
-		prom.TrafficSwitchCounter.WithLabelValues(hostName, "enabled").Inc()
+		prom.TrafficSwitchCounter.WithLabelValues(validLabel(hostName), "enabled").Inc()
 	}
 }
 

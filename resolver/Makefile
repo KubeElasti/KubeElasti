@@ -26,6 +26,13 @@ vet: ## Run go vet against code.
 test: fmt vet ## Run tests.
 	go test ./... -race -coverprofile=cover.out -covermode=atomic
 
+FUZZ_TIME ?= 30s
+
+.PHONY: fuzz
+fuzz: ## Run the fuzz targets of the request path for FUZZ_TIME each.
+	go test ./internal/hostmanager/ -run '^$$' -fuzz '^FuzzGetHost$$' -fuzztime $(FUZZ_TIME)
+	go test ./internal/hostmanager/ -run '^$$' -fuzz '^FuzzExtractNamespaceAndService$$' -fuzztime $(FUZZ_TIME)
+
 .PHONY: run
 run: ## Run resolver locally
 	go run ./cmd/
